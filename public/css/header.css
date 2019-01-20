@@ -1,0 +1,16 @@
+header {
+    background-color: #155592;
+    height: 70px
+}
+.btn {
+    background-color: #27c2a5;
+    color: #fff;
+    font-size: 15px;
+    padding: 7px 14px;
+    border-radius: 5px;
+    border-bottom: 4px solid #219882;
+}
+.btn:hover, .btn:focus {
+    background-color: #25a890;
+    border-bottom: 4px solid #25a890;
+}
