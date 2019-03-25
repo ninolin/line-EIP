@@ -8,7 +8,7 @@ class Authenticate
 {
     const SESSION = 'code';//存放在Session的Key值
     const REDIRECT_TO = 'whmanage';//轉跳的主頁
-    const EXPIRED_MINS = '+ 1min'; //輸入Session過期時間
+    const EXPIRED_MINS = '+ 15min'; //輸入Session過期時間
 
     public function handle($request, Closure $next) {
         $timestamp = session(self::SESSION); //取得在session中的時間

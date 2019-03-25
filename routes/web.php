@@ -20,7 +20,7 @@ Route::get('/', function () {
 })->name('login');
 
 Route::middleware('auth')->get('/whmanage', 'View\whmanage@index')->name('whmanage');
-
+Route::middleware('auth')->get('/userlist', 'View\userlist@index')->name('userlist');
 Route::middleware('auth')->get('/formmanage', function () {
     return view('contents.formmanage');
 })->name('formmanage');

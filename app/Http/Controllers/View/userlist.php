@@ -4,8 +4,9 @@ namespace App\Http\Controllers\View;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Input;
 use DB;
-class whmanage extends Controller
+class userlist extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -14,9 +15,17 @@ class whmanage extends Controller
      */
     public function index()
     {
-        $users = DB::connection('mysql_erptools')->select('select * from user', []);
+        $page = Input::get('page', 1);
+        $users = DB::connection('mysql_erptools')->select('select * from user limit ?,10', [($page-1)*10]);
+        $total_users = DB::connection('mysql_erptools')->select('select * from user', []);
+        $total_pages = ceil(count($total_users)/10);
+        debug($page);
         debug($users);
-        return view('contents.whmanage', ['users' => $users]);
+        return view('contents.userlist', [
+            'users' => $users, 
+            'page' => $page,
+            'total_pages' => $total_pages
+        ]);
     }
 
     /**

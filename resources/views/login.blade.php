@@ -22,7 +22,7 @@
                         <div class="form-group">    
                             <input type="password" name="password" class="form-control" placeholder="Enter Password">
                         </div>
-                        <button type="submit" class="btn"><i class="fas fa-sign-in-alt"></i>Login</button>
+                        <button type="submit" class="btn-c"><i class="fas fa-sign-in-alt"></i>Login</button>
                     </form>
                 </div>
             </div>

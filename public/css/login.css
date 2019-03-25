@@ -38,15 +38,18 @@ button {
     width: 40%;
     margin: 5px 0 25px;
 }
-.btn {
+.btn-c {
     background-color: #27c2a5;
     color: #fff;
     font-size: 19px;
     padding: 7px 14px;
     border-radius: 5px;
     border-bottom: 4px solid #219882;
+    border-top: 0px;
+    border-right: 0px;
+    border-left: 0px;
 }
-.btn:hover, .btn:focus {
+.btn-c:hover, .btn-c:focus {
     background-color: #25a890;
     border-bottom: 4px solid #25a890;
 }

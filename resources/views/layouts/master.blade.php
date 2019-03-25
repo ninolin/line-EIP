@@ -8,7 +8,7 @@
         <link href="https://fonts.googleapis.com/css?family=Nunito:200,600" rel="stylesheet" type="text/css">
         <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/solid.css" integrity="sha384-+0VIRx+yz1WBcCTXBkVQYIBVNEFH1eP6Zknm16roZCyeNg2maWEpk/l/KsyFKs7G" crossorigin="anonymous">
         <link href="{{ asset('js/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
-        
+        <link rel="stylesheet" href="{{ asset('css/public.css') }}">
     </head>
     <body>
         @include('layouts.header')
