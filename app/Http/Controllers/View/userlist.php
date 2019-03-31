@@ -16,8 +16,8 @@ class userlist extends Controller
     public function index()
     {
         $page = Input::get('page', 1);
-        $users = DB::connection('mysql_erptools')->select('select * from user limit ?,10', [($page-1)*10]);
-        $total_users = DB::connection('mysql_erptools')->select('select * from user', []);
+        $users = DB::select('select * from user limit ?,10', [($page-1)*10]);
+        $total_users = DB::select('select * from user', []);
         $total_pages = ceil(count($total_users)/10);
         debug($page);
         debug($users);

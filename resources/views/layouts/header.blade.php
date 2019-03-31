@@ -5,12 +5,13 @@
         <ul class="navbar-nav bd-navbar-nav flex-row">
             <li class="nav-item px-3">
                 <a class="angle-down nav-link @if (Request::is('whmanage')) active @endif" href="{{ route('whmanage') }}">工時管理</a>
-                    <ul>
-                        <div>
-                            <li><a class="@if (Request::is('userlist')) active @endif" href="{{ route('userlist') }}">員工清單</a></li>
-                            <li><a class="@if (Request::is('formmanage')) active @endif" href="{{ route('formmanage') }}">查看最近請假</a></li>
-                        </div>
-                    </ul>
+                <ul>
+                    <div>
+                        <li><a class="@if (Request::is('userlist')) active @endif" href="{{ route('userlist') }}">員工清單</a></li>
+                        <li><a class="@if (Request::is('titlelist')) active @endif" href="{{ route('titlelist') }}">職等設定</a></li>
+                        <li><a class="@if (Request::is('formmanage')) active @endif" href="{{ route('formmanage') }}">查看最近請假</a></li>
+                    </div>
+                </ul>
             </li>
             <li class="nav-item px-3">
                 <a class="nav-link @if (Request::is('formmanage')) active @endif" href="{{ route('formmanage') }}">表單管理</a>

@@ -15,5 +15,6 @@
         @yield('content')
         <script src="{{ asset('js/jquery/jquery.min.js') }}"></script>
         <script src="{{ asset('js/bootstrap/js/bootstrap.min.js') }}"></script>
+        <script src="{{ asset('js/restcall.js') }}"></script>
     </body>
 </html>

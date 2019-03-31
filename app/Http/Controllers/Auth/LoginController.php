@@ -20,8 +20,8 @@ class LoginController extends Controller
         $password = $request->input('password');
         debug($account);
         debug(md5($password));
-        //$users = DB::select('select * from users where name = ? and password = ?', [$account, $password]);
-        $users = DB::connection('mysql_erptools')->select('select * from user where email = ? and password = ?', [$account, md5($password)]);
+        $users = DB::select('select * from user where email = ? and password = ?', [$account, md5($password)]);
+        // $users = DB::connection('mysql_erptools')->select('select * from user where email = ? and password = ?', [$account, md5($password)]);
         print_r($users);
 
         if(sizeof($users) == 1 ) {

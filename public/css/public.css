@@ -17,3 +17,7 @@
     background-color: #25a890;
     border-bottom: 4px solid #25a890;
 }
+.table td {
+    padding-top: .4rem !important;
+    padding-bottom: .4rem !important;
+}

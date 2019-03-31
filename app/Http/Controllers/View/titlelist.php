@@ -4,8 +4,9 @@ namespace App\Http\Controllers\View;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Input;
 use DB;
-class whmanage extends Controller
+class titlelist extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -14,9 +15,15 @@ class whmanage extends Controller
      */
     public function index()
     {
-        $users = DB::select('select * from user', []);
-        debug($users);
-        return view('contents.whmanage', ['users' => $users]);
+        $page = Input::get('page', 1);
+        $titles = DB::select('select * from eip_title limit ?,10', [($page-1)*10]);
+        $total_titles = DB::select('select * from eip_title', []);
+        $total_pages = ceil(count($total_titles)/10);
+        return view('contents.titlelist', [
+            'titles' => $titles, 
+            'page' => $page,
+            'total_pages' => $total_pages
+        ]);
     }
 
     /**
@@ -26,7 +33,24 @@ class whmanage extends Controller
      */
     public function create()
     {
-        //
+        $name = Input::get('name', '');
+        $titles = DB::select('select name from eip_title where name =?', [$name]);
+        if(count($titles) > 0) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'name exist'
+            ]);
+        }
+        if(DB::insert("insert into eip_title (name) values (?)", [$name]) == 1) {
+            return response()->json([
+                'status' => 'successful'
+            ]);
+        } else {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'insert db error'
+            ]);
+        }
     }
 
     /**

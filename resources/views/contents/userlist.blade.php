@@ -3,7 +3,7 @@
 @section('content')
 <div class="container-fluid pt-lg-4">
   <form>
-    <div class="form-group row">
+    <div class="row">
       <div class="col-sm-4 form-row">
         <div class="col-auto">
           <input type="text" class="form-control" placeholder="帳號或Email">

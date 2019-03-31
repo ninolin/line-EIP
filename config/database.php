@@ -47,23 +47,7 @@ return [
             'prefix_indexes' => true,
             'strict' => true,
             'engine' => null,
-        ],
-
-        'mysql_erptools' => [
-            'driver' => 'mysql',
-            'host' => env('DB_HOST_ERPTOOLS'),
-            'port' => env('DB_PORT_ERPTOOLS'),
-            'database' => env('DB_DATABASE_ERPTOOLS'),
-            'username' => env('DB_USERNAME_ERPTOOLS'),
-            'password' => env('DB_PASSWORD_ERPTOOLS'),
-            'unix_socket' => env('DB_SOCKET', ''),
-            'charset' => 'utf8',
-            'collation' => 'utf8_unicode_ci',
-            'prefix' => '',
-            'prefix_indexes' => true,
-            'strict' => true,
-            'engine' => null,
-        ],
+        ]
 
     ],
 
