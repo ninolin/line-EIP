@@ -9,12 +9,14 @@
         <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/solid.css" integrity="sha384-+0VIRx+yz1WBcCTXBkVQYIBVNEFH1eP6Zknm16roZCyeNg2maWEpk/l/KsyFKs7G" crossorigin="anonymous">
         <link href="{{ asset('js/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
         <link rel="stylesheet" href="{{ asset('css/public.css') }}">
+        <link rel="stylesheet" href="{{ asset('js/select2/select2.min.css') }}">
     </head>
     <body>
         @include('layouts.header')
         @yield('content')
         <script src="{{ asset('js/jquery/jquery.min.js') }}"></script>
         <script src="{{ asset('js/bootstrap/js/bootstrap.min.js') }}"></script>
+        <script src="{{ asset('js/select2/select2.min.js') }}"></script>
         <script src="{{ asset('js/restcall.js') }}"></script>
     </body>
 </html>

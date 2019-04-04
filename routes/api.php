@@ -16,5 +16,10 @@ use Illuminate\Http\Request;
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
-Route::post('titlelist', 'View\titlelist@create');
+Route::get('userlist', 'View\userlist@index');
+Route::put('userlist/{id}', 'View\userlist@update');
+Route::get('titlelist', 'View\titlelist@index');
+Route::post('titlelist', 'View\titlelist@store');
+Route::put('titlelist/{id}', 'View\titlelist@update');
+Route::delete('titlelist/{id}', 'View\titlelist@destroy');
 Route::get('test', 'Line\Test@show');
