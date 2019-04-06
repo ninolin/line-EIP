@@ -47,8 +47,7 @@ class Test extends Controller
      */
     public function show()
     {
-        $results = DB::select('select * from message');
-        print_r($results);
+        echo "aaa";
     }
 
     /**

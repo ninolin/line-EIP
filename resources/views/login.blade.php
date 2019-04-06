@@ -14,7 +14,7 @@
         <div class="modal-dialog text-center">
             <div class="main-section">
                 <div class="modal-content">
-                    <form class="col-12" method="POST" action="{{ route('ccc') }}">
+                    <form class="col-12" method="POST" action="{{ route('doLogin') }}">
                         {{ csrf_field() }}
                         <div class="form-group">    
                             <input type="text" name="account" class="form-control" placeholder="Enter Username">
