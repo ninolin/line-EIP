@@ -13,7 +13,7 @@
 
 Route::get('/login', function () {return view('login');})->name('login');
 Route::get('/', function () {return view('login');})->name('login');
-Route::get('/applyLeave', function () {return view('line\applyLeave');})->name('applyLeave');
+Route::get('/applyLeave', function () {return view('line/applyLeave');})->name('applyLeave');
 
 Route::middleware('auth')->get('/whmanage', 'View\whmanage@index')->name('whmanage');
 Route::middleware('auth')->get('/userlist', 'View\userlist@create')->name('userlist');
