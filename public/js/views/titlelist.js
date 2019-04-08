@@ -1,13 +1,10 @@
 const showTitleModal = (type, title_id, title_name) => {
-    console.log(type);
     if(type == 'update') {
-        console.log('aaa');
         $('#titleModal').modal('toggle');
         $("#titleModal").find(".modal-title").html("修改職等");
         $("#titleModal").find(".title-name").val(title_name);
         $("#titleModal").find(".todo").attr("onclick", "update_title('"+title_id+"')").html("修改");
     } else if(type == 'add') {
-        console.log('bbb');
         $('#titleModal').modal('toggle');
         $("#titleModal").find(".modal-title").html("新增職等");
         $("#titleModal").find(".title-name").val('');

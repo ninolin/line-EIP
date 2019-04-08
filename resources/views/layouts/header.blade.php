@@ -9,6 +9,7 @@
                     <div>
                         <li><a class="@if (Request::is('userlist')) active @endif" href="{{ route('userlist') }}">員工清單</a></li>
                         <li><a class="@if (Request::is('titlelist')) active @endif" href="{{ route('titlelist') }}">職等設定</a></li>
+                        <li><a class="@if (Request::is('leavetypelist')) active @endif" href="{{ route('leavetypelist') }}">假別設定</a></li>
                         <li><a class="@if (Request::is('formmanage')) active @endif" href="{{ route('formmanage') }}">查看最近請假</a></li>
                     </div>
                 </ul>

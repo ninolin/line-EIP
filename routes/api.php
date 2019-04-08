@@ -14,10 +14,13 @@ use Illuminate\Http\Request;
 */
 
 //Route::middleware('auth:api')->get('/user', function (Request $request) {return $request->user();});
-Route::middleware('auth:api')->get('userlist', 'View\userlist@index');
-Route::middleware('auth:api')->put('userlist/{id}', 'View\userlist@update');
-Route::middleware('auth:api')->get('titlelist', 'View\titlelist@index');
-Route::middleware('auth:api')->post('titlelist', 'View\titlelist@store');
-Route::middleware('auth:api')->put('titlelist/{id}', 'View\titlelist@update');
-Route::middleware('auth:api')->delete('titlelist/{id}', 'View\titlelist@destroy');
+Route::get('userlist', 'View\userlist@index');
+Route::put('userlist/{id}', 'View\userlist@update');
+Route::get('titlelist', 'View\titlelist@index');
+Route::post('titlelist', 'View\titlelist@store');
+Route::put('titlelist/{id}', 'View\titlelist@update');
+Route::delete('titlelist/{id}', 'View\titlelist@destroy');
+Route::post('leavetypelist', 'View\leavetypelist@store');
+Route::put('leavetypelist/{id}', 'View\leavetypelist@update');
+Route::delete('leavetypelist/{id}', 'View\leavetypelist@destroy');
 Route::post('receive', 'Line\Receive@index');
