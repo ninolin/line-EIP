@@ -17,44 +17,81 @@
                 <div>
                     <form class="col-12" method="POST" action="{{ route('doLogin') }}">
                         {{ csrf_field() }}
-                        <div class="form-group form-inline">    
-                            <label class="col-3">申請人</label>
-                            <div class="col-9">
-                                Tim
-                            </div>
-                        </div>
+                        <div id="useridfield"></div>
                         <div class="form-group form-inline">    
                             <label class="col-3">假別</label>
                             <select class="form-control col-9">
-                                <option>休假</option>
-                                <option>病假</option>
-                                <option>事假</option>
+                                @foreach($leavetypes as $type)
+                                    <option>{{$type->name}}</option>
+                                @endforeach
                             </select>
                         </div>
                         <div class="form-group form-inline">    
                             <label class="col-3">代理人</label>
                             <select class="form-control col-9">
-                                <option>休假</option>
-                                <option>病假</option>
-                                <option>事假</option>
+                                @foreach($users as $user)
+                                    <option>{{$user->cname}}</option>
+                                @endforeach
                             </select>
                         </div>
                         <div class="form-group form-inline">  
                             <label class="col-3">起日</label>  
                             <input class="col-6" id="startDate" type="date"/>
                             <select class="form-control col-3" id="startTime">
-                                <option>休假</option>
-                                <option>病假</option>
-                                <option>事假</option>
+                                <option>00:00</option>
+                                <option>01:00</option>
+                                <option>02:00</option>
+                                <option>03:00</option>
+                                <option>04:00</option>
+                                <option>05:00</option>
+                                <option>06:00</option>
+                                <option>07:00</option>
+                                <option>08:00</option>
+                                <option>09:00</option>
+                                <option>10:00</option>
+                                <option>11:00</option>
+                                <option>12:00</option>
+                                <option>13:00</option>
+                                <option>14:00</option>
+                                <option>15:00</option>
+                                <option>16:00</option>
+                                <option>17:00</option>
+                                <option>18:00</option>
+                                <option>19:00</option>
+                                <option>20:00</option>
+                                <option>21:00</option>
+                                <option>22:00</option>
+                                <option>23:00</option>
                             </select>
                         </div>
                         <div class="form-group form-inline">  
                             <label class="col-3">迄日</label>  
                             <input class="col-6" id="endDate" type="date"/>
                             <select class="form-control col-3" id="endTime">
-                                <option>休假</option>
-                                <option>病假</option>
-                                <option>事假</option>
+                            <option>00:00</option>
+                                <option>01:00</option>
+                                <option>02:00</option>
+                                <option>03:00</option>
+                                <option>04:00</option>
+                                <option>05:00</option>
+                                <option>06:00</option>
+                                <option>07:00</option>
+                                <option>08:00</option>
+                                <option>09:00</option>
+                                <option>10:00</option>
+                                <option>11:00</option>
+                                <option>12:00</option>
+                                <option>13:00</option>
+                                <option>14:00</option>
+                                <option>15:00</option>
+                                <option>16:00</option>
+                                <option>17:00</option>
+                                <option>18:00</option>
+                                <option>19:00</option>
+                                <option>20:00</option>
+                                <option>21:00</option>
+                                <option>22:00</option>
+                                <option>23:00</option>
                             </select>
                         </div>
                         <div class="form-group form-inline">
@@ -69,6 +106,7 @@
         <script src="{{ asset('js/jquery/jquery.min.js') }}"></script>
         <script src="{{ asset('js/bootstrap/js/bootstrap.min.js') }}"></script>
         <script src="{{ asset('js/gijgo/gijgo.js') }}"></script>
-        <script src="{{ asset('js/line/applyLeave.js') }}"></script>
+        <script src="{{ asset('js/line/applyleave.js') }}"></script>
+        <script src="https://d.line-scdn.net/liff/1.0/sdk.js"></script>
     </body>
 </html>
