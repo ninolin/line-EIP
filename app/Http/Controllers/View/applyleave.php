@@ -57,6 +57,26 @@ class applyleave extends Controller
         $sql .= "value ";
         $sql .= "(?, ?, ?, ?, ?, ?, ?, ?) ";
         if(DB::insert($sql, [$line_id, $leave_agent_user_no, $leave_type_id, $start_date, $start_time, $end_date, $end_time, $comment]) == 1) {
+            $response = array (
+                "to" => $line_id,
+                "messages" => array (
+                    array (
+                        "type" => "text",
+                        "text" => "Hello. You say". $start_date
+                    )
+                )
+            );
+
+            $header[] = "Content-Type: application/json";
+            $header[] = "Authorization: Bearer g0E9K4fU54BZVITKc1w7C343NA8yb15YD76K+u472xg8ZCdFFeNGTk16hi97VjNxHQTBl3tRlMxEsoZ8x/nQZkvGY7EIDpWpHML6VB4zLqCdrdPUdlU6VBn6Lpzfjsi1WqRP+YQOhZlq87olqbR25VGUYhWQfeY8sLGRXgo3xvw=";
+            $ch = curl_init("https://api.line.me/v2/bot/message/push");
+            curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
+            curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($response));                                                                  
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);                                                                      
+            curl_setopt($ch, CURLOPT_HTTPHEADER, $header);                                                                                                   
+            $result = curl_exec($ch);
+            curl_close($ch);
+
             return response()->json([
                 'status' => 'successful'
             ]);
