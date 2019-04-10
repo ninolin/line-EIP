@@ -5,15 +5,17 @@ window.onload = function (e) {
 };
 
 function initializeApp(data) {
-    $("#userdata").html("userId", data.context.userId);
-    //document.getElementById('useridfield').textContent = data.context.userId;
+    //$("#userdata").html("aaa");
+    //$("#userdata").html("userId", data.context.userId);
+    document.getElementById('useridfield').textContent = data.context.userId;
+    //document.getElementById('useridfield').textContent = "aaa";
 }
 
 const apply_leave = () => {
     promise_call({
         url: "./api/applyleave", 
         data: {
-            "userId": $("#userdata").html(),
+            "userId": document.getElementById('useridfield').textContent,
             "leaveType": $("#leaveType").val(),
             "leaveAgent": $("#leaveAgent").val(),
             "startDate": $("#startDate").val(),
