@@ -5,25 +5,29 @@ window.onload = function (e) {
 };
 
 function initializeApp(data) {
-    //$("#userdata").html("aaa");
-    //$("#userdata").html("userId", data.context.userId);
     document.getElementById('useridfield').textContent = data.context.userId;
-    //document.getElementById('useridfield').textContent = "aaa";
 }
 
 const apply_leave = () => {
+    const post_data = {
+        "userId": document.getElementById('useridfield').textContent,
+        "leaveType": $("#leaveType").val(),
+        "leaveAgent": $("#leaveAgent").val(),
+        "startDate": $("#startDate").val(),
+        "startTime": $("#startTime").val(),
+        "endDate": $("#endDate").val(),
+        "endTime": $("#endTime").val()
+    }
+    for (k in post_data) {
+        if(post_data[k] == "") {
+            alert("資料不正確");
+            return;
+        }
+    }
+    post_data.comment = $("#comment").val();
     promise_call({
         url: "./api/applyleave", 
-        data: {
-            "userId": document.getElementById('useridfield').textContent,
-            "leaveType": $("#leaveType").val(),
-            "leaveAgent": $("#leaveAgent").val(),
-            "startDate": $("#startDate").val(),
-            "startTime": $("#startTime").val(),
-            "endDate": $("#endDate").val(),
-            "endTime": $("#endTime").val(),
-            "comment": $("#comment").val(),
-        }, 
+        data: post_data, 
         method: "post"
     })
     .then(v => {

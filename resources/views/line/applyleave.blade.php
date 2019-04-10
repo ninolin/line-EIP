@@ -17,7 +17,7 @@
                 <div>
                     <form class="col-12" method="POST" action="{{ route('doLogin') }}">
                         {{ csrf_field() }}
-                        <div id="useridfield"></div>
+                        <div id="useridfield" style="display:none"></div>
                         <div class="form-group form-inline">    
                             <label class="col-3">假別</label>
                             <select id="leaveType" class="form-control col-9">
