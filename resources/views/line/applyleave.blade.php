@@ -105,8 +105,8 @@
         </div>
         <script src="{{ asset('js/jquery/jquery.min.js') }}"></script>
         <script src="{{ asset('js/bootstrap/js/bootstrap.min.js') }}"></script>
-        <script src="{{ asset('js/gijgo/gijgo.js') }}"></script>
         <script src="{{ asset('js/line/applyleave.js') }}"></script>
+        <script src="{{ asset('js/restcall.js') }}"></script>
         <script src="https://d.line-scdn.net/liff/1.0/sdk.js"></script>
     </body>
 </html>
