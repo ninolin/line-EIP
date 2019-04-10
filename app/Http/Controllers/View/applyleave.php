@@ -51,7 +51,7 @@ class applyleave extends Controller
         $end_date = $request->get('endDate');
         $end_time = $request->get('endTime');
         $comment = $request->get('comment');
-        debug($line_id);
+        //debug($line_id);
         $sql = "insert into eip_leave_apply ";
         $sql .= "(line_id, leave_agent_user_no, leave_type_id, start_date, start_time, end_date, end_time, comment) ";
         $sql .= "value ";
@@ -62,11 +62,12 @@ class applyleave extends Controller
                 "messages" => array (
                     array (
                         "type" => "text",
-                        "text" => "Hello. You say". $start_date
+                        "text" => "成功送出假單/n假別:". $leave_type_id. "/n起:". $start_date .$start_time
                     )
                 )
             );
-            debug($response);
+            //debug($response);
+
             $header[] = "Content-Type: application/json";
             $header[] = "Authorization: Bearer g0E9K4fU54BZVITKc1w7C343NA8yb15YD76K+u472xg8ZCdFFeNGTk16hi97VjNxHQTBl3tRlMxEsoZ8x/nQZkvGY7EIDpWpHML6VB4zLqCdrdPUdlU6VBn6Lpzfjsi1WqRP+YQOhZlq87olqbR25VGUYhWQfeY8sLGRXgo3xvw=";
             $ch = curl_init("https://api.line.me/v2/bot/message/push");
