@@ -63,17 +63,17 @@ class applyleave extends Controller
                 $leavename = $v->name;
             }
             debug($leavename);
-            // $users = DB::select('select cname from user where NO =?', [$leave_agent_user_no]);
-            // $cname = "";
-            // foreach ($leavetypes as $v) {
-            //     $cname = $v->cname;
-            // }
+            $users = DB::select('select cname from user where NO =?', [$leave_agent_user_no]);
+            $cname = "";
+            foreach ($users as $v) {
+                $cname = $v->cname;
+            }
             $response = array (
                 "to" => $line_id,
                 "messages" => array (
                     array (
                         "type" => "text",
-                        "text" => "成功送出假單假別:". $leavename. "起:". $start_date .$start_time
+                        "text" => "成功送出假單 假別:". $leavename. " 代理人: ".$cname." 起:". $start_date .$start_time. " 迄:". $end_date .$end_time
                     )
                 )
             );
