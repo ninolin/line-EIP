@@ -51,7 +51,7 @@ class applyleave extends Controller
         $end_date = $request->get('endDate');
         $end_time = $request->get('endTime');
         $comment = $request->get('comment');
-
+        debug($line_id);
         $sql = "insert into eip_leave_apply ";
         $sql .= "(line_id, leave_agent_user_no, leave_type_id, start_date, start_time, end_date, end_time, comment) ";
         $sql .= "value ";

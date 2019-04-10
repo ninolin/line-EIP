@@ -22,7 +22,7 @@
                             <label class="col-3">假別</label>
                             <select id="leaveType" class="form-control col-9">
                                 @foreach($leavetypes as $type)
-                                    <option>{{$type->name}}</option>
+                                    <option value="{{$type->id}}">{{$type->name}}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -30,7 +30,7 @@
                             <label class="col-3">代理人</label>
                             <select id="leaveAgent" class="form-control col-9">
                                 @foreach($users as $user)
-                                    <option>{{$user->cname}}</option>
+                                    <option value="{{$user->NO}}">{{$user->cname}}</option>
                                 @endforeach
                             </select>
                         </div>
