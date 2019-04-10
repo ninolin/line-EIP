@@ -17,10 +17,10 @@
                 <div>
                     <form class="col-12" method="POST" action="{{ route('doLogin') }}">
                         {{ csrf_field() }}
-                        <div id="useridfield"></div>
+                        <div id="userdata"></div>
                         <div class="form-group form-inline">    
                             <label class="col-3">假別</label>
-                            <select class="form-control col-9">
+                            <select id="leaveType" class="form-control col-9">
                                 @foreach($leavetypes as $type)
                                     <option>{{$type->name}}</option>
                                 @endforeach
@@ -28,7 +28,7 @@
                         </div>
                         <div class="form-group form-inline">    
                             <label class="col-3">代理人</label>
-                            <select class="form-control col-9">
+                            <select id="leaveAgent" class="form-control col-9">
                                 @foreach($users as $user)
                                     <option>{{$user->cname}}</option>
                                 @endforeach
@@ -68,7 +68,7 @@
                             <label class="col-3">迄日</label>  
                             <input class="col-6" id="endDate" type="date"/>
                             <select class="form-control col-3" id="endTime">
-                            <option>00:00</option>
+                                <option>00:00</option>
                                 <option>01:00</option>
                                 <option>02:00</option>
                                 <option>03:00</option>
@@ -98,7 +98,7 @@
                             <label class="col-3">備註</label>  
                             <textarea class=" col-9 form-control" rows="3" id="comment"></textarea>
                         </div>
-                        <button type="submit" class="btn-c"><i class="fas fa-sign-in-alt"></i>申請</button>
+                        <button type="button" class="btn-c" onclick="apply_leave()"><i class="fas fa-sign-in-alt"></i>申請</button>
                     </form>
                 </div>
             </div>

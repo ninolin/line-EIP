@@ -43,7 +43,29 @@ class applyleave extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $line_id = $request->get('userId');
+        $leave_agent_user_no = $request->get('leaveAgent');
+        $leave_type_id = $request->get('leaveType');
+        $start_date = $request->get('startDate');
+        $start_time = $request->get('startTime');
+        $end_date = $request->get('endDate');
+        $end_time = $request->get('endTime');
+        $comment = $request->get('comment');
+
+        $sql = "insert into eip_leave_apply ";
+        $sql .= "(line_id, leave_agent_user_no, leave_type_id, start_date, start_time, end_date, end_time, comment) ";
+        $sql .= "value ";
+        $sql .= "(?, ?, ?, ?, ?, ?, ?, ?) ";
+        if(DB::insert($sql, [$line_id, $leave_agent_user_no, $leave_type_id, $start_date, $start_time, $end_date, $end_time, $comment]) == 1) {
+            return response()->json([
+                'status' => 'successful'
+            ]);
+        } else {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'insert error'
+            ]);
+        }
     }
 
     /**
