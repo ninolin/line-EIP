@@ -73,7 +73,7 @@ class applyleave extends Controller
                 "messages" => array (
                     array (
                         "type" => "text",
-                        "text" => "成功送出假單 假別:". $leavename. " 代理人: ".$cname." 起:". $start_date .$start_time. " 迄:". $end_date .$end_time
+                        "text" => "成功送出假單 假別:". $leavename. " 代理人: ".$cname." 起:". $start_date ." ".$start_time. " 迄:". $end_date ." ".$end_time. " 備註:". $comment
                     )
                 )
             );
