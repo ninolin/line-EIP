@@ -57,22 +57,22 @@ class applyleave extends Controller
         $sql .= "value ";
         $sql .= "(?, ?, ?, ?, ?, ?, ?, ?) ";
         if(DB::insert($sql, [$line_id, $leave_agent_user_no, $leave_type_id, $start_date, $start_time, $end_date, $end_time, $comment]) == 1) {
-            $leavetypes = DB::select('select name from eip_leave_type where id = ?', [$leave_type_id]);
-            $leavename = "";
-            foreach ($leavetypes as $v) {
-                $leavename = $v->name;
-            }
-            $users = DB::select('select cname from user where NO =?', [$leave_agent_user_no]);
-            $cname = "";
-            foreach ($leavetypes as $v) {
-                $cname = $v->cname;
-            }
+            // $leavetypes = DB::select('select name from eip_leave_type where id = ?', [$leave_type_id]);
+            // $leavename = "";
+            // foreach ($leavetypes as $v) {
+            //     $leavename = $v->name;
+            // }
+            // $users = DB::select('select cname from user where NO =?', [$leave_agent_user_no]);
+            // $cname = "";
+            // foreach ($leavetypes as $v) {
+            //     $cname = $v->cname;
+            // }
             $response = array (
                 "to" => $line_id,
                 "messages" => array (
                     array (
                         "type" => "text",
-                        "text" => "成功送出假單%0D%0A假別:". $leavename. "%0D%0A起:". $start_date .$start_time
+                        "text" => "成功送出假單%0D%0A假別:". $leave_type_id. "%0D%0A起:". $start_date .$start_time
                     )
                 )
             );
