@@ -5,7 +5,7 @@ window.onload = function (e) {
 };
 
 function initializeApp(data) {
-    $("#userdata").attr("userId", data.context.userId);
+    $("#userdata").html("userId", data.context.userId);
     //document.getElementById('useridfield').textContent = data.context.userId;
 }
 
@@ -13,7 +13,7 @@ const apply_leave = () => {
     promise_call({
         url: "./api/applyleave", 
         data: {
-            "userId": $("#userdata").attr("userId"),
+            "userId": $("#userdata").html(),
             "leaveType": $("#leaveType").val(),
             "leaveAgent": $("#leaveAgent").val(),
             "startDate": $("#startDate").val(),
