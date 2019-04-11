@@ -115,6 +115,9 @@ class applyleave extends Controller
                         )
                     )
                 );
+                Log::info("upper_line_id_response:");
+                Log::info("upper_line_id_response:".$response);
+
                 $header[] = "Content-Type: application/json";
                 $header[] = "Authorization: Bearer g0E9K4fU54BZVITKc1w7C343NA8yb15YD76K+u472xg8ZCdFFeNGTk16hi97VjNxHQTBl3tRlMxEsoZ8x/nQZkvGY7EIDpWpHML6VB4zLqCdrdPUdlU6VBn6Lpzfjsi1WqRP+YQOhZlq87olqbR25VGUYhWQfeY8sLGRXgo3xvw=";
                 $ch = curl_init("https://api.line.me/v2/bot/message/push");
