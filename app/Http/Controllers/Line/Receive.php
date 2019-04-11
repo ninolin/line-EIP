@@ -35,7 +35,8 @@ class Receive extends Controller
      */
     public function store(Request $request)
     {
-        Log::info($request);
+        $bodyContent = $request->getContent();
+        Log::info($bodyContent);
         return response()->json([
             'status' => 'successful'
         ]);
