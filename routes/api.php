@@ -24,4 +24,4 @@ Route::post('leavetypelist', 'View\leavetypelist@store');
 Route::put('leavetypelist/{id}', 'View\leavetypelist@update');
 Route::delete('leavetypelist/{id}', 'View\leavetypelist@destroy');
 Route::post('applyleave', 'View\applyleave@store');
-Route::post('receive', 'Line\Receive@index');
+Route::post('receive', 'Line\Receive@store');

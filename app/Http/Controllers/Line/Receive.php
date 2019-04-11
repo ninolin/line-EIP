@@ -14,9 +14,7 @@ class Receive extends Controller
      */
     public function index()
     {
-        return response()->json([
-            'status' => 'successful'
-        ]);
+        
     }
 
     /**
@@ -37,7 +35,10 @@ class Receive extends Controller
      */
     public function store(Request $request)
     {
-        //
+        Log::info($request);
+        return response()->json([
+            'status' => 'successful'
+        ]);
     }
 
     /**
