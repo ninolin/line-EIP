@@ -126,6 +126,7 @@ class applyleave extends Controller
                 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);                                                                      
                 curl_setopt($ch, CURLOPT_HTTPHEADER, $header);                                                                                                   
                 $result = curl_exec($ch);
+                Log::info("upper_line_id_result:".$result);
                 curl_close($ch);
             }
             
