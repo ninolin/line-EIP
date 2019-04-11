@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Input;
 use DB;
+use Log;
 
 class applyleave extends Controller
 {
@@ -83,7 +84,8 @@ class applyleave extends Controller
             foreach ($upper_users as $v) {
                 $upper_line_id = $v->line_id; //第一簽核人的line_id
             }
-
+            Log::info("agent_line_id:".$agent_line_id);
+            Log::info("upper_line_id:".$upper_line_id);
             $response = array (
                 "to" => $line_id,
                 "messages" => array (
