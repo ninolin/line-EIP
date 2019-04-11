@@ -57,28 +57,42 @@ class applyleave extends Controller
         $sql .= "value ";
         $sql .= "(?, ?, ?, ?, ?, ?, ?, ?) ";
         if(DB::insert($sql, [$line_id, $leave_agent_user_no, $leave_type_id, $start_date, $start_time, $end_date, $end_time, $comment]) == 1) {
-            $leavetypes = DB::select('select name from eip_leave_type where id = ?', [$leave_type_id]);
-            $leavename = "";
-            foreach ($leavetypes as $v) {
-                $leavename = $v->name;
-            }
-            debug($leavename);
-            $users = DB::select('select cname from user where NO =?', [$leave_agent_user_no]);
-            $cname = "";
+            
+            $users = DB::select('select cname from user where line_id =?', [$line_id]);
+            $cname = ""; //申請人
             foreach ($users as $v) {
                 $cname = $v->cname;
             }
+
+            $leavetypes = DB::select('select name from eip_leave_type where id = ?', [$leave_type_id]);
+            $leavename = ""; //假別
+            foreach ($leavetypes as $v) {
+                $leavename = $v->name;
+            }
+            //debug($leavename);
+            $agent_users = DB::select('select cname, line_id from user where NO =?', [$leave_agent_user_no]);
+            $agent_cname = ""; //代理人
+            $agent_line_id = ""; //代理人的line_id
+            foreach ($agent_users as $v) {
+                $agent_cname = $v->cname;
+                $agent_line_id = $v->line_id;
+            }
+
+            $upper_users = DB::select('select line_id from user where NO in (select upper_user_no from user where line_id =?)', [$line_id]);
+            $upper_line_id = "";
+            foreach ($upper_users as $v) {
+                $upper_line_id = $v->line_id; //第一簽核人的line_id
+            }
+
             $response = array (
                 "to" => $line_id,
                 "messages" => array (
                     array (
                         "type" => "text",
-                        "text" => "成功送出假單 假別:". $leavename. " 代理人: ".$cname." 起:". $start_date ." ".$start_time. " 迄:". $end_date ." ".$end_time. " 備註:". $comment
+                        "text" => "成功送出假單 假別:". $leavename. " 代理人: ".$agent_cname." 起:". $start_date ." ".$start_time. " 迄:". $end_date ." ".$end_time. " 備註:". $comment
                     )
                 )
             );
-            //debug($response);
-
             $header[] = "Content-Type: application/json";
             $header[] = "Authorization: Bearer g0E9K4fU54BZVITKc1w7C343NA8yb15YD76K+u472xg8ZCdFFeNGTk16hi97VjNxHQTBl3tRlMxEsoZ8x/nQZkvGY7EIDpWpHML6VB4zLqCdrdPUdlU6VBn6Lpzfjsi1WqRP+YQOhZlq87olqbR25VGUYhWQfeY8sLGRXgo3xvw=";
             $ch = curl_init("https://api.line.me/v2/bot/message/push");
@@ -88,6 +102,49 @@ class applyleave extends Controller
             curl_setopt($ch, CURLOPT_HTTPHEADER, $header);                                                                                                   
             $result = curl_exec($ch);
             curl_close($ch);
+
+            if( $upper_line_id != "") {
+                $response = array (
+                    "to" => $upper_line_id,
+                    "messages" => array (
+                        array (
+                            "type" => "text",
+                            "text" => $cname. "送出假單，請審核 假別:". $leavename. " 代理人: ".$agent_cname." 起:". $start_date ." ".$start_time. " 迄:". $end_date ." ".$end_time. " 備註:". $comment
+                        )
+                    )
+                );
+                $header[] = "Content-Type: application/json";
+                $header[] = "Authorization: Bearer g0E9K4fU54BZVITKc1w7C343NA8yb15YD76K+u472xg8ZCdFFeNGTk16hi97VjNxHQTBl3tRlMxEsoZ8x/nQZkvGY7EIDpWpHML6VB4zLqCdrdPUdlU6VBn6Lpzfjsi1WqRP+YQOhZlq87olqbR25VGUYhWQfeY8sLGRXgo3xvw=";
+                $ch = curl_init("https://api.line.me/v2/bot/message/push");
+                curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
+                curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($response));                                                                  
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);                                                                      
+                curl_setopt($ch, CURLOPT_HTTPHEADER, $header);                                                                                                   
+                $result = curl_exec($ch);
+                curl_close($ch);
+            }
+            
+            if( $agent_line_id != "") {
+                $response = array (
+                    "to" => $agent_line_id,
+                    "messages" => array (
+                        array (
+                            "type" => "text",
+                            "text" => $cname. "送出假單並指定您為代理人 假別:". $leavename. " 代理人: ".$agent_cname." 起:". $start_date ." ".$start_time. " 迄:". $end_date ." ".$end_time. " 備註:". $comment
+                        )
+                    )
+                );
+                $header[] = "Content-Type: application/json";
+                $header[] = "Authorization: Bearer g0E9K4fU54BZVITKc1w7C343NA8yb15YD76K+u472xg8ZCdFFeNGTk16hi97VjNxHQTBl3tRlMxEsoZ8x/nQZkvGY7EIDpWpHML6VB4zLqCdrdPUdlU6VBn6Lpzfjsi1WqRP+YQOhZlq87olqbR25VGUYhWQfeY8sLGRXgo3xvw=";
+                $ch = curl_init("https://api.line.me/v2/bot/message/push");
+                curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
+                curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($response));                                                                  
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);                                                                      
+                curl_setopt($ch, CURLOPT_HTTPHEADER, $header);                                                                                                   
+                $result = curl_exec($ch);
+                curl_close($ch);
+            }
+
 
             return response()->json([
                 'status' => 'successful'
