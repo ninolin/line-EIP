@@ -58,7 +58,12 @@ class applyleave extends Controller
         $sql .= "value ";
         $sql .= "(?, ?, ?, ?, ?, ?, ?, ?) ";
         if(DB::insert($sql, [$line_id, $leave_agent_user_no, $leave_type_id, $start_date, $start_time, $end_date, $end_time, $comment]) == 1) {
-            
+            $last_appy_record = DB::select('select max(id) as last_id from eip_leave_apply');
+            $last_appy_id = ""; //假單流水號
+            foreach ($last_appy_record as $v) {
+                $last_appy_id = $v->last_id;
+            }
+
             $users = DB::select('select cname from user where line_id =?', [$line_id]);
             $cname = ""; //申請人
             foreach ($users as $v) {
@@ -79,11 +84,21 @@ class applyleave extends Controller
                 $agent_line_id = $v->line_id;
             }
 
-            $upper_users = DB::select('select line_id from user where NO in (select upper_user_no from user where line_id =?)', [$line_id]);
-            $upper_line_id = "";
+            $upper_users = DB::select('select NO, line_id from user where NO in (select upper_user_no from user where line_id =?)', [$line_id]);
+            $upper_line_id = "";    //第一簽核人的line_id
+            $upper_user_no = "";    //第一簽核人的user_no
             foreach ($upper_users as $v) {
-                $upper_line_id = $v->line_id; //第一簽核人的line_id
+                $upper_line_id = $v->line_id; 
+                $upper_user_no = $v->NO; 
             }
+
+            if(DB::insert("insert into eip_leave_apply_process (leave_apply_id, upper_user_no) value (?, ?)", [$last_appy_id, $upper_user_no]) != 1) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'insert error'
+                ]);
+            }
+
             Log::info("agent_line_id:".$agent_line_id);
             Log::info("upper_line_id:".$upper_line_id);
             $response = array (
