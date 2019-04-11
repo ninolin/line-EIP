@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Line;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Log;
 
 class Receive extends Controller
 {
