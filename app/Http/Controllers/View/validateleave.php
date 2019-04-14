@@ -25,12 +25,12 @@ class validateleave extends Controller
         $sql .= '   where upper_user_no IN ';
         $sql .= '   (select NO from user where line_id =?)) ';
         $sql .= ') as a ';
-        $sql .= 'left join user as u1';
+        $sql .= 'left join user as u1 ';
         $sql .= 'on a.leave_agent_user_no = u1.no ';
         $sql .= 'left join eip_leave_type ';
-        $sql .= 'on a.leave_type_id = eip_leave_type.id';
-        $sql .= 'left join user as u2';
-        $sql .= 'on a.line_id = u2.line_id';
+        $sql .= 'on a.leave_type_id = eip_leave_type.id ';
+        $sql .= 'left join user as u2 ';
+        $sql .= 'on a.line_id = u2.line_id ';
         debug($sql);
         $leaves = DB::select($sql, [$id]);
         debug($leaves);
