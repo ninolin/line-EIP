@@ -15,17 +15,17 @@ function initializeApp(data) {
             alert("get data error");
         } else {
             alert(JSON.stringify(v));
-            // $("#leave_data").html("");
-            // v.data.map(item => {
-            //     $html =  "<tr>";
-            //     $html += "<td>"+item.cname+"</td>";
-            //     $html += "<td>"+item.agent_cname+"</td>";
-            //     $html += "<td>"+item.levae_name+"</td>";
-            //     $html += "<td>"+item.start_date+" "+item.start_time+"</td>";
-            //     $html += "<td>"+item.end_date+" "+item.end_time+"</td>";
-            //     $html =  "</tr>";
-            //     $("#leave_data").append($html);
-            // })
+            $("#leave_data").html("");
+            v.data.map(item => {
+                $html =  "<tr>";
+                $html += "<td>"+item.cname+"</td>";
+                $html += "<td>"+item.agent_cname+"</td>";
+                $html += "<td>"+item.levae_name+"</td>";
+                $html += "<td>"+item.start_date+" "+item.start_time+"</td>";
+                $html += "<td>"+item.end_date+" "+item.end_time+"</td>";
+                $html =  "</tr>";
+                $("#leave_data").append($html);
+            })
         }
         
     })
