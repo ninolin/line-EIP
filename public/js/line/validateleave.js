@@ -50,9 +50,11 @@ const show_leave = (apply_id) => {
                 $html += "<td>"+item.start_date+" "+item.start_time+"</td>";
                 $html += "<td>"+item.end_date+" "+item.end_time+"</td>";
                 $html += "</tr>";
-                $html += "<tr>";
-                $html += "<td colspan='5'>"+item.comment+"</td>";
-                $html += "</tr>";
+                if(item.comment) {
+                    $html += "<tr>";
+                    $html += "<td colspan='5'>備住:"+item.comment+"</td>";
+                    $html += "</tr>";
+                }
                 $("#leave_data_in_modal").append($html);
             })
             $('#validateModal').modal('toggle');

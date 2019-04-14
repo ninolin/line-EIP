@@ -59,22 +59,19 @@
                             </tr>
                         </thead>
                         <tbody id="leave_data_in_modal">
-                           <tr><td colspan="5">無資料</td></tr>
                         </tbody>
                     </table>
                 </div>
                 <div class="row">
-                <label for="title-name" class="col-form-label w-25">簽核職等:</label>
-                <div class="col-form-label w-75">
-                    <select id="title_set_select"></select>
-                </div>
+                    <input class="col-12" id="reject_reason" placeholder="拒絕原因"/>
                 </div>
             </div>
             </form>
         </div>
         <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
-            <button type="button" class="btn btn-primary todo" onclick="add_leave()">新增</button>
+            <button type="button" class="btn btn-primary todo" onclick="add_leave()">拒絕</button>
+            <button type="button" class="btn btn-primary todo" onclick="add_leave()">送出</button>
         </div>
         </div>
     </div>
