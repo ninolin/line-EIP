@@ -220,7 +220,6 @@ class validateleave extends Controller
         if($validate == 'agree') {
             $is_validate = 1; //agree
         }
-        log::info("axxxxx");
         $users = DB::select('select NO, title_id, upper_user_no from user where line_id =?', [$line_id]);
         $NO = ""; //審核人NO
         $title_id = ""; //審核人title_id
@@ -230,15 +229,7 @@ class validateleave extends Controller
             $title_id =  $v->title_id;
             $upper_user_no =  $v->upper_user_no;
         }
-        log::info("bbbbbb");
-        log::info("is_validate");
-        log::info($is_validate);
-        log::info("reject_reason");
-        log::info($reject_reason);
-        log::info("leave_apply_id");
-        log::info($leave_apply_id);
-        log::info("upper_user_no");
-        log::info($NO);
+
         if(DB::update("update eip_leave_apply_process set is_validate =?, reject_reason =? where leave_apply_id =? and upper_user_no =?", [$is_validate, $reject_reason, $leave_apply_id, $NO]) != 1) {
             return response()->json([
                 'status' => 'error',
@@ -260,16 +251,11 @@ class validateleave extends Controller
             }
         } else {
             //同意審核
-            log::info("aaaa");
             $leave_types = DB::select('select approved_title_id from eip_leave_type where id in (select leave_type_id from eip_leave_apply where id =?)', [$leave_apply_id]);
             $approved_title_id = "";
             foreach ($leave_types as $v) {
                 $approved_title_id = $v->approved_title_id;
             }
-            log::info("approved_title_id");
-            log::info($approved_title_id);
-            log::info("title_id");
-            log::info($title_id);
             if($approved_title_id == $title_id) {
                 //全部審核完了
                 log::info("update eip_leave_apply set apply_status =? where id =?");
