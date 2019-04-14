@@ -11,6 +11,7 @@ function initializeApp(data) {
         method: "get"
     })
     .then(v => {
+        alert(v);
         alert(JSON.stringify(v));
         // if(v.status == "successful") {
         //     liff.closeWindow();
