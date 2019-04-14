@@ -256,6 +256,10 @@ class validateleave extends Controller
             foreach ($leave_types as $v) {
                 $approved_title_id = $v->approved_title_id;
             }
+            log::info("approved_title_id");
+            log::info($approved_title_id);
+            log::info("title_id");
+            log::info($title_id);
             if($approved_title_id == $title_id) {
                 //全部審核完了
                 log::info("update eip_leave_apply set apply_status =? where id =?");
