@@ -35,11 +35,11 @@
         </div>
     </body>
     <!-- Modal -->
-    <div class="modal fade" id="leaveModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal fade" id="validateModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
         <div class="modal-header">
-            <h5 class="modal-leave">新增假別</h5>
+            <h5 class="modal-leave">審核請假</h5>
             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
             </button>
@@ -48,8 +48,20 @@
             <form>
             <div class="form-group container-fluid">
                 <div class="row">
-                <label for="leave-name" class="col-form-label w-25">假別:</label>
-                <input type="text" class="form-control w-75 leave-name">
+                    <table class="table table-bordered table-striped">
+                        <thead class="table-thead">
+                            <tr>
+                                <th scope="col">申</th>
+                                <th scope="col">代</th>
+                                <th scope="col">假</th>
+                                <th scope="col">起</th>
+                                <th scope="col">迄</th>
+                            </tr>
+                        </thead>
+                        <tbody id="leave_data_in_modal">
+                           <tr><td colspan="5">無資料</td></tr>
+                        </tbody>
+                    </table>
                 </div>
                 <div class="row">
                 <label for="title-name" class="col-form-label w-25">簽核職等:</label>
