@@ -23,7 +23,7 @@ function initializeApp(data) {
                 $html += "<td>"+item.leave_name+"</td>";
                 $html += "<td>"+item.start_date+" "+item.start_time+"</td>";
                 $html += "<td>"+item.end_date+" "+item.end_time+"</td>";
-                $html += "<td><button type='button' class='btn btn-primary btn-sm' onclick=show_leave(item)>查</button></td>";
+                $html += "<td><button type='button' class='btn btn-primary btn-sm' onclick=show_leave("+item+")>查</button></td>";
                 $html += "</tr>";
                 $("#leave_data").append($html);
             })
