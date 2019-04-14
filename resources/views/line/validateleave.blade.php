@@ -13,7 +13,20 @@
         <div class="text-center">
             <div class="main-section">
                 <div>
-                    123
+                    <table class="table table-bordered table-striped">
+                        <thead class="table-thead">
+                            <tr>
+                                <th scope="col">申</th>
+                                <th scope="col">代</th>
+                                <th scope="col">假</th>
+                                <th scope="col">起</th>
+                                <th scope="col">迄</th>
+                            </tr>
+                        </thead>
+                        <tbody id="leave_data">
+                           無資料
+                        </tbody>
+                    </table>
                 </div>
                 <div id="useridfield"></div>
                 <div id="result"></div>

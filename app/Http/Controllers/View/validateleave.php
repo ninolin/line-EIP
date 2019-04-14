@@ -17,7 +17,7 @@ class validateleave extends Controller
      */
     public function index($id)
     {
-        $sql  = 'select a.*, user.cname as agent_cname, eip_leave_type.name as levae_name ';
+        $sql  = 'select a.*, u2.cname as cname, u1.cname as agent_cname, eip_leave_type.name as levae_name ';
         $sql .= 'from ';
         $sql .= '(select * from eip_leave_apply where id IN (  ';
         $sql .= '   select leave_apply_id ';
@@ -25,12 +25,13 @@ class validateleave extends Controller
         $sql .= '   where upper_user_no IN ';
         $sql .= '   (select NO from user where line_id =?)) ';
         $sql .= ') as a ';
-        $sql .= 'left join user ';
-        $sql .= 'on a.leave_agent_user_no = user.no ';
+        $sql .= 'left join user as u1';
+        $sql .= 'on a.leave_agent_user_no = u1.no ';
         $sql .= 'left join eip_leave_type ';
         $sql .= 'on a.leave_type_id = eip_leave_type.id';
-        Log::info("sql:".$id);
-        Log::info("sql:".$sql);
+        $sql .= 'left join user as u2';
+        $sql .= 'on a.line_id = u2.line_id';
+
         $leaves = DB::select($sql, [$id]);
         return response()->json([
             'status' => 'successful',

@@ -11,15 +11,26 @@ function initializeApp(data) {
         method: "get"
     })
     .then(v => {
-        document.getElementById('result').textContent = data.context.userId;
+        if(v.status != 'successful') {
+            alert("get data error");
+        } else {
+            $("#leave_data").html("");
+            v.data.map(item => {
+                $html =  "<tr>";
+                $html += "<td>"+item.cname+"</td>";
+                $html += "<td>"+item.agent_cname+"</td>";
+                $html += "<td>"+item.levae_name+"</td>";
+                $html += "<td>"+item.start_date+" "+item.start_time+"</td>";
+                $html += "<td>"+item.end_date+" "+item.end_time+"</td>";
+                $html =  "</tr>";
+                $("#leave_data").append($html);
+            })
+        }
         alert(JSON.stringify(v));
-        // if(v.status == "successful") {
-        //     liff.closeWindow();
-        // } 
     })
 }
 
-const apply_leave = () => {
+const validate_leave = () => {
     const post_data = {
         "userId": document.getElementById('useridfield').textContent,
         "leaveType": $("#leaveType").val(),
