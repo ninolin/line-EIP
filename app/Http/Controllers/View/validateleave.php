@@ -251,6 +251,7 @@ class validateleave extends Controller
             }
         } else {
             //同意審核
+            log::info("aaaa");
             $leave_types = DB::select('select approved_title_id from eip_leave_type where id in (select leave_type_id from eip_leave_apply where id =?)', [$leave_apply_id]);
             $approved_title_id = "";
             foreach ($leave_types as $v) {
