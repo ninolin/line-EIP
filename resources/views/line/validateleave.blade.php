@@ -15,6 +15,8 @@
                 <div>
                     123
                 </div>
+                <div id="useridfield"></div>
+                <div id="result"></div>
             </div>
         </div>
         <script src="{{ asset('js/jquery/jquery.min.js') }}"></script>
