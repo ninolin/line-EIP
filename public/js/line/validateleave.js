@@ -28,12 +28,23 @@ function initializeApp(data) {
                 $("#leave_data").append($html);
             })
         }
-        
     })
 }
 
 const show_leave = (apply_id) => {
     alert(apply_id);
+    promise_call({
+        url: "./api/applyleave/"+apply_id, 
+        method: "get"
+    })
+    .then(v => {
+        if(v.status != 'successful') {
+            alert("get data error");
+        } else {
+            //alert(JSON.stringify(v));
+           
+        }
+    })
    // alert(JSON.stringify(leave));
 }
 
