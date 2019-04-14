@@ -208,13 +208,17 @@ class validateleave extends Controller
         if($validate == 'agree') {
             $is_validate = 1; //agree
         }
-
+        Log::info($leave_apply_id);
+        Log::info($line_id);
+        Log::info($validate);
+        Log::info($reject_reason);
+        Log::info($is_validate);
         $users = DB::select('select NO from user where line_id =?', [$line_id]);
         $NO = ""; //審核人NO
         foreach ($users as $v) {
             $NO = $v->NO;
         }
-
+        Log::info($NO);
         if(DB::update("update eip_leave_apply_process set is_validate =?, reject_reason =? where leave_apply_id =? and upper_user_no =?", [$is_validate, $reject_reason, $leave_apply_id, $NO]) == 1) {
             return response()->json([
                 'status' => 'successful'
