@@ -15,6 +15,7 @@ Route::get('/login', function () {return view('login');})->name('login');
 Route::get('/', function () {return view('login');})->name('login');
 // Route::get('/applyLeave', function () {return view('line/applyLeave');})->name('applyLeave');
 Route::get('/applyleave', 'View\applyleave@create');
+Route::get('/validateleave', 'View\validateleave@create');
 Route::middleware('auth')->get('/whmanage', 'View\whmanage@index')->name('whmanage');
 Route::middleware('auth')->get('/userlist', 'View\userlist@create')->name('userlist');
 Route::middleware('auth')->get('/titlelist', 'View\titlelist@create')->name('titlelist');

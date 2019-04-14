@@ -25,3 +25,4 @@ Route::put('leavetypelist/{id}', 'View\leavetypelist@update');
 Route::delete('leavetypelist/{id}', 'View\leavetypelist@destroy');
 Route::post('applyleave', 'View\applyleave@store');
 Route::post('receive', 'Line\Receive@store');
+Route::get('validateleave/{id}', 'View\validateleave@index');
