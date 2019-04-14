@@ -12,7 +12,6 @@ function initializeApp(data) {
     })
     .then(v => {
         document.getElementById('result').textContent = data.context.userId;
-        alert(v);
         alert(JSON.stringify(v));
         // if(v.status == "successful") {
         //     liff.closeWindow();
