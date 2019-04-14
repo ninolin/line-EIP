@@ -237,6 +237,8 @@ class validateleave extends Controller
                 'message' => 'update error'
             ]);
         }
+        log::info("is_validate");
+        log::info($is_validate);
         if($is_validate == 0) {
             //拒絕審核
             if(DB::update("update eip_leave_apply set apply_status =? where id =?", ['N', $leave_apply_id]) != 1) {
