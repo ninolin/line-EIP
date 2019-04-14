@@ -58,26 +58,7 @@ class validateleave extends Controller
      */
     public function store(Request $request)
     {
-        $line_id = $request->get('userId');
-        $apply_id = $request->get('apply_id');
-        $validate = $request->get('validate');
-        $reject_reason = $request->get('reject_reason');
-        $is_validate = 0; //rejeact
-        if($validate == 'agree') {
-            $is_validate = 1; //agree
-        }
-
-        $users = DB::select('select NO from user where line_id =?', [$line_id]);
-        $NO = ""; //審核人NO
-        foreach ($users as $v) {
-            $NO = $v->NO;
-        }
-
-        if(DB::update("update eip_leave_apply_process set is_validate =?, reject_reason =? where leave_apply_id =? and upper_user_no =?", [$is_validate, $reject_reason, $apply_process_id, $NO]) == 1) {
-            return response()->json([
-                'status' => 'successful'
-            ]);
-        }
+        
         //debug($line_id);
         // $sql = "insert into eip_leave_apply ";
         // $sql .= "(line_id, leave_agent_user_no, leave_type_id, start_date, start_time, end_date, end_time, comment) ";
@@ -219,7 +200,26 @@ class validateleave extends Controller
      */
     public function edit($id)
     {
-        //
+        $leave_apply_id = $id;
+        $line_id = $request->get('userId');
+        $validate = $request->get('validate');
+        $reject_reason = $request->get('reject_reason');
+        $is_validate = 0; //rejeact
+        if($validate == 'agree') {
+            $is_validate = 1; //agree
+        }
+
+        $users = DB::select('select NO from user where line_id =?', [$line_id]);
+        $NO = ""; //審核人NO
+        foreach ($users as $v) {
+            $NO = $v->NO;
+        }
+
+        if(DB::update("update eip_leave_apply_process set is_validate =?, reject_reason =? where leave_apply_id =? and upper_user_no =?", [$is_validate, $reject_reason, $leave_apply_id, $NO]) == 1) {
+            return response()->json([
+                'status' => 'successful'
+            ]);
+        }
     }
 
     /**

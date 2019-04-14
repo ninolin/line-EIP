@@ -64,15 +64,14 @@ const show_leave = (apply_id) => {
 
 const validate_leave = (type, apply_id) => {
 
-    alert(type+apply_id+document.getElementById('useridfield').textContent);
+    //alert(type+apply_id+document.getElementById('useridfield').textContent);
     const post_data = {
         "userId": document.getElementById('useridfield').textContent,
-        "apply_id": apply_id,
         "validate": type,
         "reject_reason": $("#reject_reason").val()
     }
     promise_call({
-        url: "./api/applyleave", 
+        url: "./api/validateleave/"+apply_id, 
         data: post_data, 
         method: "post"
     })
