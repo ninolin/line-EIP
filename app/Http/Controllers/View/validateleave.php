@@ -258,6 +258,8 @@ class validateleave extends Controller
             }
             if($approved_title_id == $title_id) {
                 //全部審核完了
+                log::info("update eip_leave_apply set apply_status =? where id =?");
+                log::info($leave_apply_id);
                 if(DB::update("update eip_leave_apply set apply_status =? where id =?", ['Y', $leave_apply_id]) != 1) {
                     return response()->json([
                         'status' => 'error',
