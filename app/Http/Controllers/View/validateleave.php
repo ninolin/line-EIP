@@ -200,6 +200,18 @@ class validateleave extends Controller
      */
     public function edit($id)
     {
+        
+    }
+
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function update(Request $request, $id)
+    {
         $leave_apply_id = $id;
         $line_id = $request->get('userId');
         $validate = $request->get('validate');
@@ -224,18 +236,6 @@ class validateleave extends Controller
                 'status' => 'successful'
             ]);
         }
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
-    {
-        //
     }
 
     /**
