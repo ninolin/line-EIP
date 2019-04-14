@@ -19,7 +19,7 @@ class LoginController extends Controller
         $account = $request->input('account');
         $password = $request->input('password');
         //debug($account);
-        //debug(md5($password));
+        debug(md5($password));
         $users = DB::select('select * from user where email = ? and password = ?', [$account, md5($password)]);
         if(sizeof($users) == 1 ) {
             if ($this->auth->setVerified()) {

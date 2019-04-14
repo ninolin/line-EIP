@@ -16,10 +16,11 @@ Route::get('/', function () {return view('login');})->name('login');
 // Route::get('/applyLeave', function () {return view('line/applyLeave');})->name('applyLeave');
 Route::get('/applyleave', 'View\applyleave@create');
 Route::get('/validateleave', 'View\validateleave@create');
+Route::get('/leavelog', 'View\leavelog@create')->name('leavelog');
 Route::middleware('auth')->get('/whmanage', 'View\whmanage@index')->name('whmanage');
 Route::middleware('auth')->get('/userlist', 'View\userlist@create')->name('userlist');
 Route::middleware('auth')->get('/titlelist', 'View\titlelist@create')->name('titlelist');
 Route::middleware('auth')->get('/leavetypelist', 'View\leavetypelist@create')->name('leavetypelist');
 Route::middleware('auth')->get('/formmanage', function () {return view('contents.formmanage');})->name('formmanage');
-Route::post('/login', 'Auth/LoginController@login')->name('doLogin');//驗證密碼
+Route::post('/login', 'Auth\LoginController@login')->name('doLogin');//驗證密碼
 
