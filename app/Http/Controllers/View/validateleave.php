@@ -31,8 +31,9 @@ class validateleave extends Controller
         $sql .= 'on a.leave_type_id = eip_leave_type.id';
         $sql .= 'left join user as u2';
         $sql .= 'on a.line_id = u2.line_id';
-
+        debug($sql);
         $leaves = DB::select($sql, [$id]);
+        debug($leaves);
         return response()->json([
             'status' => 'successful',
             'data' => $leaves
