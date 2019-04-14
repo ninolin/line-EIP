@@ -17,7 +17,7 @@ class validateleave extends Controller
      */
     public function index($id)
     {
-        $sql  = 'select a.*, u2.cname as cname, u1.cname as agent_cname, eip_leave_type.name as levae_name ';
+        $sql  = 'select a.*, u2.cname as cname, u1.cname as agent_cname, eip_leave_type.name as leave_name ';
         $sql .= 'from ';
         $sql .= '(select * from eip_leave_apply where id IN (  ';
         $sql .= '   select leave_apply_id ';
