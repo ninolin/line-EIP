@@ -231,14 +231,21 @@ class validateleave extends Controller
             $upper_user_no =  $v->upper_user_no;
         }
         log::info("bbbbbb");
+        log::info("is_validate");
+        log::info($is_validate);
+        log::info("reject_reason");
+        log::info($reject_reason);
+        log::info("leave_apply_id");
+        log::info($leave_apply_id);
+        log::info("upper_user_no");
+        log::info($NO);
         if(DB::update("update eip_leave_apply_process set is_validate =?, reject_reason =? where leave_apply_id =? and upper_user_no =?", [$is_validate, $reject_reason, $leave_apply_id, $NO]) != 1) {
             return response()->json([
                 'status' => 'error',
                 'message' => 'update error'
             ]);
         }
-        log::info("is_validate");
-        log::info($is_validate);
+        
         if($is_validate == 0) {
             //拒絕審核
             if(DB::update("update eip_leave_apply set apply_status =? where id =?", ['N', $leave_apply_id]) != 1) {
