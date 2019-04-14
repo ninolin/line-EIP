@@ -14,6 +14,7 @@ function initializeApp(data) {
         if(v.status != 'successful') {
             alert("get data error");
         } else {
+            alert(JSON.stringify(v));
             $("#leave_data").html("");
             v.data.map(item => {
                 $html =  "<tr>";
@@ -26,7 +27,7 @@ function initializeApp(data) {
                 $("#leave_data").append($html);
             })
         }
-        alert(JSON.stringify(v));
+        
     })
 }
 
