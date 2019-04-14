@@ -15,7 +15,7 @@ function initializeApp(data) {
             alert("get data error");
         } else {
             //alert(JSON.stringify(v));
-            $("#leave_data").html("");
+            if(v.data.length > 0)  $("#leave_data").html("");
             v.data.map(item => {
                 $html =  "<tr>";
                 $html += "<td>"+item.cname+"</td>";

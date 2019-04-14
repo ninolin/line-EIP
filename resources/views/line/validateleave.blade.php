@@ -29,7 +29,7 @@
                         </tbody>
                     </table>
                 </div>
-                <div id="useridfield"></div>
+                <div id="useridfield" style="display:none"></div>
                 <div id="result"></div>
             </div>
         </div>
