@@ -63,31 +63,22 @@ const show_leave = (apply_id) => {
 }
 
 const validate_leave = (type, apply_id) => {
+
     alert(type+apply_id+document.getElementById('useridfield').textContent);
-    // const post_data = {
-    //     "userId": document.getElementById('useridfield').textContent,
-    //     "leaveType": $("#leaveType").val(),
-    //     "leaveAgent": $("#leaveAgent").val(),
-    //     "startDate": $("#startDate").val(),
-    //     "startTime": $("#startTime").val(),
-    //     "endDate": $("#endDate").val(),
-    //     "endTime": $("#endTime").val()
-    // }
-    // for (k in post_data) {
-    //     if(post_data[k] == "") {
-    //         alert("資料不正確");
-    //         return;
-    //     }
-    // }
-    // post_data.comment = $("#comment").val();
-    // promise_call({
-    //     url: "./api/applyleave", 
-    //     data: post_data, 
-    //     method: "post"
-    // })
-    // .then(v => {
-    //     if(v.status == "successful") {
-    //         liff.closeWindow();
-    //     } 
-    // })
+    const post_data = {
+        "userId": document.getElementById('useridfield').textContent,
+        "apply_id": apply_id,
+        "validate": type,
+        "reject_reason": $("#reject_reason").val()
+    }
+    promise_call({
+        url: "./api/applyleave", 
+        data: post_data, 
+        method: "post"
+    })
+    .then(v => {
+        if(v.status == "successful") {
+            liff.closeWindow();
+        } 
+    })
 }
