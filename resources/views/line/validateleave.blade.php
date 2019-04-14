@@ -33,10 +33,44 @@
                 <div id="result"></div>
             </div>
         </div>
-        <script src="{{ asset('js/jquery/jquery.min.js') }}"></script>
-        <script src="{{ asset('js/bootstrap/js/bootstrap.min.js') }}"></script>
-        <script src="{{ asset('js/line/validateleave.js') }}"></script>
-        <script src="{{ asset('js/restcall.js') }}"></script>
-        <script src="https://d.line-scdn.net/liff/1.0/sdk.js"></script>
     </body>
+    <!-- Modal -->
+    <div class="modal fade" id="leaveModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-leave">新增假別</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div class="modal-body">
+            <form>
+            <div class="form-group container-fluid">
+                <div class="row">
+                <label for="leave-name" class="col-form-label w-25">假別:</label>
+                <input type="text" class="form-control w-75 leave-name">
+                </div>
+                <div class="row">
+                <label for="title-name" class="col-form-label w-25">簽核職等:</label>
+                <div class="col-form-label w-75">
+                    <select id="title_set_select"></select>
+                </div>
+                </div>
+            </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
+            <button type="button" class="btn btn-primary todo" onclick="add_leave()">新增</button>
+        </div>
+        </div>
+    </div>
+    </div>
+
+    <script src="{{ asset('js/jquery/jquery.min.js') }}"></script>
+    <script src="{{ asset('js/bootstrap/js/bootstrap.min.js') }}"></script>
+    <script src="{{ asset('js/line/validateleave.js') }}"></script>
+    <script src="{{ asset('js/restcall.js') }}"></script>
+    <script src="https://d.line-scdn.net/liff/1.0/sdk.js"></script>
 </html>

@@ -41,8 +41,8 @@ const show_leave = (apply_id) => {
         if(v.status != 'successful') {
             alert("get data error");
         } else {
-            alert(JSON.stringify(v));
-           
+            //alert(JSON.stringify(v));
+            $('#leaveModal').modal('toggle');
         }
     })
    // alert(JSON.stringify(leave));
