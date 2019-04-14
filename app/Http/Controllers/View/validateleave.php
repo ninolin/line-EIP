@@ -230,7 +230,7 @@ class validateleave extends Controller
             $title_id =  $v->title_id;
             $upper_user_no =  $v->upper_user_no;
         }
-        
+        log::info("bbbbbb");
         if(DB::update("update eip_leave_apply_process set is_validate =?, reject_reason =? where leave_apply_id =? and upper_user_no =?", [$is_validate, $reject_reason, $leave_apply_id, $NO]) != 1) {
             return response()->json([
                 'status' => 'error',
