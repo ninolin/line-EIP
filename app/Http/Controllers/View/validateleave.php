@@ -220,21 +220,67 @@ class validateleave extends Controller
         if($validate == 'agree') {
             $is_validate = 1; //agree
         }
-        Log::info($leave_apply_id);
-        Log::info($line_id);
-        Log::info($validate);
-        Log::info($reject_reason);
-        Log::info($is_validate);
-        $users = DB::select('select NO from user where line_id =?', [$line_id]);
+
+        $users = DB::select('select NO, title_id, upper_user_no from user where line_id =?', [$line_id]);
         $NO = ""; //審核人NO
+        $title_id = ""; //審核人title_id
+        $upper_user_no = ""; //審核人的下一個審核人
         foreach ($users as $v) {
             $NO = $v->NO;
+            $title_id =  $v->title_id;
+            $upper_user_no =  $v->upper_user_no;
         }
-        Log::info($NO);
-        if(DB::update("update eip_leave_apply_process set is_validate =?, reject_reason =? where leave_apply_id =? and upper_user_no =?", [$is_validate, $reject_reason, $leave_apply_id, $NO]) == 1) {
+        
+        if(DB::update("update eip_leave_apply_process set is_validate =?, reject_reason =? where leave_apply_id =? and upper_user_no =?", [$is_validate, $reject_reason, $leave_apply_id, $NO]) != 1) {
             return response()->json([
-                'status' => 'successful'
+                'status' => 'error',
+                'message' => 'update error'
             ]);
+        }
+        if($is_validate == 0) {
+            //拒絕審核
+            if(DB::update("update eip_leave_apply set apply_status =? where id =?", ['N', $leave_apply_id]) != 1) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'update error'
+                ]);
+            } else {
+                return response()->json([
+                    'status' => 'successful'
+                ]);
+            }
+        } else {
+            //同意審核
+            $leave_types = DB::select('select approved_title_id from eip_leave_type where id in (select leave_type_id from eip_leave_apply where id =?)', [$leave_apply_id]);
+            $approved_title_id = "";
+            foreach ($leave_types as $v) {
+                $approved_title_id = $v->approved_title_id;
+            }
+            if($approved_title_id == $title_id) {
+                //全部審核完了
+                if(DB::update("update eip_leave_apply set apply_status =? where id =?", ['Y', $leave_apply_id]) != 1) {
+                    return response()->json([
+                        'status' => 'error',
+                        'message' => 'update error'
+                    ]);
+                } else {
+                    return response()->json([
+                        'status' => 'successful'
+                    ]);
+                }
+            } else {
+                //繼續給下一個人審核
+                if(DB::insert("insert into eip_leave_apply_process (leave_apply_id, upper_user_no) value (?, ?)", [$leave_apply_id, $upper_user_no]) != 1) {
+                    return response()->json([
+                        'status' => 'error',
+                        'message' => 'insert error'
+                    ]);
+                } else {
+                    return response()->json([
+                        'status' => 'successful'
+                    ]);
+                }
+            }
         }
     }
 

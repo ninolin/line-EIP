@@ -71,7 +71,7 @@
         <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
             <button type="button" class="btn btn-danger reject" onclick="reject_leave()">拒絕</button>
-            <button type="button" class="btn btn-primary agree" onclick="agree_leave()">送出</button>
+            <button type="button" class="btn btn-primary agree" onclick="agree_leave()">同意</button>
         </div>
         </div>
     </div>
