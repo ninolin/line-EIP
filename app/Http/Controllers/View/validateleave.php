@@ -220,7 +220,7 @@ class validateleave extends Controller
         if($validate == 'agree') {
             $is_validate = 1; //agree
         }
-
+        log::info("axxxxx");
         $users = DB::select('select NO, title_id, upper_user_no from user where line_id =?', [$line_id]);
         $NO = ""; //審核人NO
         $title_id = ""; //審核人title_id
