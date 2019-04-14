@@ -63,15 +63,15 @@
                     </table>
                 </div>
                 <div class="row">
-                    <input class="col-12" id="reject_reason" placeholder="拒絕原因"/>
+                    <input class="col-12" id="reject_reason" placeholder="若要拒絕請輸入原因"/>
                 </div>
             </div>
             </form>
         </div>
         <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
-            <button type="button" class="btn btn-primary todo" onclick="add_leave()">拒絕</button>
-            <button type="button" class="btn btn-primary todo" onclick="add_leave()">送出</button>
+            <button type="button" class="btn btn-danger reject" onclick="reject_leave()">拒絕</button>
+            <button type="button" class="btn btn-primary agree" onclick="agree_leave()">送出</button>
         </div>
         </div>
     </div>

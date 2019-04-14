@@ -32,7 +32,6 @@ function initializeApp(data) {
 }
 
 const show_leave = (apply_id) => {
-    alert(apply_id);
     promise_call({
         url: "./api/applyleave/"+apply_id, 
         method: "get"
@@ -41,7 +40,6 @@ const show_leave = (apply_id) => {
         if(v.status != 'successful') {
             alert("get data error");
         } else {
-            $("#leave_data").html("");
             v.data.map(item => {
                 $html =  "<tr>";
                 $html += "<td>"+item.cname+"</td>";
@@ -57,37 +55,39 @@ const show_leave = (apply_id) => {
                 }
                 $("#leave_data_in_modal").append($html);
             })
+            $("#validateModal").find(".agree").attr("onclick", "validate_leave('agree', "+apply_id+")");
+            $("#validateModal").find(".reject").attr("onclick", "validate_leave('reject', "+apply_id+")");
             $('#validateModal').modal('toggle');
         }
     })
-   // alert(JSON.stringify(leave));
 }
 
-const validate_leave = () => {
-    const post_data = {
-        "userId": document.getElementById('useridfield').textContent,
-        "leaveType": $("#leaveType").val(),
-        "leaveAgent": $("#leaveAgent").val(),
-        "startDate": $("#startDate").val(),
-        "startTime": $("#startTime").val(),
-        "endDate": $("#endDate").val(),
-        "endTime": $("#endTime").val()
-    }
-    for (k in post_data) {
-        if(post_data[k] == "") {
-            alert("資料不正確");
-            return;
-        }
-    }
-    post_data.comment = $("#comment").val();
-    promise_call({
-        url: "./api/applyleave", 
-        data: post_data, 
-        method: "post"
-    })
-    .then(v => {
-        if(v.status == "successful") {
-            liff.closeWindow();
-        } 
-    })
+const validate_leave = (type, apply_id) => {
+    alert(type+apply_id+document.getElementById('useridfield').textContent);
+    // const post_data = {
+    //     "userId": document.getElementById('useridfield').textContent,
+    //     "leaveType": $("#leaveType").val(),
+    //     "leaveAgent": $("#leaveAgent").val(),
+    //     "startDate": $("#startDate").val(),
+    //     "startTime": $("#startTime").val(),
+    //     "endDate": $("#endDate").val(),
+    //     "endTime": $("#endTime").val()
+    // }
+    // for (k in post_data) {
+    //     if(post_data[k] == "") {
+    //         alert("資料不正確");
+    //         return;
+    //     }
+    // }
+    // post_data.comment = $("#comment").val();
+    // promise_call({
+    //     url: "./api/applyleave", 
+    //     data: post_data, 
+    //     method: "post"
+    // })
+    // .then(v => {
+    //     if(v.status == "successful") {
+    //         liff.closeWindow();
+    //     } 
+    // })
 }
