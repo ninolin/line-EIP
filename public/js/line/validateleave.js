@@ -68,7 +68,7 @@ const validate_leave = (type, apply_id) => {
     const post_data = {
         "userId": document.getElementById('useridfield').textContent,
         "validate": type,
-        "reject_reason": $("#reject_reason").val()
+        "reject_reason": $("#reject_reason").val() || ""
     }
     promise_call({
         url: "./api/validateleave/"+apply_id, 
