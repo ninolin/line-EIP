@@ -14,7 +14,7 @@ function initializeApp(data) {
         if(v.status != 'successful') {
             alert("get data error");
         } else {
-            alert(JSON.stringify(v));
+            //alert(JSON.stringify(v));
             $("#leave_data").html("");
             v.data.map(item => {
                 $html =  "<tr>";
@@ -23,12 +23,17 @@ function initializeApp(data) {
                 $html += "<td>"+item.leave_name+"</td>";
                 $html += "<td>"+item.start_date+" "+item.start_time+"</td>";
                 $html += "<td>"+item.end_date+" "+item.end_time+"</td>";
-                $html +=  "</tr>";
+                $html += "<td><button type='button' class='btn btn-primary btn-sm' onclick=show_leave(item)>查</button></td>";
+                $html += "</tr>";
                 $("#leave_data").append($html);
             })
         }
         
     })
+}
+
+const show_leave = (leave) => {
+    alert(JSON.stringify(leave));
 }
 
 const validate_leave = () => {

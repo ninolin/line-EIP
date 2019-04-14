@@ -21,10 +21,11 @@
                                 <th scope="col">假</th>
                                 <th scope="col">起</th>
                                 <th scope="col">迄</th>
+                                <th scope="col"></th>
                             </tr>
                         </thead>
                         <tbody id="leave_data">
-                           無資料
+                           <tr><td colspan="6">無資料</td></tr>
                         </tbody>
                     </table>
                 </div>
