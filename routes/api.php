@@ -16,15 +16,21 @@ use Illuminate\Http\Request;
 //Route::middleware('auth:api')->get('/user', function (Request $request) {return $request->user();});
 Route::get('userlist', 'View\userlist@index');
 Route::put('userlist/{id}', 'View\userlist@update');
+
 Route::get('titlelist', 'View\titlelist@index');
 Route::post('titlelist', 'View\titlelist@store');
 Route::put('titlelist/{id}', 'View\titlelist@update');
 Route::delete('titlelist/{id}', 'View\titlelist@destroy');
+
 Route::post('leavetypelist', 'View\leavetypelist@store');
 Route::put('leavetypelist/{id}', 'View\leavetypelist@update');
 Route::delete('leavetypelist/{id}', 'View\leavetypelist@destroy');
+
 Route::post('applyleave', 'View\applyleave@store');
+Route::get('applyleave/{id}', 'View\applyleave@show');
+
 Route::post('receive', 'Line\Receive@store');
 Route::get('validateleave/{id}', 'View\validateleave@index');
 Route::post('validateleave/{id}', 'View\validateleave@update');
-Route::get('applyleave/{id}', 'View\applyleave@show');
+
+Route::get('leavelog/{id}', 'View\leavelog@index');

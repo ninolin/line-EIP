@@ -17,7 +17,63 @@ class leavelog extends Controller
      */
     public function index($id)
     {
-        //
+        $leavetypes = DB::select('select approved_title_id from eip_leave_type where id in (select leave_type_id from eip_leave_apply where id = ?)', [$id]);
+        $approved_title_id = ""; //該假別最後審核人的職等
+        foreach ($leavetypes as $v) {
+            $approved_title_id = $v->approved_title_id;
+        }
+        $sql = "select NO from user where line_id in (select line_id from eip_leave_apply where id =?)";
+        $users = DB::select($sql, [$id]);
+        $user_no = ""; //申請人no
+        foreach ($users as $v) {
+            $user_no = $v->NO;
+        }
+        $result = [];
+        for ( $i=0 ; $i<10 ; $i++ ) {
+            $users = DB::select("select NO, cname, title_id from user where NO IN (select upper_user_no from user where NO =?)", [$user_no]);
+            $user_no = "";
+            $user_cname = "";
+            $user_title_id = "";
+            foreach ($users as $v) {
+                $user_no = $v->NO;
+                $user_cname = $v->cname;
+                $user_title_id = $v->title_id;
+            }
+
+            $process = DB::select("select * from eip_leave_apply_process where leave_apply_id =? and upper_user_no =?", [$id, $user_no]);
+            if(count($process) > 0) {
+                $is_validate = "";
+                $reject_reason = "";
+                $validate_time = "";
+                foreach ($process as $v) {
+                    $is_validate = $v->is_validate;
+                    $reject_reason = $v->reject_reason;
+                    $validate_time = $v->validate_time;
+                }
+                $arr = array(
+                    'user_cname' => $user_cname, 
+                    'is_validate' => $is_validate,
+                    'reject_reason' => $reject_reason,
+                    'validate_time' => $validate_time
+                );
+                array_push($result, $arr);
+            } else {
+                $arr = array(
+                    'user_cname' => $user_cname, 
+                    'is_validate' => '',
+                    'reject_reason' => '',
+                    'validate_time' => ''
+                );
+                array_push($result, $arr);
+            }
+            if($user_title_id == $approved_title_id){
+                break;
+            }
+        }
+        return response()->json([
+            'status' => 'successful',
+            'data' => $result
+        ]);
     }
 
     /**

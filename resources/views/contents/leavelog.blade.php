@@ -75,11 +75,11 @@
 </nav>
 </div>
 <!-- Modal -->
-<div class="modal fade" id="setModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+<div class="modal fade" id="logModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title">設定職等和第一簽核人</h5>
+        <h5 class="modal-title">簽核紀錄</h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
@@ -88,26 +88,29 @@
         <form>
           <div class="form-group container-fluid">
             <div class="row">
-              <label for="title-name" class="col-form-label w-25">職等:</label>
-              <div class="col-form-label w-75">
-                <select id="title_set_select"></select>
-              </div>
-            </div>
-            <div class="row">
-              <label for="title-name" class="col-form-label w-25">第一簽核人:</label>
-              <div class="col-form-label w-75">
-                <select id="upper_user_set_select" class="w-75"></select>
-              </div>
+              <table class="table table-bordered table-striped">
+                <thead class="table-thead">
+                  <tr>
+                      <th scope="col">簽核順位</th>
+                      <th scope="col">簽核人</th>
+                      <th scope="col">簽核狀態</th>
+                      <th scope="col">拒絕原因</th>
+                      <th scope="col">簽核時間</th>
+                  </tr>
+                </thead>
+                <tbody id="log_data">
+                  <tr><td colspan="5">無資料</td></tr>
+                </tbody>
+              </table>
             </div>
           </div>
         </form>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
-        <button type="button" class="btn btn-primary todo">新增</button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">關閉</button>
       </div>
     </div>
   </div>
 </div>
-<script src="{{ asset('js/views/userlist.js') }}"></script>
+<script src="{{ asset('js/views/leavelog.js') }}"></script>
 @endsection
