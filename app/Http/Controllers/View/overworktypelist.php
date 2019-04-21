@@ -7,7 +7,8 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Validator;
 use DB;
-class leavetypelist extends Controller
+
+class overworktypelist extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -16,25 +17,21 @@ class leavetypelist extends Controller
      */
     public function index()
     {
-        // $users = DB::select('select * from user', []);
-        // return response()->json([
-        //     'status' => 'successful',
-        //     'data' => $users
-        // ]);
+        //
     }
 
     /**
-     * 顯示假別資料頁面
+     * 顯示加班資料頁面
      * @author nino
      * @return \Illuminate\Http\Response
      */
     public function create()
     {
         $page = Input::get('page', 1);
-        $types = DB::select('select elt.*, et.name as title_name, et.id as title_id from eip_leave_type elt, eip_title et where elt.approved_title_id = et.id order by name limit ?,10 ', [($page-1)*10]);
-        $total_types = DB::select('select * from eip_leave_type', []);
+        $types = DB::select('select eot.*, et.name as title_name, et.id as title_id from eip_overwork_type eot, eip_title et where eot.approved_title_id = et.id order by hour limit ?,10 ', [($page-1)*10]);
+        $total_types = DB::select('select * from eip_overwork_type', []);
         $total_pages = ceil(count($total_types)/10);
-        return view('contents.leavetypelist', [
+        return view('contents.overworktypelist', [
             'types' => $types, 
             'page' => $page,
             'total_pages' => $total_pages
@@ -42,21 +39,18 @@ class leavetypelist extends Controller
     }
 
     /**
-     * 新增假別資料
+     * 新增加班資料
      * @author nino
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
     {
-        //debug( $request->get('name'));
-        $name = $request->get('name');
-        $day = $request->get('day');
+        $hour = $request->get('hour');
         $approved_title_id = $request->get('approved_title_id');
         //檢查參數格式是否正確
         $validator = Validator::make($request->all(), [
-            'name' => 'required|string|max:32',
-            'day' => 'required|integer',
+            'hour' => 'required|integer',
             'approved_title_id' => 'required|integer'
         ]);
         if ($validator->fails()) {
@@ -65,16 +59,16 @@ class leavetypelist extends Controller
                 'message' => $validator->errors()->all()
             ], 400);
         }
-        //檢查一樣天數的假是否存在
-        $types = DB::select('select name from eip_leave_type where name =? and day =?', [$name, $day]);
+        //檢查一樣小時的加班是否存在
+        $types = DB::select('select hour from eip_overwork_type where hour =?', [$hour]);
         if(count($types) > 0) {
             return response()->json([
                 'status' => 'error',
-                'message' => 'name exists'
+                'message' => 'hour exists'
             ], 409);
         }
 
-        if(DB::insert("insert into eip_leave_type (name, day, approved_title_id) values (?, ?, ?)", [$name, $day, $approved_title_id]) == 1) {
+        if(DB::insert("insert into eip_overwork_type (hour, approved_title_id) values (?, ?)", [$hour, $approved_title_id]) == 1) {
             return response()->json([
                 'status' => 'successful'
             ]);
@@ -109,7 +103,7 @@ class leavetypelist extends Controller
     }
 
     /**
-     * 修改假別資料
+     * 修改加班資料
      * @author nino
      * @param  \Illuminate\Http\Request  $request
      * @param  int  $id
@@ -117,13 +111,11 @@ class leavetypelist extends Controller
      */
     public function update(Request $request, $id)
     {
-        $name = $request->get('name');
-        $day = $request->get('day');
+        $hour = $request->get('hour');
         $approved_title_id = $request->get('approved_title_id');
         //檢查參數格式是否正確
         $validator = Validator::make($request->all(), [
-            'name' => 'required|string|max:32',
-            'day' => 'required|integer',
+            'hour' => 'required|integer',
             'approved_title_id' => 'required|integer'
         ]);
         if ($validator->fails()) {
@@ -132,16 +124,16 @@ class leavetypelist extends Controller
                 'message' => $validator->errors()->all()
             ], 400);
         }
-        //檢查一樣天數的假是否存在
-        $types = DB::select('select name from eip_leave_type where name =? and day =? and id != ?', [$name, $day, $id]);
+        //檢查一樣小時的加班是否存在
+        $types = DB::select('select hour from eip_overwork_type where hour =? and id != ?', [$hour, $id]);
         if(count($types) > 0) {
             return response()->json([
                 'status' => 'error',
-                'message' => 'name exists'
+                'message' => 'hour exists'
             ], 409);
         }
 
-        if(DB::update("update eip_leave_type set name =?, day =?, approved_title_id =? where id =?", [$name, $day, $approved_title_id, $id]) == 1) {
+        if(DB::update("update eip_overwork_type set hour =?, approved_title_id =? where id =?", [$hour, $approved_title_id, $id]) == 1) {
             return response()->json([
                 'status' => 'successful'
             ]);
@@ -154,14 +146,14 @@ class leavetypelist extends Controller
     }
 
     /**
-     * 刪除假別資料
+     * 刪除加班資料
      * @author nino
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
     public function destroy($id)
     {
-        if(DB::delete("delete from eip_leave_type where id =?", [$id]) == 1) {
+        if(DB::delete("delete from eip_overwork_type where id =?", [$id]) == 1) {
             return response()->json([
                 'status' => 'successful'
             ]);

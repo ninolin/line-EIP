@@ -22,7 +22,8 @@ const add_title = () => {
         if(v.status == "successful") {
             window.location.reload();
         } else {
-            $('#addTitleModal').modal('toggle');
+            //$('#addTitleModal').modal('toggle');
+            alert(v.message);
         }
     })
 }
@@ -37,9 +38,15 @@ const update_title = (title_id) => {
         if(v.status == "successful") {
             window.location.reload();
         } else {
-            $('#addTitleModal').modal('toggle');
+            alert(v.message);
         }
     })
+}
+
+const showDeleteModal = async (title_id, title_name) => {
+    $("#deleteModal").find(".todo").attr("onclick", "delete_title('"+title_id+"')").html("刪除");
+    $("#deleteModal").find(".delete_msg").html("確認要刪除「"+title_name+"」該職等嗎?");
+    $('#deleteModal').modal('toggle');
 }
 
 const delete_title = (title_id) => {
@@ -51,7 +58,7 @@ const delete_title = (title_id) => {
         if(v.status == "successful") {
             window.location.reload();
         } else {
-            //$('#addTitleModal').modal('toggle');
+            alert(v.message);
         }
     })
 }

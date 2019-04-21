@@ -30,7 +30,7 @@
               <td> {{$title->name}} </td>
               <td>  
                 <button type="button" class="btn btn-outline-primary btn-sm" onclick="showTitleModal('update', '{{$title->id}}', '{{$title->name}}')">修改</button>
-                <button type="button" class="btn btn-outline-danger btn-sm" onclick="delete_title({{$title->id}})">刪除</button>
+                <button type="button" class="btn btn-outline-danger btn-sm" onclick="showDeleteModal({{$title->id}}, '{{$title->name}}')">刪除</button>
               </td>
             </tr>
           @endforeach
@@ -80,6 +80,30 @@
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
         <button type="button" class="btn btn-primary todo" onclick="add_title()">新增</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-sm" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-leave">刪除職等</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form>
+          <div class="container-fluid">
+            <div class="row form-group delete_msg"></div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
+        <button type="button" class="btn btn-danger todo" onclick="delete_title()">刪除</button>
       </div>
     </div>
   </div>

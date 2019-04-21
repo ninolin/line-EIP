@@ -5,6 +5,7 @@ namespace App\Http\Controllers\View;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Input;
+use Illuminate\Support\Facades\Validator;
 use DB;
 class titlelist extends Controller
 {
@@ -15,17 +16,17 @@ class titlelist extends Controller
      */
     public function index()
     {
-        $titles = DB::select('select * from eip_title', []);
-        return response()->json([
-            'status' => 'successful',
-            'data' => $titles
-        ]);
+        // $titles = DB::select('select * from eip_title', []);
+        // return response()->json([
+        //     'status' => 'successful',
+        //     'data' => $titles
+        // ]);
         
     }
 
     /**
-     * Show the form for creating a new resource.
-     *
+     * 顯示職等資料頁面
+     * @author nino
      * @return \Illuminate\Http\Response
      */
     public function create()
@@ -42,22 +43,34 @@ class titlelist extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
-     *
+     * 新增職等資料
+     * @author nino
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
     {
         //debug( $request->get('name'));
+        //檢查參數格式是否正確
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|string|max:32'
+        ]);
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => 'error',
+                'message' => $validator->errors()->all()
+            ], 400);
+        }
         $name = Input::get('name', '');
+        //檢查一樣名稱的職等是否存在
         $titles = DB::select('select name from eip_title where name =?', [$name]);
         if(count($titles) > 0) {
             return response()->json([
                 'status' => 'error',
                 'message' => 'name exists'
-            ]);
+            ], 409);
         }
+
         if(DB::insert("insert into eip_title (name) values (?)", [$name]) == 1) {
             return response()->json([
                 'status' => 'successful'
@@ -66,7 +79,7 @@ class titlelist extends Controller
             return response()->json([
                 'status' => 'error',
                 'message' => 'insert error'
-            ]);
+            ], 500);
         }
     }
 
@@ -93,8 +106,8 @@ class titlelist extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
-     *
+     * 修改職等別資料
+     * @author nino
      * @param  \Illuminate\Http\Request  $request
      * @param  int  $id
      * @return \Illuminate\Http\Response
@@ -102,16 +115,26 @@ class titlelist extends Controller
     public function update(Request $request, $id)
     {
 
-        //debug( $request->get('name'));
-        //debug( $id);
+        //檢查參數格式是否正確
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|string|max:32'
+        ]);
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => 'error',
+                'message' => $validator->errors()->all()
+            ], 400);
+        }
         $name = $request->get('name');
+        //檢查一樣名稱的職等是否存在
         $titles = DB::select('select name from eip_title where name =? and id !=?', [$name, $id]);
         if(count($titles) > 0) {
             return response()->json([
                 'status' => 'error',
                 'message' => 'name exists'
-            ]);
+            ], 409);
         }
+
         if(DB::update("update eip_title set name =? where id =?", [$name, $id]) == 1) {
             return response()->json([
                 'status' => 'successful'
@@ -120,13 +143,13 @@ class titlelist extends Controller
             return response()->json([
                 'status' => 'error',
                 'message' => 'update error'
-            ]);
+            ], 500);
         }
     }
 
     /**
-     * Remove the specified resource from storage.
-     *
+     * 刪除職等資料
+     * @author nino
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
@@ -140,7 +163,7 @@ class titlelist extends Controller
             return response()->json([
                 'status' => 'error',
                 'message' => 'delete error'
-            ]);
+            ], 500);
         }
     }
 }

@@ -6,7 +6,7 @@
     <div class="row">
       <div class="col-sm-4 form-row">
         <div class="col-auto">
-          <button type="button" class="btn-c" onclick="showLeaveModal('add')">新增假別</button>
+          <button type="button" class="btn-c" onclick="showOverworkModal('add')">新增加班</button>
         </div>
       </div>
     </div>
@@ -15,8 +15,7 @@
     <table class="table table-bordered table-striped">
       <thead class="table-thead">
         <tr>
-          <th scope="col">假別</th>
-          <th scope="col">天數</th>
+          <th scope="col">小時</th>
           <th scope="col">簽核職等</th>
           <th scope="col" class="w-25">操作</th>
         </tr>
@@ -24,17 +23,16 @@
       <tbody>
         @if(count($types) === 0) 
           <tr>
-            <td colspan="4" class="text-center"> 目前無資料 </td>
+            <td colspan="3" class="text-center"> 目前無資料 </td>
           </tr>
         @else
           @foreach($types as $type)
             <tr>
-              <td> {{$type->name}} </td>
-              <td> {{$type->day}} </td>
+              <td> {{$type->hour}} </td>
               <td> {{$type->title_name}} </td>
               <td>  
-                <button type="button" class="btn btn-outline-primary btn-sm" onclick="showLeaveModal('update', '{{$type->id}}', '{{$type->name}}', '{{$type->day}}', '{{$type->title_id}}')">修改</button>
-                <button type="button" class="btn btn-outline-danger btn-sm" onclick="showDeleteModal('{{$type->id}}', '{{$type->name}}', '{{$type->day}}')">刪除</button>
+                <button type="button" class="btn btn-outline-primary btn-sm" onclick="showOverworkModal('update', '{{$type->id}}', '{{$type->hour}}', '{{$type->title_id}}')">修改</button>
+                <button type="button" class="btn btn-outline-danger btn-sm" onclick="showDeleteModal('{{$type->id}}', '{{$type->hour}}')">刪除</button>
               </td>
             </tr>
           @endforeach
@@ -62,11 +60,11 @@
 </div>
 
 <!-- Modal -->
-<div class="modal fade" id="leaveModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+<div class="modal fade" id="overworkModal" tabindex="-1" role="dialog" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-leave">新增假別</h5>
+        <h5>新增加班</h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
@@ -75,12 +73,8 @@
         <form>
           <div class="container-fluid">
             <div class="row form-group">
-              <label for="leave-name" class="col-form-label w-25">假別:</label>
-              <input type="text" class="form-control w-75 leave-name">
-            </div>
-            <div class="row form-group">
-              <label for="leave-day" class="col-form-label w-25">天數:</label>
-              <input type="text" class="form-control w-75 leave-day">
+              <label for="overwork-hour" class="col-form-label w-25">小時:</label>
+              <input type="text" class="form-control w-75 overwork-hour">
             </div>
             <div class="row form-group">
               <label for="title-name" class="col-form-label w-25">簽核職等:</label>
@@ -93,7 +87,7 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
-        <button type="button" class="btn btn-primary todo" onclick="add_leave()">新增</button>
+        <button type="button" class="btn btn-primary todo" onclick="add_overwork()">新增</button>
       </div>
     </div>
   </div>
@@ -103,7 +97,7 @@
   <div class="modal-dialog modal-dialog-centered modal-sm" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-leave">刪除假別</h5>
+        <h5>刪除加班</h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
@@ -117,10 +111,10 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
-        <button type="button" class="btn btn-danger todo" onclick="delete_leave()">刪除</button>
+        <button type="button" class="btn btn-danger todo" onclick="delete_overwork()">刪除</button>
       </div>
     </div>
   </div>
 </div>
-<script src="{{ asset('js/views/leavetypelist.js') }}"></script>
+<script src="{{ asset('js/views/overworktypelist.js') }}"></script>
 @endsection

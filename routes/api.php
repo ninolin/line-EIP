@@ -26,6 +26,10 @@ Route::post('leavetypelist', 'View\leavetypelist@store');
 Route::put('leavetypelist/{id}', 'View\leavetypelist@update');
 Route::delete('leavetypelist/{id}', 'View\leavetypelist@destroy');
 
+Route::post('overworktypelist', 'View\overworktypelist@store');
+Route::put('overworktypelist/{id}', 'View\overworktypelist@update');
+Route::delete('overworktypelist/{id}', 'View\overworktypelist@destroy');
+
 Route::post('applyleave', 'View\applyleave@store');
 Route::get('applyleave/{id}', 'View\applyleave@show');
 
