@@ -18,6 +18,7 @@ Route::get('/applyleave', 'View\applyleave@create');
 Route::get('/validateleave', 'View\validateleave@create');
 Route::get('/leavelog', 'View\leavelog@create')->name('leavelog');
 //Route::middleware('auth')->get('/whmanage', 'View\whmanage@index')->name('whmanage');
+Route::get('/whmanage', 'View\whmanage@index')->name('whmanage');
 Route::get('/userlist', 'View\userlist@create')->name('userlist');
 Route::get('/titlelist', 'View\titlelist@create')->name('titlelist');
 Route::get('/leavetypelist', 'View\leavetypelist@create')->name('leavetypelist');
