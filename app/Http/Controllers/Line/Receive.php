@@ -41,7 +41,7 @@ class Receive extends Controller
         //$abc = LineServiceProvider::test();
         $bodyContent = $request->getContent();
         Log::info($bodyContent);
-        //$json_obj = json_decode($bodyContent); //轉成json格式
+        $json_obj = json_decode($bodyContent); //轉成json格式
         $sender_userid = $json_obj->events[0]->source->userId; //取得訊息發送者的id
         $sender_txt = $json_obj->events[0]->message->text; //取得訊息內容
         LineServiceProvider::sendTextMsg($sender_userid, $sender_txt);
