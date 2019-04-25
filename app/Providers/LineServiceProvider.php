@@ -61,7 +61,8 @@ class LineServiceProvider extends ServiceProvider
         log::info($line_channel_access_token);
         log::info($response);
         $header[] = "Content-Type: application/json";
-        $header[] = "Authorization: Bearer ".$line_channel_access_token;
+        //$header[] = "Authorization: Bearer ".$line_channel_access_token;
+        $header[] = "Authorization: Bearer nqthqaLzpsEvlm4PyEAXnieHqVeaVT0ooibgnKgD5AQzWGKquyrQf14it20EAYIkxeAzRqwr9tnO/dFzPk3dTH5MPiZRuU4nF91rO+y4juGcrwT/yjOwQXmGYwWVzwait18dDDFDBoXLb0dvA4wISAdB04t89/1O/w1cDnyilFU=";
         $ch = curl_init("https://api.line.me/v2/bot/message/push");
         curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
         curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($response));                                                                  
