@@ -31,6 +31,7 @@ class LineServiceProvider extends ServiceProvider
     {
         //尋找該用戶所屬line_channel的access_token
         $channel_array = Config::get('line.channel');
+        Log::info($channel_array);
         $line_channel = "";
         $line_channel_access_token = "";
         $users = DB::select('select line_channel from user where line_id = ?', [$line_id]);
@@ -42,6 +43,7 @@ class LineServiceProvider extends ServiceProvider
                 }
             }
         }
+        Log::info($line_channel_access_token);
         if($line_channel_access_token == "") return 0;
 
         $response = array (
