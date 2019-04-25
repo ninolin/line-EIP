@@ -36,6 +36,7 @@ class LineServiceProvider extends ServiceProvider
         $line_channel = "";
         $line_channel_access_token = "";
         $users = DB::select('select line_channel from user where line_id = ?', [$line_id]);
+        log::info($users);
         foreach ($users as $value) {
             $line_channel = $value->line_channel; //這個用戶所屬的line_channel
             foreach ($channel_array as $c) {
