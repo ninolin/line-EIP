@@ -32,7 +32,7 @@ class Receive extends Controller
                     if(md5($v->dd) == $sender_txt){
                         log::info("zzzz");
                         log::info($sender_userid." ".$channel_id." ".$v->NO);
-                        if(DB::update("update user set line_id =?, line_channel = ? where NO =?", [$sender_userid, $channel_id, $v->NO]) != 1) {
+                        if(DB::update("update user set line_id =?, line_channel = ? where NO =?", [$sender_userid, $channel_id, $v->NO]) == 1) {
                             LineServiceProvider::sendTextMsg($sender_userid, "恭喜".$v->cname."成功加入，歡迎使用");
                         } else {
                             LineServiceProvider::sendTextMsg($sender_userid, "綁定失敗:更新db失敗");
