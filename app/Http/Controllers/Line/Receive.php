@@ -17,7 +17,7 @@ class Receive extends Controller
         $json_obj = json_decode($bodyContent); //轉成json格式
         $sender_userid = $json_obj->events[0]->source->userId; //取得訊息發送者的id
         $sender_txt = $json_obj->events[0]->message->text; //取得訊息內容
-
+        log::info("sender_txt:".$sender_txt);
         $user = DB::select('select * from user where line_id =?', [$sender_userid]);
         if(count($user) == 0) {
             //該line_id無在db中存在，判斷是不是一個md5字串，是的話就是要進行綁定，否的話就請輸入認證碼
