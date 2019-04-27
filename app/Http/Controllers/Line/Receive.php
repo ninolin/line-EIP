@@ -11,7 +11,7 @@ use App\Providers\LineServiceProvider;
 
 class Receive extends Controller
 {
-    public function receive()
+    public function receive(Request $request)
     {
         $bodyContent = $request->getContent(); //取得request的body內容
         $json_obj = json_decode($bodyContent); //轉成json格式
