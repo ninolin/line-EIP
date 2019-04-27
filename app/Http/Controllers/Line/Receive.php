@@ -23,7 +23,7 @@ class Receive extends Controller
         if(count($user) == 0) {
             //該line_id無在db中存在，判斷是不是一個md5字串，是的話就是要進行綁定，否的話就請輸入認證碼
             if (preg_match("/[a-z0-9]{32}/", $sender_txt)) {
-                $unlink_user = DB::select("select * from user where line_id = '' or line_is is null", []);
+                $unlink_user = DB::select("select * from user where line_id = '' or line_id is null", []);
                 foreach ($unlink_user as $v) {
                     if(md5($v->dd) == $sender_txt){
                         log::info($sender_userid." ".$channel_id." ".$v->NO);
