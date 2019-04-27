@@ -16,11 +16,11 @@ class titlelist extends Controller
      */
     public function index()
     {
-        // $titles = DB::select('select * from eip_title', []);
-        // return response()->json([
-        //     'status' => 'successful',
-        //     'data' => $titles
-        // ]);
+        $titles = DB::select('select * from eip_title', []);
+        return response()->json([
+            'status' => 'successful',
+            'data' => $titles
+        ]);
         
     }
 
