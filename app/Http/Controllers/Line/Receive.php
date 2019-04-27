@@ -26,8 +26,9 @@ class Receive extends Controller
             if (preg_match("/[a-z0-9]{32}/", $sender_txt)) {
                 log::info("bbbb");
                 $unlink_user = DB::select("select * from user where line_id = '' or line_id is null", []);
-                log::info($unlink_user);
+               
                 foreach ($unlink_user as $v) {
+                    log::info(md5($v->dd));
                     if(md5($v->dd) == $sender_txt){
                         log::info("zzzz");
                         log::info($sender_userid." ".$channel_id." ".$v->NO);
