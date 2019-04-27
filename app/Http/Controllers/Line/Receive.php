@@ -54,6 +54,7 @@ class Receive extends Controller
      */
     public function index()
     {
+        log::info("aaaa:");
         $bodyContent = $request->getContent(); //取得request的body內容
         $json_obj = json_decode($bodyContent); //轉成json格式
         $sender_userid = $json_obj->events[0]->source->userId; //取得訊息發送者的id
