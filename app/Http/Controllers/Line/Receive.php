@@ -13,7 +13,7 @@ class Receive extends Controller
 {
     public function receive(Request $request)
     {
-        $channel_id = "1635106062";
+        $line_channel = "1635106062";
         $bodyContent = $request->getContent(); //取得request的body內容
         $json_obj = json_decode($bodyContent); //轉成json格式
         $sender_replyToken = $json_obj->events[0]->replyToken; //取得訊息的replyToken
@@ -32,21 +32,21 @@ class Receive extends Controller
                     log::info(md5($v->dd));
                     if(md5($v->dd) == $sender_txt){
                         log::info("zzzz");
-                        log::info($sender_userid." ".$channel_id." ".$v->NO);
-                        if(DB::update("update user set line_id =?, line_channel = ? where NO =?", [$sender_userid, $channel_id, $v->NO]) == 1) {
+                        log::info($sender_userid." ".$line_channel." ".$v->NO);
+                        if(DB::update("update user set line_id =?, line_channel = ? where NO =?", [$sender_userid, $line_channel, $v->NO]) == 1) {
                             LineServiceProvider::pushTextMsg($sender_userid, "恭喜".$v->cname."成功加入，歡迎使用");
                         } else {
-                            LineServiceProvider::replyTextMsg($sender_userid, $sender_replyToken, "綁定失敗:更新db失敗");
+                            LineServiceProvider::replyTextMsg($sender_userid, $sender_replyToken, $line_channel, "綁定失敗:更新db失敗");
                         }
                     }
                 }
             } else {
                 log::info("cccc");
-                LineServiceProvider::replyTextMsg($sender_userid, $sender_replyToken, "歡迎初次使用EIP系統，請輸入認證碼來讓我知道你是誰");
+                LineServiceProvider::replyTextMsg($sender_userid, $sender_replyToken, $line_channel, "歡迎初次使用EIP系統，請輸入認證碼來讓我知道你是誰");
             }            
         } else {
             log::info("dddd");
-            LineServiceProvider::replyTextMsg($sender_userid, $sender_replyToken, $sender_txt);
+            LineServiceProvider::replyTextMsg($sender_userid, $sender_replyToken, $line_channel, $sender_txt);
         }
         return response()->json([
             'status' => 'successful',
