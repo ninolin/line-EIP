@@ -16,6 +16,7 @@ class Receive extends Controller
         $channel_id = "1635106062";
         $bodyContent = $request->getContent(); //取得request的body內容
         $json_obj = json_decode($bodyContent); //轉成json格式
+        $sender_replyToken = $json_obj->events[0]->replyToken; //取得訊息的replyToken
         $sender_userid = $json_obj->events[0]->source->userId; //取得訊息發送者的id
         $sender_txt = $json_obj->events[0]->message->text; //取得訊息內容
         log::info("sender_txt:".$sender_txt);
@@ -33,19 +34,19 @@ class Receive extends Controller
                         log::info("zzzz");
                         log::info($sender_userid." ".$channel_id." ".$v->NO);
                         if(DB::update("update user set line_id =?, line_channel = ? where NO =?", [$sender_userid, $channel_id, $v->NO]) == 1) {
-                            LineServiceProvider::sendTextMsg($sender_userid, "恭喜".$v->cname."成功加入，歡迎使用");
+                            LineServiceProvider::pushTextMsg($sender_userid, "恭喜".$v->cname."成功加入，歡迎使用");
                         } else {
-                            LineServiceProvider::sendTextMsg($sender_userid, "綁定失敗:更新db失敗");
+                            LineServiceProvider::replyTextMsg($sender_userid, $sender_replyToken, "綁定失敗:更新db失敗");
                         }
                     }
                 }
             } else {
                 log::info("cccc");
-                LineServiceProvider::sendTextMsg($sender_userid, "歡迎初次使用EIP系統，請輸入認證碼來讓我知道你是誰");
+                LineServiceProvider::replyTextMsg($sender_userid, $sender_replyToken, "歡迎初次使用EIP系統，請輸入認證碼來讓我知道你是誰");
             }            
         } else {
             log::info("dddd");
-            LineServiceProvider::sendTextMsg($sender_userid, $sender_txt);
+            LineServiceProvider::replyTextMsg($sender_userid, $sender_replyToken, $sender_txt);
         }
         return response()->json([
             'status' => 'successful',
