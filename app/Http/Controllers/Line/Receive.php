@@ -26,6 +26,7 @@ class Receive extends Controller
                 $unlink_user = DB::select("select * from user where line_id = '' or line_is is null", []);
                 foreach ($unlink_user as $v) {
                     if(md5($v->dd) == $sender_txt){
+                        log::info($sender_userid." ".$channel_id." ".$v->NO);
                         if(DB::update("update user set line_id =?, line_channel = ? where NO =?", [$sender_userid, $channel_id, $v->NO]) != 1) {
                             LineServiceProvider::sendTextMsg($sender_userid, "恭喜".$v->cname."成功加入，歡迎使用");
                         } else {
