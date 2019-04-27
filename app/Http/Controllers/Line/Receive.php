@@ -13,6 +13,7 @@ class Receive extends Controller
 {
     public function receive(Request $request)
     {
+        $channel_id = "1635106062";
         $bodyContent = $request->getContent(); //取得request的body內容
         $json_obj = json_decode($bodyContent); //轉成json格式
         $sender_userid = $json_obj->events[0]->source->userId; //取得訊息發送者的id
@@ -25,7 +26,7 @@ class Receive extends Controller
                 $unlink_user = DB::select("select * from user where line_id = '' or line_is is null", []);
                 foreach ($unlink_user as $v) {
                     if(md5($v->dd) == $sender_txt){
-                        if(DB::update("update user set line_id =? where NO =?", [$sender_userid, $v->NO]) != 1) {
+                        if(DB::update("update user set line_id =?, line_channel = ? where NO =?", [$sender_userid, $channel_id, $v->NO]) != 1) {
                             LineServiceProvider::sendTextMsg($sender_userid, "恭喜".$v->cname."成功加入，歡迎使用");
                         } else {
                             LineServiceProvider::sendTextMsg($sender_userid, "綁定失敗:更新db失敗");
