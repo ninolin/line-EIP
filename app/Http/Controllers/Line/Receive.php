@@ -19,20 +19,13 @@ class Receive extends Controller
         $sender_replyToken = $json_obj->events[0]->replyToken; //取得訊息的replyToken
         $sender_userid = $json_obj->events[0]->source->userId; //取得訊息發送者的id
         $sender_txt = $json_obj->events[0]->message->text; //取得訊息內容
-        log::info("sender_txt:".$sender_txt);
         $user = DB::select('select * from user where line_id =?', [$sender_userid]);
         if(count($user) == 0) {
-            log::info("aaaa");
             //該line_id無在db中存在，判斷是不是一個md5字串，是的話就是要進行綁定，否的話就請輸入認證碼
             if (preg_match("/[a-z0-9]{32}/", $sender_txt)) {
-                log::info("bbbb");
-                $unlink_user = DB::select("select * from user where line_id = '' or line_id is null", []);
-               
+                $unlink_user = DB::select("select * from user where status = 'T' and (line_id = '' or line_id is null)", []);
                 foreach ($unlink_user as $v) {
-                    log::info(md5($v->dd));
                     if(md5($v->dd) == $sender_txt){
-                        log::info("zzzz");
-                        log::info($sender_userid." ".$line_channel." ".$v->NO);
                         if(DB::update("update user set line_id =?, line_channel = ? where NO =?", [$sender_userid, $line_channel, $v->NO]) == 1) {
                             LineServiceProvider::pushTextMsg($sender_userid, "恭喜".$v->cname."成功加入，歡迎使用");
                         } else {
@@ -41,11 +34,9 @@ class Receive extends Controller
                     }
                 }
             } else {
-                log::info("cccc");
                 LineServiceProvider::replyTextMsgWithChannel($sender_userid, $sender_replyToken, $line_channel, "歡迎初次使用EIP系統，請輸入認證碼來讓我知道你是誰");
             }            
         } else {
-            log::info("dddd");
             LineServiceProvider::replyTextMsgWithChannel($sender_userid, $sender_replyToken, $line_channel, $sender_txt);
         }
         return response()->json([
