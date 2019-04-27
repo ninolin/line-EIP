@@ -36,17 +36,17 @@ class Receive extends Controller
                         if(DB::update("update user set line_id =?, line_channel = ? where NO =?", [$sender_userid, $line_channel, $v->NO]) == 1) {
                             LineServiceProvider::pushTextMsg($sender_userid, "恭喜".$v->cname."成功加入，歡迎使用");
                         } else {
-                            LineServiceProvider::replyTextMsg($sender_userid, $sender_replyToken, $line_channel, "綁定失敗:更新db失敗");
+                            LineServiceProvider::replyTextMsgWithChannel($sender_userid, $sender_replyToken, $line_channel, "綁定失敗:更新db失敗");
                         }
                     }
                 }
             } else {
                 log::info("cccc");
-                LineServiceProvider::replyTextMsg($sender_userid, $sender_replyToken, $line_channel, "歡迎初次使用EIP系統，請輸入認證碼來讓我知道你是誰");
+                LineServiceProvider::replyTextMsgWithChannel($sender_userid, $sender_replyToken, $line_channel, "歡迎初次使用EIP系統，請輸入認證碼來讓我知道你是誰");
             }            
         } else {
             log::info("dddd");
-            LineServiceProvider::replyTextMsg($sender_userid, $sender_replyToken, $line_channel, $sender_txt);
+            LineServiceProvider::replyTextMsgWithChannel($sender_userid, $sender_replyToken, $line_channel, $sender_txt);
         }
         return response()->json([
             'status' => 'successful',

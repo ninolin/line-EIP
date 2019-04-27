@@ -71,7 +71,7 @@ class LineServiceProvider extends ServiceProvider
         curl_close($ch);
     }
 
-    public static function replyTextMsgWithoutChannel($line_id, $reply_token, $line_channel, $msg)
+    public static function replyTextMsgWithChannel($line_id, $reply_token, $line_channel, $msg)
     {
         //尋找該用戶所屬line_channel的access_token
         $channel_array = Config::get('line.channel');
