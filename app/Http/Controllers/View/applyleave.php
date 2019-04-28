@@ -63,17 +63,24 @@ class applyleave extends Controller
             $end_time = $request->get('endTime');               //迄時
             $comment = $request->get('comment');                //備註
             //透過假別名稱、起日、迄日找到假別id
-            $leave_days = round(($start_date-$end_date)/3600/24); //請假天數
-            $leave_type_arr = DB::select('select * from eip_leave_type where name =?', [$leavename]);
+            $leave_days = round((strtotime($end_date)-strtotime($start_date))/3600/24); //請假天數
+            echo $leave_days;
+            $leave_type_arr = DB::select('select * from eip_leave_type where name =? order by day ASC', [$leavename]);
             $leave_type_id = "";
+            $i = 0;
             foreach ($leave_type_arr as $v) {
+                $i++;
                 if($leave_days < $v->day) {
+                    $leave_type_id = $v->id;
+                    break;
+                }
+                if($leave_type_id == "" && count($leave_type_arr) == $i){
                     $leave_type_id = $v->id;
                     break;
                 }
             }
             //取得申請人的NO和別名
-            $users = DB::select('select NO, cname from user where line_id =?', [$line_id]);
+            $users = DB::select('select NO, cname from user where line_id =?', [$apply_user_line_id]);
             $apply_user_NO = "";    //申請人NO
             $apply_user_cname = ""; //申請人別名
             if(count($users) != 1) {
@@ -124,8 +131,8 @@ class applyleave extends Controller
             Log::info("agent_line_id:".$agent_line_id);
             Log::info("upper_line_id:".$upper_line_id);
             LineServiceProvider::pushTextMsg($apply_user_line_id, "成功送出假單 假別:". $leavename. " 代理人: ".$agent_cname." 起:". $start_date ." ".$start_time. " 迄:". $end_date ." ".$end_time. " 備註:". $comment);
-            LineServiceProvider::pushTextMsg($upper_line_id, $cname. "送出假單，請審核 假別:". $leavename. " 代理人: ".$agent_cname." 起:". $start_date ." ".$start_time. " 迄:". $end_date ." ".$end_time. " 備註:". $comment);
-            LineServiceProvider::pushTextMsg($agent_line_id, $cname. "送出假單，並指定您為代理人 假別:". $leavename. " 起:". $start_date ." ".$start_time. " 迄:". $end_date ." ".$end_time);
+            LineServiceProvider::pushTextMsg($upper_line_id, $apply_user_cname. "送出假單，請審核 假別:". $leavename. " 代理人: ".$agent_cname." 起:". $start_date ." ".$start_time. " 迄:". $end_date ." ".$end_time. " 備註:". $comment);
+            LineServiceProvider::pushTextMsg($agent_line_id, $apply_user_cname. "送出假單，並指定您為代理人 假別:". $leavename. " 起:". $start_date ." ".$start_time. " 迄:". $end_date ." ".$end_time);
 
             return response()->json([
                 'status' => 'successful'

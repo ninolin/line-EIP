@@ -62,7 +62,7 @@ class applyoverwork extends Controller
                 }
             }
             //取得申請人的NO和別名
-            $users = DB::select('select NO, cname from user where line_id =?', [$line_id]);
+            $users = DB::select('select NO, cname from user where line_id =?', [$apply_user_line_id]);
             $apply_user_NO = "";    //申請人NO
             $apply_user_cname = ""; //申請人別名
             if(count($users) != 1) {
@@ -96,16 +96,16 @@ class applyoverwork extends Controller
                 $upper_line_id = $v->line_id; 
                 $upper_user_no = $v->NO; 
             }
+            echo $upper_line_id;
             //寫入簽核流程紀錄(該table沒有紀錄申請人和簽核人的line_id是因為可能會有換line帳號的情況發生)
             if(DB::insert("insert into eip_leave_apply_process (apply_id, apply_type, apply_user_no, upper_user_no) value (?, ?, ?, ?)", [$last_appy_id, 'O', $apply_user_no, $upper_user_no]) != 1) {
                 DB::delete("delete from eip_leave_apply where id = ?", [$last_appy_id]);
                 throw new Exception('insert db error'); 
             }
             //通知申請人、代理人、第一簽核人
-            Log::info("agent_line_id:".$agent_line_id);
             Log::info("upper_line_id:".$upper_line_id);
             LineServiceProvider::pushTextMsg($apply_user_line_id, "成功送出加班 加班日:". $overworkDate ." 加班小時".$overworkHour. " 備註:". $comment);
-            LineServiceProvider::pushTextMsg($upper_line_id, $cname. "送出假單，請審核 加班日:". $overworkDate ." 加班小時".$overworkHour. " 備註:". $comment);
+            LineServiceProvider::pushTextMsg($upper_line_id, $apply_user_cname. "送出假單，請審核 加班日:". $overworkDate ." 加班小時".$overworkHour. " 備註:". $comment);
 
             return response()->json([
                 'status' => 'successful'

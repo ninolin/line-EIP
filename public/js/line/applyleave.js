@@ -18,7 +18,7 @@ const apply_leave = () => {
         "endDate": $("#endDate").val(),
         "endTime": $("#endTime").val()
     }
-
+    
     for (k in post_data) {
         if(post_data[k] == "") {
             alert("資料不正確");
