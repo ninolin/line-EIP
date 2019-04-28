@@ -1,8 +1,8 @@
 window.onload = function (e) {
-    // liff.init(function (data) {
-    //     initializeApp(data);
-    // });
-    initializeApp({})
+    liff.init(function (data) {
+        initializeApp(data);
+    });
+    //initializeApp({})
 };
 
 function initializeApp(data) {
