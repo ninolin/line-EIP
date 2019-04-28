@@ -28,6 +28,7 @@ const apply_overwork = () => {
         method: "post"
     })
     .then(v => {
+        alert();
         if(v.status == "successful") {
             liff.closeWindow();
         } 

@@ -130,6 +130,7 @@ class applyleave extends Controller
             //通知申請人、代理人、第一簽核人
             Log::info("agent_line_id:".$agent_line_id);
             Log::info("upper_line_id:".$upper_line_id);
+            echo $agent_line_id;
             LineServiceProvider::pushTextMsg($apply_user_line_id, "成功送出假單 假別:". $leavename. " 代理人: ".$agent_cname." 起:". $start_date ." ".$start_time. " 迄:". $end_date ." ".$end_time. " 備註:". $comment);
             LineServiceProvider::pushTextMsg($upper_line_id, $apply_user_cname. "送出假單，請審核 假別:". $leavename. " 代理人: ".$agent_cname." 起:". $start_date ." ".$start_time. " 迄:". $end_date ." ".$end_time. " 備註:". $comment);
             LineServiceProvider::pushTextMsg($agent_line_id, $apply_user_cname. "送出假單，並指定您為代理人 假別:". $leavename. " 起:". $start_date ." ".$start_time. " 迄:". $end_date ." ".$end_time);
