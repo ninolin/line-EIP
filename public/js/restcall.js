@@ -7,4 +7,4 @@ const promise_call = (option) => {
       xhr.onerror = () => reject(JSON.parse(xhr.statusText));
       xhr.send(JSON.stringify(option.data));
     });
-  };
+};

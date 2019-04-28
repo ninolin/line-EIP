@@ -32,7 +32,6 @@ const apply_leave = () => {
         method: "post"
     })
     .then(v => {
-        alert(v.status);
         if(v.status == "successful") {
             liff.closeWindow();
         } 
