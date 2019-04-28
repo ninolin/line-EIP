@@ -15,14 +15,14 @@
         <div class="text-center">
             <div class="main-section">
                 <div>
-                    <form class="col-12" method="POST" action="{{ route('doLogin') }}">
+                    <form class="col-12" method="POST">
                         {{ csrf_field() }}
                         <div id="useridfield" style="display:none"></div>
                         <div class="form-group form-inline">    
                             <label class="col-3">假別</label>
                             <select id="leaveType" class="form-control col-9">
                                 @foreach($leavetypes as $type)
-                                    <option value="{{$type->id}}">{{$type->name}}</option>
+                                    <option value="{{$type->name}}">{{$type->name}}</option>
                                 @endforeach
                             </select>
                         </div>

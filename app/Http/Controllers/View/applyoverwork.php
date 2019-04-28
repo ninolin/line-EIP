@@ -9,7 +9,7 @@ use App\Providers\LineServiceProvider;
 use DB;
 use Log;
 
-class applyleave extends Controller
+class applyoverwork extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -28,14 +28,8 @@ class applyleave extends Controller
      */
     public function create()
     {
-        //因為有同一種假但不同天數的假別，所以做distinct name，之後新增假時，再判斷是用那一種假的id
-        $sql = 'select distinct elt.name, et.name as title_name, et.id as title_id ';
-        $sql .='from eip_leave_type elt, eip_title et ';
-        $sql .='where elt.approved_title_id = et.id ';
-        $leavetypes = DB::select($sql, []);
         $users = DB::select("select * from user where status = 'T' and level != 'guest'", []);
-        return view('line.applyleave', [
-            'leavetypes' => $leavetypes,
+        return view('line.applyoverwork', [
             'users' => $users
         ]);
     }
@@ -52,23 +46,18 @@ class applyleave extends Controller
             /*
              * 2個step:
              * step1: 寫入請假紀錄
-             * step2: 通知申請人、代理人、第一簽核人
+             * step2: 通知申請人、第一簽核人
             */
-            $apply_user_line_id = $request->get('userId');      //申請者的line_id
-            $leave_agent_user_no = $request->get('leaveAgent'); //代理人的user_NO
-            $leavename = $request->get('leaveType');            //假別名稱
-            $start_date = $request->get('startDate');           //起日
-            $start_time = $request->get('startTime');           //起時
-            $end_date = $request->get('endDate');               //迄日
-            $end_time = $request->get('endTime');               //迄時
-            $comment = $request->get('comment');                //備註
+            $apply_user_line_id = $request->get('userId');  //申請者的line_id
+            $overworkDate = $request->get('overworkDate');  //加班日
+            $overworkHour = $request->get('overworkHour');  //加班小時
+            $comment = $request->get('comment');            //備註
             //透過假別名稱、起日、迄日找到假別id
-            $leave_days = round(($start_date-$end_date)/3600/24); //請假天數
-            $leave_type_arr = DB::select('select * from eip_leave_type where name =?', [$leavename]);
-            $leave_type_id = "";
-            foreach ($leave_type_arr as $v) {
-                if($leave_days < $v->day) {
-                    $leave_type_id = $v->id;
+            $overwork_type_arr = DB::select('select * from eip_overwork_type', []);
+            $overwork_type_id = "";
+            foreach ($overwork_type_arr as $v) {
+                if($overworkHour < $v->hour) {
+                    $overwork_type_id = $v->id;
                     break;
                 }
             }
@@ -87,10 +76,10 @@ class applyleave extends Controller
 
             //寫入請假紀錄
             $sql = "insert into eip_leave_apply ";
-            $sql .= "(apply_user_no, apply_type, agent_user_no, type_id, start_date, start_time, end_date, end_time, comment) ";
+            $sql .= "(apply_user_no, apply_type, type_id, over_work_date, over_work_hours, comment) ";
             $sql .= "value ";
-            $sql .= "(?, ?, ?, ?, ?, ?, ?, ?, ?) ";
-            if(DB::insert($sql, [$apply_user_no, 'L', $leave_agent_user_no, $leave_type_id, $start_date, $start_time, $end_date, $end_time, $comment]) != 1) {
+            $sql .= "(?, ?, ?, ?, ?, ?) ";
+            if(DB::insert($sql, [$apply_user_no, 'O', $overwork_type_id, $overworkDate, $overworkHour, $comment]) != 1) {
                 throw new Exception('insert db error'); 
             }
             //取得剛剛寫入的請假紀錄id
@@ -98,14 +87,6 @@ class applyleave extends Controller
             $last_appy_id = ""; //假單流水號
             foreach ($last_appy_record as $v) {
                 $last_appy_id = $v->last_id;
-            }
-            //取得代理人的資料
-            $agent_users = DB::select('select cname, line_id from user where NO =?', [$leave_agent_user_no]);
-            $agent_cname = ""; //代理人
-            $agent_line_id = ""; //代理人的line_id
-            foreach ($agent_users as $v) {
-                $agent_cname = $v->cname;
-                $agent_line_id = $v->line_id;
             }
             //取得第一簽核人的資料
             $upper_users = DB::select('select NO, line_id from user where NO in (select upper_user_no from user where line_id =?)', [$apply_user_line_id]);
@@ -116,16 +97,15 @@ class applyleave extends Controller
                 $upper_user_no = $v->NO; 
             }
             //寫入簽核流程紀錄(該table沒有紀錄申請人和簽核人的line_id是因為可能會有換line帳號的情況發生)
-            if(DB::insert("insert into eip_leave_apply_process (apply_id, apply_type, apply_user_no, upper_user_no) value (?, ?, ?, ?)", [$last_appy_id, 'L', $apply_user_no, $upper_user_no]) != 1) {
+            if(DB::insert("insert into eip_leave_apply_process (apply_id, apply_type, apply_user_no, upper_user_no) value (?, ?, ?, ?)", [$last_appy_id, 'O', $apply_user_no, $upper_user_no]) != 1) {
                 DB::delete("delete from eip_leave_apply where id = ?", [$last_appy_id]);
                 throw new Exception('insert db error'); 
             }
             //通知申請人、代理人、第一簽核人
             Log::info("agent_line_id:".$agent_line_id);
             Log::info("upper_line_id:".$upper_line_id);
-            LineServiceProvider::pushTextMsg($apply_user_line_id, "成功送出假單 假別:". $leavename. " 代理人: ".$agent_cname." 起:". $start_date ." ".$start_time. " 迄:". $end_date ." ".$end_time. " 備註:". $comment);
-            LineServiceProvider::pushTextMsg($upper_line_id, $cname. "送出假單，請審核 假別:". $leavename. " 代理人: ".$agent_cname." 起:". $start_date ." ".$start_time. " 迄:". $end_date ." ".$end_time. " 備註:". $comment);
-            LineServiceProvider::pushTextMsg($agent_line_id, $cname. "送出假單，並指定您為代理人 假別:". $leavename. " 起:". $start_date ." ".$start_time. " 迄:". $end_date ." ".$end_time);
+            LineServiceProvider::pushTextMsg($apply_user_line_id, "成功送出加班 加班日:". $overworkDate ." 加班小時".$overworkHour. " 備註:". $comment);
+            LineServiceProvider::pushTextMsg($upper_line_id, $cname. "送出假單，請審核 加班日:". $overworkDate ." 加班小時".$overworkHour. " 備註:". $comment);
 
             return response()->json([
                 'status' => 'successful'

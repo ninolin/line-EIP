@@ -8,15 +8,11 @@ function initializeApp(data) {
     document.getElementById('useridfield').textContent = data.context.userId;
 }
 
-const apply_leave = () => {
+const apply_overwork = () => {
     const post_data = {
         "userId": document.getElementById('useridfield').textContent,
-        "leaveType": $("#leaveType").val(),
-        "leaveAgent": $("#leaveAgent").val(),
-        "startDate": $("#startDate").val(),
-        "startTime": $("#startTime").val(),
-        "endDate": $("#endDate").val(),
-        "endTime": $("#endTime").val()
+        "overworkDate": $("#overworkDate").val(),
+        "overworkHour": $("#overworkHour").val()
     }
 
     for (k in post_data) {
@@ -27,7 +23,7 @@ const apply_leave = () => {
     }
     post_data.comment = $("#comment").val();
     promise_call({
-        url: "./api/applyleave", 
+        url: "./api/applyoverwork", 
         data: post_data, 
         method: "post"
     })

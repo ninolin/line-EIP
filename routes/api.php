@@ -33,6 +33,9 @@ Route::delete('overworktypelist/{id}', 'View\overworktypelist@destroy');
 Route::post('applyleave', 'View\applyleave@store');
 Route::get('applyleave/{id}', 'View\applyleave@show');
 
+Route::post('applyoverwork', 'View\applyoverwork@store');
+Route::get('applyoverwork/{id}', 'View\applyoverwork@show');
+
 Route::post('receive', 'Line\Receive@receive');
 Route::get('validateleave/{id}', 'View\validateleave@index');
 Route::post('validateleave/{id}', 'View\validateleave@update');
