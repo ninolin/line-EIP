@@ -29,7 +29,6 @@ class LineServiceProvider extends ServiceProvider
         //
     }
 
-
     public static function pushTextMsg($line_id, $msg)
     {
         //尋找該用戶所屬line_channel的access_token
