@@ -6,7 +6,7 @@ window.onload = function (e) {
 };
 
 function initializeApp(data) {
-    //document.getElementById('useridfield').textContent = data.context.userId;
+    document.getElementById('useridfield').textContent = data.context.userId;
     promise_call({
         url: "./api/validateleave/"+data.context.userId, 
         //url: "./api/validateleave/U8d41dfb18097f57080858e39b929ce39", 
@@ -33,7 +33,7 @@ function initializeApp(data) {
                     $html += "<td>"+item.over_work_date+"("+item.over_work_hours+"小時)</td>";
                     $html += "<td>-</td>";
                 }
-                $html += "<td><button type='button' class='btn btn-primary btn-sm' onclick='show_leave("+item.id+")'>查</button></td>";
+                $html += "<td><button type='button' class='btn btn-primary btn-sm' onclick='show_leave("+item.id+", \""+item.apply_type+"\")'>查</button></td>";
                 $html += "</tr>";
                 $("#leave_data").append($html);
             })
@@ -41,7 +41,8 @@ function initializeApp(data) {
     })
 }
 
-const show_leave = (apply_id) => {
+const show_leave = (apply_id, apply_type) => {
+    //console.log(apply_type);
     promise_call({
         url: "./api/applyleave/"+apply_id, 
         method: "get"
@@ -73,19 +74,20 @@ const show_leave = (apply_id) => {
                 }
                 $("#leave_data_in_modal").append($html);
             })
-            $("#validateModal").find(".agree").attr("onclick", "validate_leave('agree', "+apply_id+")");
-            $("#validateModal").find(".reject").attr("onclick", "validate_leave('reject', "+apply_id+")");
+            $("#validateModal").find(".agree").attr("onclick", "validate_leave('agree', "+apply_id+", \""+apply_type+"\")");
+            $("#validateModal").find(".reject").attr("onclick", "validate_leave('reject', "+apply_id+", \""+apply_type+"\")");
             $('#validateModal').modal('toggle');
         }
     })
 }
 
-const validate_leave = (type, apply_id) => {
+const validate_leave = (type, apply_id, apply_type) => {
 
     const post_data = {
         "userId": document.getElementById('useridfield').textContent,
         //"userId": "U8d41dfb18097f57080858e39b929ce39", 
         "validate": type,
+        "apply_type": apply_type, 
         "reject_reason": $("#reject_reason").val() || "null"
     }
     promise_call({

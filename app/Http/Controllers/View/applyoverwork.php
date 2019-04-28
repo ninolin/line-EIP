@@ -105,7 +105,7 @@ class applyoverwork extends Controller
             //通知申請人、代理人、第一簽核人
             Log::info("upper_line_id:".$upper_line_id);
             LineServiceProvider::pushTextMsg($apply_user_line_id, "成功送出加班 加班日:". $overworkDate ." 加班小時".$overworkHour. " 備註:". $comment);
-            LineServiceProvider::pushTextMsg($upper_line_id, $apply_user_cname. "送出假單，請審核 加班日:". $overworkDate ." 加班小時".$overworkHour. " 備註:". $comment);
+            LineServiceProvider::pushTextMsg($upper_line_id, $apply_user_cname. "送出加班，請審核 加班日:". $overworkDate ." 加班小時".$overworkHour. " 備註:". $comment);
 
             return response()->json([
                 'status' => 'successful'
