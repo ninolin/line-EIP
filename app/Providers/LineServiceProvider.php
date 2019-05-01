@@ -29,7 +29,7 @@ class LineServiceProvider extends ServiceProvider
         //
     }
 
-    private function findAccessToken($line_id) {
+    private static function findAccessToken($line_id) {
         //尋找該用戶所屬line_channel的access_token
         $channel_array = Config::get('line.channel');
         log::info($channel_array);
@@ -48,7 +48,7 @@ class LineServiceProvider extends ServiceProvider
         if($line_channel_access_token == "") return 0;
     }
 
-    private function sendPushMsg($line_channel_access_token, $response) {
+    private static function sendPushMsg($line_channel_access_token, $response) {
         $header[] = "Content-Type: application/json";
         $header[] = "Authorization: Bearer ".$line_channel_access_token;
         $ch = curl_init("https://api.line.me/v2/bot/message/push");
@@ -64,7 +64,7 @@ class LineServiceProvider extends ServiceProvider
     public static function pushTextMsg($line_id, $msg)
     {
         
-        $line_channel_access_token = $this->findAccessToken($line_id);
+        $line_channel_access_token = self::findAccessToken($line_id);
         // $channel_array = Config::get('line.channel');
         // log::info($channel_array);
         // $line_channel = "";
@@ -92,7 +92,7 @@ class LineServiceProvider extends ServiceProvider
         );
         log::info($line_channel_access_token);
         log::info($response);
-        $result = $this->sendPushMsg($line_channel_access_token, $response);
+        $result = self::sendPushMsg($line_channel_access_token, $response);
         // $header[] = "Content-Type: application/json";
         // $header[] = "Authorization: Bearer ".$line_channel_access_token;
         // $ch = curl_init("https://api.line.me/v2/bot/message/push");
