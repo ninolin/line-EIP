@@ -17,30 +17,35 @@ class leavelog extends Controller
      */
     public function index($id)
     {
-        $leavetypes = DB::select('select approved_title_id from eip_leave_type where id in (select leave_type_id from eip_leave_apply where id = ?)', [$id]);
+        $sql =  "select approved_title_id from eip_leave_type where id in (select type_id from eip_leave_apply where id = ? and apply_type = 'L')";
+        $sql .= "union ";
+        $sql .= "select approved_title_id from eip_overwork_type where id in (select type_id from eip_leave_apply where id = ? and apply_type = 'O')";
+        $leavetypes = DB::select($sql, [$id, $id]);
         $approved_title_id = ""; //該假別最後審核人的職等
         foreach ($leavetypes as $v) {
             $approved_title_id = $v->approved_title_id;
         }
-        $sql = "select NO from user where line_id in (select line_id from eip_leave_apply where id =?)";
-        $users = DB::select($sql, [$id]);
-        $user_no = ""; //申請人no
+
+        $users = DB::select("select apply_user_no from eip_leave_apply where id =?", [$id]);
+        $apply_user_no = ""; //申請人no
         foreach ($users as $v) {
-            $user_no = $v->NO;
+            $apply_user_no = $v->apply_user_no;
         }
+        //因為db的設計機制是類似linklist的方式把員工的簽核人串起來的，所以會產生無窮迴圈的可能，所以最多跑10個簽核人
         $result = [];
         for ( $i=0 ; $i<10 ; $i++ ) {
-            $users = DB::select("select NO, cname, title_id from user where NO IN (select upper_user_no from user where NO =?)", [$user_no]);
+            $users = DB::select("select NO, cname, title_id from user where NO IN (select upper_user_no from user where NO =?)", [$apply_user_no]);
             $user_no = "";
             $user_cname = "";
             $user_title_id = "";
             foreach ($users as $v) {
                 $user_no = $v->NO;
+                $apply_user_no = $v->NO;
                 $user_cname = $v->cname;
                 $user_title_id = $v->title_id;
             }
 
-            $process = DB::select("select * from eip_leave_apply_process where leave_apply_id =? and upper_user_no =?", [$id, $user_no]);
+            $process = DB::select("select * from eip_leave_apply_process where apply_id =? and upper_user_no =?", [$id, $user_no]);
             if(count($process) > 0) {
                 $is_validate = "";
                 $reject_reason = "";
@@ -84,9 +89,18 @@ class leavelog extends Controller
     public function create()
     {
         $page = Input::get('page', 1);
-        $sql =  'select ela.*, u1.cname, u2.cname as agent_cname, elt.name as leave_type_name ';
-        $sql .= 'from eip_leave_apply ela, user as u1, user as u2, eip_leave_type elt ';
-        $sql .= 'where ela.line_id = u1.line_id and ela.leave_agent_user_no = u2.NO and ela.leave_type_id = elt.id ';
+        // $sql =  'select ela.*, u1.cname, u2.cname as agent_cname, elt.name as leave_type_name ';
+        // $sql .= 'from eip_leave_apply ela, user as u1, user as u2, eip_leave_type elt ';
+        // $sql .= 'where ela.apply_user_no = u1.NO and ela.agent_user_no = u2.NO and ela.type_id = elt.id ';
+        $sql  = 'select a.*, u2.cname as cname, u1.cname as agent_cname, eip_leave_type.name as leave_name ';
+        $sql .= 'from ';
+        $sql .= '(select * from eip_leave_apply) as a ';
+        $sql .= 'left join user as u1 ';
+        $sql .= 'on a.agent_user_no = u1.NO ';
+        $sql .= 'left join eip_leave_type ';
+        $sql .= 'on a.type_id = eip_leave_type.id ';
+        $sql .= 'left join user as u2 ';
+        $sql .= 'on a.apply_user_no = u2.NO ';
         $sql .= 'limit ?,10 ';
         $logs = DB::select($sql, [($page-1)*10]);
         $total_logs = DB::select('select * from eip_leave_apply', []);

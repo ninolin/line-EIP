@@ -20,7 +20,7 @@
         <tr>
           <th scope="col">申請人</th>
           <th scope="col">代理人</th>
-          <th scope="col">假別</th>
+          <th scope="col">假別/加班</th>
           <th scope="col">起</th>
           <th scope="col">迄</th>
           <th scope="col">備註</th>
@@ -33,12 +33,36 @@
         @foreach($logs as $log)
           <tr>
             <td> {{$log->cname}} </td>
-            <td> {{$log->agent_cname}} </td>
-            <td> {{$log->leave_type_name}} </td>
-            <td> {{$log->start_date}} {{$log->start_time}}</td>
-            <td> {{$log->end_date}} {{$log->end_time}}</td>
+            <td> 
+              @if ($log->apply_type == 'L') 
+                {{$log->agent_cname}}
+              @else
+                -
+              @endif
+            </td>
+            <td> 
+              @if ($log->apply_type == 'L')
+                {{$log->leave_name}}
+              @else
+                加班
+              @endif
+            </td>
+            <td> 
+              @if ($log->apply_type == 'L')
+                {{$log->start_date}} {{$log->start_time}}
+              @else
+                {{$log->over_work_date}} ({{$log->over_work_hours}}小時)
+              @endif
+            </td>
+            <td>
+              @if ($log->apply_type == 'L') 
+                {{$log->end_date}} {{$log->end_time}}
+              @else
+                -
+              @endif
+            </td>
             <td> {{$log->comment}} </td>
-            <td> {{$log->apply_date}} </td>
+            <td> {{$log->apply_time}} </td>
             <td> 
               @if ($log->apply_status == 'Y')
                   已通過
@@ -75,8 +99,8 @@
 </nav>
 </div>
 <!-- Modal -->
-<div class="modal fade" id="logModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered" role="document">
+<div class="modal fade" id="logModal" tabindex="-1" role="dialog"aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title">簽核紀錄</h5>
