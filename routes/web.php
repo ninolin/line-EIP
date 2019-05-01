@@ -17,6 +17,7 @@ Route::get('/', function () {return view('login');})->name('login');
 Route::get('/applyleave', 'View\applyleave@create');
 Route::get('/applyoverwork', 'View\applyoverwork@create');
 Route::get('/validateleave', 'View\validateleave@create');
+Route::get('/individuallog', 'View\individuallog@create');
 Route::get('/leavelog', 'View\leavelog@create')->name('leavelog');
 //Route::middleware('auth')->get('/whmanage', 'View\whmanage@index')->name('whmanage');
 Route::get('/whmanage', 'View\whmanage@index')->name('whmanage');

@@ -69,7 +69,7 @@
               @elseif ($log->apply_status == 'N')
                   已拒絕
               @else
-                  審核中
+                  簽核中
               @endif
             </td>
             <td>  
