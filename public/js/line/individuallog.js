@@ -8,7 +8,7 @@ window.onload = function (e) {
 function initializeApp(data) {
     //document.getElementById('useridfield').textContent = data.context.userId;
     promise_call({
-        url: "./api/individualleavelog/"+data.context.userId, 
+        url: "./api/individuallog/"+data.context.userId, 
         //url: "./api/individuallog/U8d41dfb18097f57080858e39b929ce39", 
         method: "get"
     })
