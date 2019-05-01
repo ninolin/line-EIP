@@ -136,9 +136,9 @@ class validateleave extends Controller
                     ]);
                 } else {
                     if($apply_user->apply_type == 'L') {
-                        LineServiceProvider::pushTextMsg($apply_user->apply_user_line_id, "請假不通過 原因:".$reject_reason." 假別:". $apply_user->leave_name. " 起:". $apply_user->start_date ." ".$apply_user->start_time. " 迄:". $apply_user->end_date ." ".$apply_user->end_time. " 備註:". $apply_user->comment);
+                        LineServiceProvider::sendNotifyFlexMeg($apply_user->$apply_user_line_id, array_merge(["請假不通過","原因:".$reject_reason,"假別:".$apply_user->leave_name,"起日:".$apply_user->start_date ." ".$apply_user->start_time,"迄日:".$apply_user->end_date ." ".$apply_user->end_time,"備註:". $apply_user->comment]));
                     } else {
-                        LineServiceProvider::pushTextMsg($apply_user->apply_user_line_id, "加班不通過 原因:".$reject_reason." 加班日:". $apply_user->over_work_date ."(".$apply_user->over_work_hours. "小時):". $apply_user->end_date ." 備註:". $apply_user->comment);
+                        LineServiceProvider::sendNotifyFlexMeg($apply_user->$apply_user_line_id, array_merge(["加班不通過","原因:".$reject_reason,"加班日:".$apply_user->over_work_date,"加班小時:".$apply_user->over_work_hours,"備註:". $apply_user->comment]));
                     }
                     return response()->json([
                         'status' => 'successful'
@@ -163,9 +163,9 @@ class validateleave extends Controller
                         ]);
                     } else {
                         if($apply_user->apply_type == 'L') {
-                            LineServiceProvider::pushTextMsg($apply_user->apply_user_line_id, "請假已通過 假別:". $apply_user->leave_name. " 起:". $apply_user->start_date ." ".$apply_user->start_time. " 迄:". $apply_user->end_date ." ".$apply_user->end_time. " 備註:". $apply_user->comment);
+                            LineServiceProvider::sendNotifyFlexMeg($apply_user->$apply_user_line_id, array_merge(["請假已通過","假別:".$apply_user->leave_name,"起日:".$apply_user->start_date ." ".$apply_user->start_time,"迄日:".$apply_user->end_date ." ".$apply_user->end_time,"備註:". $apply_user->comment]));
                         } else {
-                            LineServiceProvider::pushTextMsg($apply_user->apply_user_line_id, "加班已通過 加班日:". $apply_user->over_work_date ."(".$apply_user->over_work_hours. "小時):". $apply_user->end_date ." 備註:". $apply_user->comment);
+                            LineServiceProvider::sendNotifyFlexMeg($apply_user->$apply_user_line_id, array_merge(["加班已通過","加班日:".$apply_user->over_work_date,"加班小時:".$apply_user->over_work_hours,"備註:". $apply_user->comment]));
                         }
                         return response()->json([
                             'status' => 'successful'
@@ -184,13 +184,11 @@ class validateleave extends Controller
                         foreach ($upper_users as $v) {
                             $upper_user_line_id = $v->line_id;
                         }
-
                         if($apply_user->apply_type == 'L') {
-                            LineServiceProvider::pushTextMsg($upper_user_line_id, $apply_user->apply_user_cname. "送出假單，請審核 假別:". $apply_user->leave_name. " 起:". $apply_user->start_date ." ".$apply_user->start_time. " 迄:". $apply_user->end_date ." ".$apply_user->end_time. " 備註:". $apply_user->comment);
+                            LineServiceProvider::sendNotifyFlexMeg($upper_user_line_id, array_merge(["請審核".$apply_user->apply_user_cname."送出的假單","假別:".$apply_user->leave_name,"起日:".$apply_user->start_date ." ".$apply_user->start_time,"迄日:".$apply_user->end_date ." ".$apply_user->end_time,"備註:". $apply_user->comment]));
                         } else {
-                            LineServiceProvider::pushTextMsg($upper_user_line_id, $apply_user->apply_user_cname. "送出加班，請審核 加班日:". $apply_user->over_work_date ."(".$apply_user->over_work_hours. "小時) 備註:". $apply_user->comment);
+                            LineServiceProvider::sendNotifyFlexMeg($upper_user_line_id, ["請審核".$apply_user->apply_user_cname."送出的加班","加班日:".$apply_user->over_work_date,"加班小時:".$apply_user->over_work_hours,"備註:". $apply_user->comment]);
                         }
-
                         return response()->json([
                             'status' => 'successful'
                         ]);

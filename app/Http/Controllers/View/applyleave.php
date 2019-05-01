@@ -61,7 +61,9 @@ class applyleave extends Controller
             $start_time = $request->get('startTime');           //起時
             $end_date = $request->get('endDate');               //迄日
             $end_time = $request->get('endTime');               //迄時
-            $comment = $request->get('comment');                //備註
+            $comment = $request->input('comment');              //備註
+            if($comment == "") $comment = "-";
+
             //透過假別名稱、起日、迄日找到假別id
             $leave_days = round((strtotime($end_date)-strtotime($start_date))/3600/24); //請假天數
             //echo $leave_days;
@@ -131,9 +133,10 @@ class applyleave extends Controller
             Log::info("agent_line_id:".$agent_line_id);
             Log::info("upper_line_id:".$upper_line_id);
             //echo $agent_line_id;
-            LineServiceProvider::pushTextMsg($apply_user_line_id, "成功送出假單 假別:". $leavename. " 代理人: ".$agent_cname." 起:". $start_date ." ".$start_time. " 迄:". $end_date ." ".$end_time. " 備註:". $comment);
-            LineServiceProvider::pushTextMsg($upper_line_id, $apply_user_cname. "送出假單，請審核 假別:". $leavename. " 代理人: ".$agent_cname." 起:". $start_date ." ".$start_time. " 迄:". $end_date ." ".$end_time. " 備註:". $comment);
-            LineServiceProvider::pushTextMsg($agent_line_id, $apply_user_cname. "送出假單，並指定您為代理人 假別:". $leavename. " 起:". $start_date ." ".$start_time. " 迄:". $end_date ." ".$end_time);
+            $msg = ["假別:". $leavename,"代理人:".$agent_cname,"起日:".$start_date." ".$start_time,"迄日:". $end_date ." ".$end_time,"備住:". $comment];
+            LineServiceProvider::sendNotifyFlexMeg($apply_user_line_id, array_merge(["已送出假單"], $msg));
+            LineServiceProvider::sendNotifyFlexMeg($upper_line_id, array_merge(["請審核".$apply_user_cname."送出的假單"], $msg));
+            LineServiceProvider::sendNotifyFlexMeg($agent_line_id, array_merge([$apply_user_cname."指定您為請假代理人"], $msg));
 
             return response()->json([
                 'status' => 'successful'

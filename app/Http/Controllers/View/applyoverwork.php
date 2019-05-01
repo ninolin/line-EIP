@@ -52,6 +52,8 @@ class applyoverwork extends Controller
             $overworkDate = $request->get('overworkDate');  //加班日
             $overworkHour = $request->get('overworkHour');  //加班小時
             $comment = $request->get('comment');            //備註
+            if($comment == "") $comment = "-";
+            
             //透過假別名稱、起日、迄日找到假別id
             $overwork_type_arr = DB::select('select * from eip_overwork_type', []);
             $overwork_type_id = "";
@@ -104,9 +106,9 @@ class applyoverwork extends Controller
             }
             //通知申請人、代理人、第一簽核人
             Log::info("upper_line_id:".$upper_line_id);
-            LineServiceProvider::pushTextMsg($apply_user_line_id, "成功送出加班 加班日:". $overworkDate ." 加班小時".$overworkHour. " 備註:". $comment);
-            LineServiceProvider::pushTextMsg($upper_line_id, $apply_user_cname. "送出加班，請審核 加班日:". $overworkDate ." 加班小時".$overworkHour. " 備註:". $comment);
-
+            $msg = ["加班日:". $overworkDate,"加班小時:".$overworkHour,"備住:". $comment];
+            LineServiceProvider::sendNotifyFlexMeg($apply_user_line_id, array_merge(["已送出加班"], $msg));
+            LineServiceProvider::sendNotifyFlexMeg($upper_line_id, array_merge(["請審核".$apply_user_cname."送出的加班"], $msg));
             return response()->json([
                 'status' => 'successful'
             ]);

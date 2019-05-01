@@ -54,38 +54,38 @@ class Receive extends Controller
      */
     public function index()
     {
-        log::info("aaaa:");
-        $bodyContent = $request->getContent(); //取得request的body內容
-        $json_obj = json_decode($bodyContent); //轉成json格式
-        $sender_userid = $json_obj->events[0]->source->userId; //取得訊息發送者的id
-        $sender_txt = $json_obj->events[0]->message->text; //取得訊息內容
-        log::info("sender_txt:".$sender_txt);
-        $user = DB::select('select * from user where line_id =?', [$sender_userid]);
-        if(count($user) == 0) {
-            //該line_id無在db中存在，判斷是不是一個md5字串，是的話就是要進行綁定，否的話就請輸入認證碼
-            if (preg_match("/[a-z0-9]{32}/", $sender_txt)) {
-                $unlink_user = DB::select("select * from user where line_id = '' or line_is is null", []);
-                foreach ($unlink_user as $v) {
-                    if(md5($v->dd) == $sender_txt){
-                        if(DB::update("update user set line_id =? where NO =?", [$sender_userid, $v->NO]) != 1) {
-                            LineServiceProvider::sendTextMsg($sender_userid, "恭喜".$v->cname."成功加入，歡迎使用");
-                        } else {
-                            LineServiceProvider::sendTextMsg($sender_userid, "綁定失敗:更新db失敗");
-                        }
-                    } else {
-                        LineServiceProvider::sendTextMsg($sender_userid, "綁定失敗:找不到符合的認證碼");
-                    }
-                }
-            } else {
-                LineServiceProvider::sendTextMsg($sender_userid, "歡迎初次使用EIP系統，請輸入認證碼來讓我知道你是誰");
-            }            
-        } else {
-            LineServiceProvider::sendTextMsg($sender_userid, $sender_txt);
-        }
-        return response()->json([
-            'status' => 'successful',
-            'message'=> 1
-        ]);
+        // log::info("aaaa:");
+        // $bodyContent = $request->getContent(); //取得request的body內容
+        // $json_obj = json_decode($bodyContent); //轉成json格式
+        // $sender_userid = $json_obj->events[0]->source->userId; //取得訊息發送者的id
+        // $sender_txt = $json_obj->events[0]->message->text; //取得訊息內容
+        // log::info("sender_txt:".$sender_txt);
+        // $user = DB::select('select * from user where line_id =?', [$sender_userid]);
+        // if(count($user) == 0) {
+        //     //該line_id無在db中存在，判斷是不是一個md5字串，是的話就是要進行綁定，否的話就請輸入認證碼
+        //     if (preg_match("/[a-z0-9]{32}/", $sender_txt)) {
+        //         $unlink_user = DB::select("select * from user where line_id = '' or line_is is null", []);
+        //         foreach ($unlink_user as $v) {
+        //             if(md5($v->dd) == $sender_txt){
+        //                 if(DB::update("update user set line_id =? where NO =?", [$sender_userid, $v->NO]) != 1) {
+        //                     LineServiceProvider::sendTextMsg($sender_userid, "恭喜".$v->cname."成功加入，歡迎使用");
+        //                 } else {
+        //                     LineServiceProvider::sendTextMsg($sender_userid, "綁定失敗:更新db失敗");
+        //                 }
+        //             } else {
+        //                 LineServiceProvider::sendTextMsg($sender_userid, "綁定失敗:找不到符合的認證碼");
+        //             }
+        //         }
+        //     } else {
+        //         LineServiceProvider::sendTextMsg($sender_userid, "歡迎初次使用EIP系統，請輸入認證碼來讓我知道你是誰");
+        //     }            
+        // } else {
+        //     LineServiceProvider::sendTextMsg($sender_userid, $sender_txt);
+        // }
+        // return response()->json([
+        //     'status' => 'successful',
+        //     'message'=> 1
+        // ]);
     }
 
     /**
