@@ -23,6 +23,11 @@
                             <input type="password" name="password" class="form-control" placeholder="Enter Password">
                         </div>
                         <button type="submit" class="btn-c"><i class="fas fa-sign-in-alt"></i>Login</button>
+                        @if (session('login_status'))
+                            <div class="alert alert-danger">
+                                {{ session('login_status') }}
+                            </div>
+                        @endif
                     </form>
                 </div>
             </div>

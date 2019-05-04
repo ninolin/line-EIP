@@ -28,6 +28,11 @@ class Authenticate
         return true;
     }
     
+    public function cleanVerified() {
+        session([self::SESSION => 0]);
+        return true;
+    }
+
     public function redirect() {
         return redirect(route(self::REDIRECT_TO));
     }

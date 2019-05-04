@@ -26,5 +26,10 @@
             </li>
         </ul>
     </div>
-    <div class="ml-md-auto"><button class="btn-c">登出</button></div>
+    <div class="ml-md-auto">
+        <form method="POST" action="{{ route('doLogout') }}">
+            {{ csrf_field() }}
+            <button class="btn-c">登出</button>
+        </form>
+    </div>
 </header>

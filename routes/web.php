@@ -27,5 +27,6 @@ Route::middleware('auth')->get('/leavetypelist', 'View\leavetypelist@create')->n
 Route::middleware('auth')->get('/overworktypelist', 'View\overworktypelist@create')->name('overworktypelist');
 Route::middleware('auth')->get('/leavelog', 'View\leavelog@create')->name('leavelog');
 Route::get('/formmanage', function () {return view('contents.formmanage');})->name('formmanage');
-Route::post('/login', 'Auth\LoginController@login')->name('doLogin');//驗證密碼
+Route::post('/login', 'Auth\AuthController@login')->name('doLogin'); //驗證帳密
+Route::post('/logout', 'Auth\AuthController@logout')->name('doLogout'); //驗證帳密
 
