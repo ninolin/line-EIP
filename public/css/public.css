@@ -21,3 +21,7 @@
     padding-top: .4rem !important;
     padding-bottom: .4rem !important;
 }
+.table th div {
+    float: right;
+    padding-right: 5px;
+}

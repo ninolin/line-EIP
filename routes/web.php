@@ -22,6 +22,7 @@ Route::get('/individuallog', 'View\individuallog@create');
 //Route::middleware('auth')->get('/whmanage', 'View\whmanage@index')->name('whmanage');
 //Route::get('/whmanage', 'View\whmanage@index')->name('whmanage');
 Route::middleware('auth')->get('/userlist', 'View\userlist@create')->name('userlist');
+Route::middleware('auth')->post('/userlist', 'View\userlist@create')->name('userlist');
 Route::middleware('auth')->get('/titlelist', 'View\titlelist@create')->name('titlelist');
 Route::middleware('auth')->get('/leavetypelist', 'View\leavetypelist@create')->name('leavetypelist');
 Route::middleware('auth')->get('/overworktypelist', 'View\overworktypelist@create')->name('overworktypelist');

@@ -1,17 +1,21 @@
+
 const showSetModal = async (user_no, title_id, upper_user_no) => {
     const titles_res = await get_all_title();
     const users_res = await get_all_user();
     if(titles_res.status == "successful" && users_res.status == "successful") {
-        const all_titles = titles_res.data.map(item => {
+        let all_titles = titles_res.data.map(item => {
             item.text = item.name;
             return item;
         })
-        const all_users = users_res.data.map(item => {
+        all_titles = [{id: 0, text: "不設定"}, ...all_titles];
+
+        let all_users = users_res.data.map(item => {
             item.id = item.NO;
             item.text = item.cname;
             return item;
         })
-       
+        all_users = [{id: 0, text: "不設定"}, ...all_users];
+
         $("#title_set_select").select2({
             dropdownParent: $("#setModal"),
             data: all_titles,
@@ -39,12 +43,14 @@ const get_all_title = () => {
          method: "get"
     })
 }
+
 const get_all_user = () => {
     return promise_call({
         url: "./api/userlist", 
         method: "get"
     })
 }
+
 const update_set = (user_no) => {
     if(user_no == $("#upper_user_set_select").val()) {
         alert("請勿設定自己為第一簽核人");
@@ -79,4 +85,14 @@ const delete_title = (title_id) => {
             //$('#addTitleModal').modal('toggle');
         }
     })
+}
+
+const reload_page = (page, order_col, order_type, source) => {
+    if(source == 'col' && order_type == 'DESC') {
+        order_type = 'ASC';
+    } else if(source == 'col' && order_type == 'ASC') {
+        order_type = 'DESC';
+    }
+    $("#search_form").attr("action", "./userlist?page="+page+"&order_col="+order_col+"&order_type="+order_type);
+    $("#search_form").submit();
 }

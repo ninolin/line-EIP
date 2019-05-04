@@ -10,6 +10,15 @@ header {
     position: relative;
     left: 8px;
 }
+.angle-up::after{
+    font-family: 'Font Awesome\ 5 free';
+    content: '\f106';
+    font-size: 15px;
+    font-weight: 900;
+    position: relative;
+    left: 8px;
+}
+
 .nav-item {
     line-height: 53px;
 }

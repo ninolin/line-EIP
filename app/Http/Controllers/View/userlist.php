@@ -15,7 +15,7 @@ class userlist extends Controller
      */
     public function index()
     {
-        $users = DB::select('select * from user', []);
+        $users = DB::select('select * from user where status = "T"', []);
         return response()->json([
             'status' => 'successful',
             'data' => $users
@@ -30,18 +30,33 @@ class userlist extends Controller
     public function create()
     {
         $page = Input::get('page', 1);
+        $search = Input::get('search', '');
+        $order_col = Input::get('order_col', 'username');
+        $order_type = Input::get('order_type', 'DESC');
+
         $sql =  'select u.*, et.name as title, u2.cname as upper_cname ';
         $sql .= 'from user u ';
         $sql .= 'left join eip_title et on u.title_id = et.id ';
         $sql .= 'left join user u2 on u.upper_user_no = u2.NO ';
-        $sql .= 'limit ?,10 ';
+        $sql .= 'where u.status = "T" ';
+        if($search != '') {
+            $sql .= 'and (u.username like "%'.$search.'%" or u.cname like "%'.$search.'%" or u.email like "%'.$search.'%") ';
+        }
+        $sql .= ' order by u.'.$order_col.' '.$order_type.' limit ?,10 ';
         $users = DB::select($sql, [($page-1)*10]);
-        //$users = DB::select('select u.*, et.name as title from user u left join eip_title et on u.title_id = et.id limit ?,10', [($page-1)*10]);
-        $total_users = DB::select('select * from user', []);
+        
+        $page_sql = 'select * from user where status = "T"';
+        if($search != '') {
+            $page_sql .= 'and (username like "%'.$search.'%" or cname like "%'.$search.'%" or email like "%'.$search.'%") ';
+        }
+        $total_users = DB::select($page_sql, []);
         $total_pages = ceil(count($total_users)/10);
         debug($page);
         debug($users);
         return view('contents.userlist', [
+            'search' => $search,
+            'order_col' => $order_col,
+            'order_type' => $order_type,
             'users' => $users, 
             'page' => $page,
             'total_pages' => $total_pages
