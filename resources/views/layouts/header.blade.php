@@ -4,7 +4,7 @@
     <div class="navbar-nav-scroll menu">
         <ul class="navbar-nav bd-navbar-nav flex-row">
             <li class="nav-item px-3">
-                <a class="angle-down nav-link @if (Request::is('whmanage')) active @endif" href="{{ route('whmanage') }}">工時管理</a>
+                <a class="angle-down nav-link">工時管理</a>
                 <ul>
                     <div>
                         <li><a class="@if (Request::is('userlist')) active @endif" href="{{ route('userlist') }}">員工清單</a></li>
