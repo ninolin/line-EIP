@@ -26,7 +26,7 @@ class Receive extends Controller
             if (preg_match("/[a-z0-9]{32}/", $sender_txt)) {
                 $unlink_user = DB::select("select * from user where status = 'T' and (line_id = '' or line_id is null)", []);
                 foreach ($unlink_user as $v) {
-                    if(md5($v->NO+$v->dd) == $sender_txt){
+                    if(md5($v->NO.$v->dd) == $sender_txt){
                         if(DB::update("update user set line_id =?, line_channel = ? where NO =?", [$sender_userid, $line_channel, $v->NO]) == 1) {
                             LineServiceProvider::pushTextMsg($sender_userid, "恭喜".$v->cname."成功加入，歡迎使用");
                         } else {
