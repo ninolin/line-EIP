@@ -39,6 +39,10 @@
             @if ($order_col == 'upper_user_no' && $order_type == 'DESC') <div class="angle-down"></div> @endif
             @if ($order_col == 'upper_user_no' && $order_type == 'ASC') <div class="angle-up"></div> @endif
           </th>
+          <th scope="col" onclick="reload_page({{$page}}, 'line_id', '{{$order_type}}', 'col')">已加入line
+            @if ($order_col == 'line_id' && $order_type == 'DESC') <div class="angle-down"></div> @endif
+            @if ($order_col == 'line_id' && $order_type == 'ASC') <div class="angle-up"></div> @endif
+          </th>
           <th scope="col">操作</th>
         </tr>
       </thead>
@@ -50,6 +54,12 @@
             <td> {{$user->cname}} </td>
             <td> {{$user->title}} </td>
             <td> {{$user->upper_cname}} </td>
+            <td> 
+              @if ($user->line_id != '') 
+                是
+              @else 
+                否
+              @endif
             <td>  
              <button type="button" class="btn btn-outline-primary btn-sm" onclick="showSetModal({{$user->NO}}, {{$user->title_id}}, {{$user->upper_user_no}})">設定</button>
             </td>
