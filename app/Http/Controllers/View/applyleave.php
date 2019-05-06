@@ -33,7 +33,7 @@ class applyleave extends Controller
         $sql .='from eip_leave_type elt, eip_title et ';
         $sql .='where elt.approved_title_id = et.id ';
         $leavetypes = DB::select($sql, []);
-        $users = DB::select("select * from user where status = 'T' and level != 'guest'", []);
+        $users = DB::select("select * from user where status = 'T' order by cname", []);
         return view('line.applyleave', [
             'leavetypes' => $leavetypes,
             'users' => $users
@@ -124,6 +124,8 @@ class applyleave extends Controller
                 $upper_line_id = $v->line_id; 
                 $upper_user_no = $v->NO; 
             }
+            if($upper_line_id == "" || $upper_user_no == "") throw new Exception('沒設定簽核人或簽核人加入系統');
+
             //寫入簽核流程紀錄(該table沒有紀錄申請人和簽核人的line_id是因為可能會有換line帳號的情況發生)
             if(DB::insert("insert into eip_leave_apply_process (apply_id, apply_type, apply_user_no, upper_user_no) value (?, ?, ?, ?)", [$last_appy_id, 'L', $apply_user_no, $upper_user_no]) != 1) {
                 DB::delete("delete from eip_leave_apply where id = ?", [$last_appy_id]);

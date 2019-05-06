@@ -30,7 +30,7 @@
                             <label class="col-3">代理人</label>
                             <select id="leaveAgent" class="form-control col-9">
                                 @foreach($users as $user)
-                                    <option value="{{$user->NO}}">{{$user->cname}}</option>
+                                    <option value="{{$user->NO}}">{{$user->cname}}-{{$user->username}}</option>
                                 @endforeach
                             </select>
                         </div>
