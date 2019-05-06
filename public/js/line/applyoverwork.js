@@ -30,6 +30,8 @@ const apply_overwork = () => {
     .then(v => {
         if(v.status == "successful") {
             liff.closeWindow();
-        } 
+        } else {
+            alert(v.message);
+        }
     })
 }

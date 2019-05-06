@@ -34,6 +34,8 @@ const apply_leave = () => {
     .then(v => {
         if(v.status == "successful") {
             liff.closeWindow();
-        } 
+        } else {
+            alert(v.message);
+        }
     })
 }

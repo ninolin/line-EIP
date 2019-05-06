@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Input;
 use App\Providers\LineServiceProvider;
 use DB;
 use Log;
+use Exception;
 
 class applyleave extends Controller
 {
@@ -85,28 +86,10 @@ class applyleave extends Controller
             $users = DB::select('select NO, cname from user where line_id =?', [$apply_user_line_id]);
             $apply_user_NO = "";    //申請人NO
             $apply_user_cname = ""; //申請人別名
-            if(count($users) != 1) {
-                throw new Exception('The line_id is not exist in the EIP'); 
-            }
+            if(count($users) != 1) throw new Exception('請假失敗:請先將您的line加入EIP中'); 
             foreach ($users as $v) {
                 $apply_user_no = $v->NO;
                 $apply_user_cname = $v->cname;
-            }
-            //debug($line_id);
-
-            //寫入請假紀錄
-            $sql = "insert into eip_leave_apply ";
-            $sql .= "(apply_user_no, apply_type, agent_user_no, type_id, start_date, start_time, end_date, end_time, comment) ";
-            $sql .= "value ";
-            $sql .= "(?, ?, ?, ?, ?, ?, ?, ?, ?) ";
-            if(DB::insert($sql, [$apply_user_no, 'L', $leave_agent_user_no, $leave_type_id, $start_date, $start_time, $end_date, $end_time, $comment]) != 1) {
-                throw new Exception('insert db error'); 
-            }
-            //取得剛剛寫入的請假紀錄id
-            $last_appy_record = DB::select('select max(id) as last_id from eip_leave_apply');
-            $last_appy_id = ""; //假單流水號
-            foreach ($last_appy_record as $v) {
-                $last_appy_id = $v->last_id;
             }
             //取得代理人的資料
             $agent_users = DB::select('select cname, line_id from user where NO =?', [$leave_agent_user_no]);
@@ -116,6 +99,7 @@ class applyleave extends Controller
                 $agent_cname = $v->cname;
                 $agent_line_id = $v->line_id;
             }
+            if($agent_line_id == "") throw new Exception('請假失敗:代理人的line未加入EIP中'); 
             //取得第一簽核人的資料
             $upper_users = DB::select('select NO, line_id from user where NO in (select upper_user_no from user where line_id =?)', [$apply_user_line_id]);
             $upper_line_id = "";    //第一簽核人的line_id
@@ -124,8 +108,22 @@ class applyleave extends Controller
                 $upper_line_id = $v->line_id; 
                 $upper_user_no = $v->NO; 
             }
-            if($upper_line_id == "" || $upper_user_no == "") throw new Exception('沒設定簽核人或簽核人加入系統');
-
+            if($upper_line_id == "") throw new Exception('請假失敗:未設定簽核人或簽核人的line未加入EIP中');
+            
+            //寫入請假紀錄
+            $sql = "insert into eip_leave_apply ";
+            $sql .= "(apply_user_no, apply_type, agent_user_no, type_id, start_date, start_time, end_date, end_time, comment) ";
+            $sql .= "value ";
+            $sql .= "(?, ?, ?, ?, ?, ?, ?, ?, ?) ";
+            if(DB::insert($sql, [$apply_user_no, 'L', $leave_agent_user_no, $leave_type_id, $start_date, $start_time, $end_date, $end_time, $comment]) != 1) {
+                throw new Exception('請假失敗:insert eip_leave_apply error'); 
+            }
+            //取得剛剛寫入的請假紀錄id
+            $last_appy_record = DB::select('select max(id) as last_id from eip_leave_apply');
+            $last_appy_id = ""; //假單流水號
+            foreach ($last_appy_record as $v) {
+                $last_appy_id = $v->last_id;
+            }
             //寫入簽核流程紀錄(該table沒有紀錄申請人和簽核人的line_id是因為可能會有換line帳號的情況發生)
             if(DB::insert("insert into eip_leave_apply_process (apply_id, apply_type, apply_user_no, upper_user_no) value (?, ?, ?, ?)", [$last_appy_id, 'L', $apply_user_no, $upper_user_no]) != 1) {
                 DB::delete("delete from eip_leave_apply where id = ?", [$last_appy_id]);
@@ -136,7 +134,7 @@ class applyleave extends Controller
             Log::info("upper_line_id:".$upper_line_id);
             //echo $agent_line_id;
             $msg = ["假別:". $leavename,"代理人:".$agent_cname,"起日:".$start_date." ".$start_time,"迄日:". $end_date ." ".$end_time,"備住:". $comment];
-            LineServiceProvider::sendNotifyFlexMeg($apply_user_line_id, array_merge(["已送出假單"], $msg));
+            LineServiceProvider::sendNotifyFlexMeg($apply_user_line_id, array_merge(["已送出假單，待簽核完成後即完成請假"], $msg));
             LineServiceProvider::sendNotifyFlexMeg($upper_line_id, array_merge(["請審核".$apply_user_cname."送出的假單"], $msg));
             LineServiceProvider::sendNotifyFlexMeg($agent_line_id, array_merge([$apply_user_cname."指定您為請假代理人"], $msg));
 

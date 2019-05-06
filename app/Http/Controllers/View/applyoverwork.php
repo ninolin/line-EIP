@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Input;
 use App\Providers\LineServiceProvider;
 use DB;
 use Log;
+use Exception;
 
 class applyoverwork extends Controller
 {
@@ -45,7 +46,7 @@ class applyoverwork extends Controller
         try {
             /*
              * 2個step:
-             * step1: 寫入請假紀錄
+             * step1: 寫入加班紀錄
              * step2: 通知申請人、第一簽核人
             */
             $apply_user_line_id = $request->get('userId');  //申請者的line_id
@@ -67,28 +68,10 @@ class applyoverwork extends Controller
             $users = DB::select('select NO, cname from user where line_id =?', [$apply_user_line_id]);
             $apply_user_NO = "";    //申請人NO
             $apply_user_cname = ""; //申請人別名
-            if(count($users) != 1) {
-                throw new Exception('The line_id is not exist in the EIP'); 
-            }
+            if(count($users) != 1) throw new Exception('請加班失敗:請先將您的line加入EIP中'); 
             foreach ($users as $v) {
                 $apply_user_no = $v->NO;
                 $apply_user_cname = $v->cname;
-            }
-            //debug($line_id);
-
-            //寫入請假紀錄
-            $sql = "insert into eip_leave_apply ";
-            $sql .= "(apply_user_no, apply_type, type_id, over_work_date, over_work_hours, comment) ";
-            $sql .= "value ";
-            $sql .= "(?, ?, ?, ?, ?, ?) ";
-            if(DB::insert($sql, [$apply_user_no, 'O', $overwork_type_id, $overworkDate, $overworkHour, $comment]) != 1) {
-                throw new Exception('insert db error'); 
-            }
-            //取得剛剛寫入的請假紀錄id
-            $last_appy_record = DB::select('select max(id) as last_id from eip_leave_apply');
-            $last_appy_id = ""; //假單流水號
-            foreach ($last_appy_record as $v) {
-                $last_appy_id = $v->last_id;
             }
             //取得第一簽核人的資料
             $upper_users = DB::select('select NO, line_id from user where NO in (select upper_user_no from user where line_id =?)', [$apply_user_line_id]);
@@ -98,17 +81,33 @@ class applyoverwork extends Controller
                 $upper_line_id = $v->line_id; 
                 $upper_user_no = $v->NO; 
             }
-            //echo $upper_line_id;
+            if($upper_line_id == "" || $upper_user_no == "") throw new Exception('請加班:未設定簽核人或簽核人的line未加入EIP中');
+
+            //寫入請假紀錄
+            $sql = "insert into eip_leave_apply ";
+            $sql .= "(apply_user_no, apply_type, type_id, over_work_date, over_work_hours, comment) ";
+            $sql .= "value ";
+            $sql .= "(?, ?, ?, ?, ?, ?) ";
+            if(DB::insert($sql, [$apply_user_no, 'O', $overwork_type_id, $overworkDate, $overworkHour, $comment]) != 1) {
+                throw new Exception('insert eip_leave_apply error'); 
+            }
+            //取得剛剛寫入的請假紀錄id
+            $last_appy_record = DB::select('select max(id) as last_id from eip_leave_apply');
+            $last_appy_id = ""; //假單流水號
+            foreach ($last_appy_record as $v) {
+                $last_appy_id = $v->last_id;
+            }
+            
             //寫入簽核流程紀錄(該table沒有紀錄申請人和簽核人的line_id是因為可能會有換line帳號的情況發生)
             if(DB::insert("insert into eip_leave_apply_process (apply_id, apply_type, apply_user_no, upper_user_no) value (?, ?, ?, ?)", [$last_appy_id, 'O', $apply_user_no, $upper_user_no]) != 1) {
                 DB::delete("delete from eip_leave_apply where id = ?", [$last_appy_id]);
-                throw new Exception('insert db error'); 
+                throw new Exception('insert eip_leave_apply_process error'); 
             }
             //通知申請人、代理人、第一簽核人
             Log::info("upper_line_id:".$upper_line_id);
             $msg = ["加班日:". $overworkDate,"加班小時:".$overworkHour,"備住:". $comment];
-            LineServiceProvider::sendNotifyFlexMeg($apply_user_line_id, array_merge(["已送出加班"], $msg));
-            LineServiceProvider::sendNotifyFlexMeg($upper_line_id, array_merge(["請審核".$apply_user_cname."送出的加班"], $msg));
+            LineServiceProvider::sendNotifyFlexMeg($apply_user_line_id, array_merge(["已申請加班，待簽核完成後即完成加班申請"], $msg));
+            LineServiceProvider::sendNotifyFlexMeg($upper_line_id, array_merge(["請審核".$apply_user_cname."送出的加班申請"], $msg));
             return response()->json([
                 'status' => 'successful'
             ]);
