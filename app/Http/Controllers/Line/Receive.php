@@ -36,6 +36,9 @@ class Receive extends Controller
                 LineServiceProvider::replyTextMsgWithChannel($sender_userid, $sender_replyToken, $line_channel, "歡迎初次使用EIP系統，請輸入認證碼來讓我知道你是誰");
             }            
         } else {
+            if($sender_txt == "log") {
+                LineServiceProvider::sendIndividualLogFlexMeg($sender_userid);
+            }
             LineServiceProvider::replyTextMsgWithChannel($sender_userid, $sender_replyToken, $line_channel, $sender_txt);
         }
         return response()->json([

@@ -134,6 +134,109 @@ class LineServiceProvider extends ServiceProvider
         $result = self::sendPushMsg($line_channel_access_token, $response);
     }
 
+    public static function sendIndividualLogFlexMeg($line_id) {
+        $sql = 'select *, elt.name as leave_name ';
+        $sql .='from eip_leave_apply elp left join eip_leave_type elt on elp.type_id = elt.id';
+        $sql .='where elp.apply_user_no IN (select NO from user where line_id = ?)';
+        $logs = DB::select($sql, [$line_id]);
+
+        $content = "";
+        $line_channel_access_token = self::findAccessToken($line_id);
+        foreach ($logs as $v) {
+            $start_date = $v->start_date;
+            $leave_name = $v->leave_name;
+            $apply_status = "成功";
+            $apply_status_color = "#555555";
+            if($v->apply_type == 'O') {
+                $start_date = $v->over_work_date;
+                $leave_name = "加班";
+            }
+            if($v->apply_status == 'P') {
+                $apply_status = "簽核中";
+                $apply_status_color = "#0073e6";
+            } else if($v->apply_status == 'N') {
+                $apply_status = "失敗";
+                $apply_status_color = "#b32400";
+            }
+            $content .= '{
+                "type": "box",
+                "layout": "horizontal",
+                "margin": "sm",
+                "spacing": "sm",
+                "contents": [
+                    {
+                        "type": "box",
+                        "layout": "horizontal",
+                        "contents": [
+                          {
+                            "type": "text",
+                            "text": "'.$start_date.'",
+                            "size": "sm",
+                            "weight": "bold",
+                            "color": "#555555",
+                            "flex": 2
+                          },
+                          {
+                            "type": "text",
+                            "text": "'.$leave_name.'",
+                            "size": "sm",
+                            "color": "#555555"
+                          },
+                          {
+                            "type": "text",
+                            "text": "'.$apply_status.'",
+                            "size": "sm",
+                            "color": "'.$apply_status_color.'"
+                          },
+                          {
+                            "type": "text",
+                            "text": "更多..",
+                            "size": "sm",
+                            "weight": "bold",
+                            "color": "#38488f",
+                            "align": "end"
+                          }
+                        ]
+                    }
+                ]
+            },
+            {
+                "type": "separator",
+                "margin": "sm"
+            },';
+        }
+        $content = substr($content,0,-1);
+        $response =  '{
+            "type": "bubble",
+            "styles": {"footer": {"separator": true}},
+            "body": {"type": "box","layout": "vertical","contents": [
+                {
+                    "type": "text",
+                    "text": "工時紀錄",
+                    "weight": "bold",
+                    "size": "xl",
+                    "margin": "md",
+                    "color": "#1DB446"
+                },
+                '.$content.'
+            ]}
+        }';
+        $response = json_decode($response, true);
+        $response = array (
+            "to" => $line_id,
+            "messages" => array (
+                array (
+                    "type" => "flex",
+                    "altText" => "This is a Flex Message",
+                    "contents" => $response
+                )
+            )
+        );
+        log::info($line_channel_access_token);
+        log::info($response);
+        $result = self::sendPushMsg($line_channel_access_token, $response);
+    }
+
     public static function pushTextMsg($line_id, $msg) {
         $line_channel_access_token = self::findAccessToken($line_id);
         $response = array (
