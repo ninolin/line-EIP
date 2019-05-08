@@ -194,7 +194,13 @@ class LineServiceProvider extends ServiceProvider
                             "size": "sm",
                             "weight": "bold",
                             "color": "#38488f",
-                            "align": "end"
+                            "align": "end",
+                            "action": {
+                                "type": "postback",
+                                "label": "Schedule",
+                                "displayText": "Schedule",
+                                "data": "SCHEDULE"
+                            }
                           }
                         ]
                     }
