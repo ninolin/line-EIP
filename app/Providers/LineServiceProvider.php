@@ -147,6 +147,7 @@ class LineServiceProvider extends ServiceProvider
             $leave_name = $v->leave_name;
             $apply_status = "成功";
             $apply_status_color = "#555555";
+            $apply_id = $v->id;
             if($v->apply_type == 'O') {
                 $start_date = $v->over_work_date;
                 $leave_name = "加班";
@@ -198,7 +199,7 @@ class LineServiceProvider extends ServiceProvider
                             "action": {
                                 "type": "postback",
                                 "label": "Schedule",
-                                "data": "'.$v->id.'"
+                                "data": "'.$apply_id.'"
                             }
                           }
                         ]
