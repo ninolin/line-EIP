@@ -136,8 +136,8 @@ class LineServiceProvider extends ServiceProvider
 
     public static function sendIndividualLogFlexMeg($line_id) {
         $sql = 'select *, elt.name as leave_name ';
-        $sql .='from eip_leave_apply elp left join eip_leave_type elt on elp.type_id = elt.id ';
-        $sql .='where elp.apply_user_no IN (select NO from user where line_id = ?)';
+        $sql .='from eip_leave_apply ela left join eip_leave_type elt on ela.type_id = elt.id ';
+        $sql .='where ela.apply_user_no IN (select NO from user where line_id = ?)';
         $logs = DB::select($sql, [$line_id]);
 
         $content = "";
@@ -198,8 +198,7 @@ class LineServiceProvider extends ServiceProvider
                             "action": {
                                 "type": "postback",
                                 "label": "Schedule",
-                                "displayText": "Schedule",
-                                "data": "SCHEDULE"
+                                "data": "'+$v->id+'"
                             }
                           }
                         ]
