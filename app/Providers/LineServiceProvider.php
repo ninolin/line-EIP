@@ -198,7 +198,7 @@ class LineServiceProvider extends ServiceProvider
                             "action": {
                                 "type": "postback",
                                 "label": "Schedule",
-                                "data": "'+$v->id+'"
+                                "data": "'.$v->id.'"
                             }
                           }
                         ]
