@@ -47,7 +47,7 @@ class Receive extends Controller
             $postback_data = $json_obj->events[0]->postback->data; //取得訊息內容
             $action = explode("&",$postback_data)[0];
             if($action == "show_apply_detail") {
-                LineServiceProvider::sendShowApplyDetailFlexMeg(explode("&",$postback_data)[1]);
+                LineServiceProvider::sendShowApplyDetailFlexMeg($sender_userid, explode("&",$postback_data)[1]);
             }
         }
         

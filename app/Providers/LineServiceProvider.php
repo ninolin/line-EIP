@@ -244,7 +244,7 @@ class LineServiceProvider extends ServiceProvider
         $result = self::sendPushMsg($line_channel_access_token, $response);
     }
 
-    public static function sendShowApplyDetailFlexMeg($apply_id) {
+    public static function sendShowApplyDetailFlexMeg($line_id, $apply_id) {
 
         $details = json_decode(LeaveApplyProvider::getLeaveApply($apply_id));
 

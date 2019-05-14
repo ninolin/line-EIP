@@ -41,7 +41,7 @@ class LeaveApplyProvider extends ServiceProvider
         $sql .= 'left join user as u2 '; //u2是apply user
         $sql .= 'on a.apply_user_no = u2.NO ';
         $apply = DB::select($sql, [$apply_id]);
-        if(count($apply == 1)) {
+        if(count($apply) == 1) {
             return json_encode($apply[0]);
         } else {
             return 0;
