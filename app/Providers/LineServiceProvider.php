@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use App\Providers\LeaveApplyProvider;
 use Log;
 use DB;
 use Config;
@@ -199,7 +200,7 @@ class LineServiceProvider extends ServiceProvider
                             "action": {
                                 "type": "postback",
                                 "label": "Schedule",
-                                "data": "'.$v->id.'"
+                                "data": "show_apply_detail&'.$v->id.'"
                             }
                           }
                         ]
@@ -227,6 +228,84 @@ class LineServiceProvider extends ServiceProvider
                 '.$content.'
             ]}
         }';
+        $response = json_decode($response, true);
+        $response = array (
+            "to" => $line_id,
+            "messages" => array (
+                array (
+                    "type" => "flex",
+                    "altText" => "This is a Flex Message",
+                    "contents" => $response
+                )
+            )
+        );
+        log::info($line_channel_access_token);
+        log::info($response);
+        $result = self::sendPushMsg($line_channel_access_token, $response);
+    }
+
+    public static function sendShowApplyDetailFlexMeg($apply_id) {
+
+        $details = json_decode(LeaveApplyProvider::getLeaveApply($apply_id));
+
+        $content = "";
+        $line_channel_access_token = self::findAccessToken($line_id);
+        foreach ($details as $v) {
+            $apply_date = $v->apply_time;
+            $start_date = $v->start_date.' '.$v->start_time;
+            $end_date = $v->end_date.' '.$v->end_time;
+            $leave_name = $v->leave_name;
+            $agent_cname = $v->agent_cname;
+            $comment = $v->comment;
+            $apply_status = "成功";
+            $apply_status_color = "#555555";
+            // if($v->apply_type == 'O') {
+            //     $start_date = $v->over_work_date;
+            //     $leave_name = "加班";
+            // }
+            if($v->apply_status == 'P') {
+                $apply_status = "簽核中";
+                $apply_status_color = "#0073e6";
+            } else if($v->apply_status == 'N') {
+                $apply_status = "失敗";
+                $apply_status_color = "#b32400";
+            }
+            $content .= '
+            {"type": "text","text": "請假紀錄","weight": "bold","size": "xl","color": "#1DB446"},
+            {"type": "text","text": "申請時間: '.$apply_date.'","size": "xs","color": "#aaaaaa","wrap": true},
+            {"type": "separator","margin": "xxl"},
+            {"type": "box","layout": "vertical","margin": "xxl","spacing": "sm","contents": [
+                {"type": "box","layout": "horizontal","contents": [
+                    {"type": "text","text": "起","size": "sm","color": "#555555","flex": 0},
+                    {"type": "text","text": "'.$start_date.'","size": "sm","color": "#111111","align": "end"}
+                ]},
+                {"type": "box","layout": "horizontal","contents": [
+                    {"type": "text","text": "迄","size": "sm","color": "#555555","flex": 0},
+                    {"type": "text","text": "'.$end_date.'","size": "sm","color": "#111111","align": "end"}
+                ]},
+                {"type": "box","layout": "horizontal","contents": [
+                    {"type": "text","text": "假別","size": "sm","color": "#555555","flex": 0},
+                    {"type": "text","text": "'.$leave_name.'","size": "sm","color": "#111111","align": "end"}
+                ]},
+                {"type": "box","layout": "horizontal","contents": [
+                    {"type": "text","text": "代理人","size": "sm","color": "#555555","flex": 0},
+                    {"type": "text","text": "'.$agent_cname.'","size": "sm","color": "#111111","align": "end"}
+                ]},
+                {"type": "box","layout": "horizontal","contents": [
+                    {"type": "text","text": "備註","size": "sm","color": "#555555","flex": 0},
+                    {"type": "text","text": "'.$comment.'","size": "sm","color": "#111111","align": "end"}
+                ]},
+                {"type": "box","layout": "horizontal","contents": [
+                    {"type": "text","text": "簽核進度","size": "sm","color": "#555555","flex": 0},
+                    {"type": "text","text": "'.$apply_status.'","size": "sm","color": "'.$apply_status_color.'","align": "end"}
+                ]},
+            {"type": "separator","margin": "xxl"}';
+        }
+        $content = substr($content,0,-1);
+        $response =  '{
+            "type": "bubble",
+            "styles": {"footer": {"separator": true}},
+            "body": {"type": "box","layout": "vertical","contents": ['.$content.']}}';
         $response = json_decode($response, true);
         $response = array (
             "to" => $line_id,
