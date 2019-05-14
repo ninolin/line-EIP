@@ -305,7 +305,7 @@ class LineServiceProvider extends ServiceProvider
         $response =  '{
             "type": "bubble",
             "styles": {"footer": {"separator": true}},
-            "body": {"type": "box","layout": "vertical","contents": ['.$content.']}}';
+            "body": {"type": "box","layout": "vertical","contents": ['.$content.']}]}}';
         $response = json_decode($response, true);
         $response = array (
             "to" => $line_id,
