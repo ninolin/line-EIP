@@ -246,11 +246,11 @@ class LineServiceProvider extends ServiceProvider
 
     public static function sendShowApplyDetailFlexMeg($line_id, $apply_id) {
 
-        $details = json_decode(LeaveApplyProvider::getLeaveApply($apply_id));
+        $v = json_decode(LeaveApplyProvider::getLeaveApply($apply_id));
 
         $content = "";
         $line_channel_access_token = self::findAccessToken($line_id);
-        foreach ($details as $v) {
+        
             $apply_date = $v->apply_time;
             $start_date = $v->start_date.' '.$v->start_time;
             $end_date = $v->end_date.' '.$v->end_time;
@@ -300,8 +300,8 @@ class LineServiceProvider extends ServiceProvider
                     {"type": "text","text": "'.$apply_status.'","size": "sm","color": "'.$apply_status_color.'","align": "end"}
                 ]},
             {"type": "separator","margin": "xxl"}';
-        }
-        $content = substr($content,0,-1);
+        
+       // $content = substr($content,0,-1);
         $response =  '{
             "type": "bubble",
             "styles": {"footer": {"separator": true}},
