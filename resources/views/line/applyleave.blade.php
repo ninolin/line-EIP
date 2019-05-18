@@ -65,12 +65,12 @@
                         </div>
                     </div>
                     <div class="weui-btn-area">
-                    <button type="button" class="btn-c" onclick="apply_leave()"><i class="fas fa-sign-in-alt"></i>申請</button>
+                        <button type="button" class="btn-c" onclick="apply_leave()"><i class="fas fa-sign-in-alt"></i>申請</button>
                     </div>
                     <!-- <div class="weui-btn-area">
                     <button type="button" class="btn-c" onclick="apply_leave()"><i class="fas fa-sign-in-alt"></i>請假申請</button>
                     </div> -->
-                    <div class="text-center">
+                    <!-- <div class="text-center">
                         <div class="main-section">
                             <div>
                                 <form class="col-12" method="POST">
@@ -160,7 +160,7 @@
                                 </form>
                             </div>
                         </div>
-                    </div>
+                    </div> -->
                 </div>
                 <div style="display:none">
                     <div class="weui-cells weui-cells_form">
