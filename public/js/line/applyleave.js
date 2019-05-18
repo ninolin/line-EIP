@@ -52,7 +52,9 @@ const apply_leave = () => {
         }
     })
 }
-
+document.getElementById('test').addEventListener('click', function () {
+    alert("xxxxx");
+});
 const change_tab = (p) => {
     alert(p);
     $(".weui-navbar__item").removeClass("weui-bar__item_on");

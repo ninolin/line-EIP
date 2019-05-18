@@ -16,7 +16,7 @@
         <div class="weui-tab">
             <div class="weui-navbar">
                 <div class="weui-navbar__item weui-bar__item_on" ontouchend="change_tab(0)">請假</div>
-                <div class="weui-navbar__item" ontouchend="change_tab(1)">加班</div>
+                <div class="weui-navbar__item" id="test" ontouchend="change_tab(1)">加班</div>
             </div>
             <div class="weui-tab__panel">
                 <div>
