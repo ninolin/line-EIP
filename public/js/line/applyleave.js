@@ -41,7 +41,7 @@ const apply_leave = () => {
     //     }
     // })
 }
-document.getElementById('test').addEventListener('click', function () {
+document.getElementById('test').addEventListener('touchend', function () {
     alert("xxxxx");
 });
 const change_tab = (p) => {
