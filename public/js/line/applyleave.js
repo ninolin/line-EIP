@@ -1,4 +1,18 @@
+var isMobile = false;
 window.onload = function (e) {
+    if( navigator.userAgent.match(/Android/i)
+        || navigator.userAgent.match(/webOS/i)
+        || navigator.userAgent.match(/iPhone/i)
+        || navigator.userAgent.match(/iPad/i)
+        || navigator.userAgent.match(/iPod/i)
+        || navigator.userAgent.match(/BlackBerry/i)
+        || navigator.userAgent.match(/Windows Phone/i)
+    ) {
+        isMobile = true;
+    } else {
+        isMobile = false;
+    }
+
     liff.init(function (data) {
         initializeApp(data);
     });
@@ -40,7 +54,7 @@ const apply_leave = () => {
     })
 }
 
-$('.weui-navbar__item').click(function(){
+$('.weui-navbar__item').on(isMobile ? 'touchend' : 'click', function(){
     $(".weui-navbar__item").removeClass("weui-bar__item_on");
     $(this).addClass("weui-bar__item_on");
     $(".weui-navbar__item").get().map((item, index) => {
