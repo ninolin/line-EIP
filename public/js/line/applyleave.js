@@ -12,7 +12,6 @@ window.onload = function (e) {
     } else {
         isMobile = false;
     }
-
     liff.init(function (data) {
         initializeApp(data);
     });
@@ -54,14 +53,14 @@ const apply_leave = () => {
     })
 }
 
-$('.weui-navbar__item').on(isMobile ? 'touchend' : 'click', function(){
+const change_tab = (p) => {
     $(".weui-navbar__item").removeClass("weui-bar__item_on");
-    $(this).addClass("weui-bar__item_on");
+    $($(".weui-navbar__item").get(p)).addClass("weui-bar__item_on");
     $(".weui-navbar__item").get().map((item, index) => {
-        if(item == this) {
+        if(index == p) {
             $($(".weui-tab__panel").children('div')[index]).show()
         } else {
             $($(".weui-tab__panel").children('div')[index]).hide();
         }
     })
-});
+}
