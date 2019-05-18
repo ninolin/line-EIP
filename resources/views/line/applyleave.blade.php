@@ -64,7 +64,7 @@
                         </div>
                     </div>
                     <div class="weui-btn-area">
-                        <a href="javascript:;" class="weui-btn weui-btn_primary" onclick="apply_leave()">請假申請</a>
+                    <button type="button" class="btn-c" onclick="apply_leave()"><i class="fas fa-sign-in-alt"></i>請假申請</button>
                     </div>
                     <!-- <div class="text-center">
                         <div class="main-section">
