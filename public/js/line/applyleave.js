@@ -22,6 +22,7 @@ function initializeApp(data) {
 }
 
 const apply_leave = () => {
+    alert("yyy");
     const post_data = {
         "userId": document.getElementById('useridfield').textContent,
         "leaveType": $("#leaveType").val(),
