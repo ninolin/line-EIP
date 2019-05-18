@@ -54,6 +54,7 @@ const apply_leave = () => {
 }
 
 const change_tab = (p) => {
+    alert(p);
     $(".weui-navbar__item").removeClass("weui-bar__item_on");
     $($(".weui-navbar__item").get(p)).addClass("weui-bar__item_on");
     $(".weui-navbar__item").get().map((item, index) => {
