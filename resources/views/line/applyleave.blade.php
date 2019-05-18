@@ -21,8 +21,7 @@
             </div>
             <div class="weui-tab__panel">
                 <div>
-                    {{ csrf_field() }}
-                    <div class="weui-cells weui-cells_form">
+                    <!-- <div class="weui-cells weui-cells_form">
                         <div class="weui-cell weui-cell_vcode">
                             <div class="weui-cell__hd"><label class="weui-label">假別</label></div>
                             <div class="weui-cell__bd">
@@ -67,16 +66,16 @@
                     </div>
                     <div class="weui-btn-area">
                         <button type="button" class="btn-c" onclick="apply_leave()"><i class="fas fa-sign-in-alt"></i>申請</button>
-                    </div>
+                    </div> -->
                     <!-- <div class="weui-btn-area">
                     <button type="button" class="btn-c" onclick="apply_leave()"><i class="fas fa-sign-in-alt"></i>請假申請</button>
                     </div> -->
-                    <!-- <div class="text-center">
+                    <div class="text-center">
                         <div class="main-section">
                             <div>
                                 <form class="col-12" method="POST">
                                     {{ csrf_field() }}
-                                    <div id="useridfield" style="display:none"></div>
+                                    <!-- <div id="useridfield" style="display:none"></div>
                                     <div class="form-group form-inline">    
                                         <label class="col-3">假別</label>
                                         <select id="leaveType" class="form-control col-9">
@@ -84,6 +83,16 @@
                                                 <option value="{{$type->name}}">{{$type->name}}</option>
                                             @endforeach
                                         </select>
+                                    </div> -->
+                                    <div class="weui-cell weui-cell_vcode">
+                                        <div class="weui-cell__hd"><label class="weui-label">假別</label></div>
+                                        <div class="weui-cell__bd">
+                                            <select id="leaveType" class="weui-select">
+                                                @foreach($leavetypes as $type)
+                                                    <option value="{{$type->name}}">{{$type->name}}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
                                     </div>
                                     <div class="form-group form-inline">    
                                         <label class="col-3">代理人</label>
@@ -161,7 +170,7 @@
                                 </form>
                             </div>
                         </div>
-                    </div> -->
+                    </div>
                 </div>
                 <div style="display:none">
                     <div class="weui-cells weui-cells_form">
