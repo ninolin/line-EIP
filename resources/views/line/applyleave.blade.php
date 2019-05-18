@@ -21,7 +21,7 @@
             </div>
             <div class="weui-tab__panel">
                 <div>
-                {{ csrf_field() }}
+                    {{ csrf_field() }}
                     <div class="weui-cells weui-cells_form">
                         <div class="weui-cell weui-cell_vcode">
                             <div class="weui-cell__hd"><label class="weui-label">假別</label></div>
@@ -71,7 +71,7 @@
                     <!-- <div class="weui-btn-area">
                     <button type="button" class="btn-c" onclick="apply_leave()"><i class="fas fa-sign-in-alt"></i>請假申請</button>
                     </div> -->
-                    <div class="text-center">
+                    <!-- <div class="text-center">
                         <div class="main-section">
                             <div>
                                 <form class="col-12" method="POST">
@@ -161,7 +161,7 @@
                                 </form>
                             </div>
                         </div>
-                    </div>
+                    </div> -->
                 </div>
                 <div style="display:none">
                     <div class="weui-cells weui-cells_form">
