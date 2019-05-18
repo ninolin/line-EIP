@@ -16,8 +16,8 @@
         
         <div class="weui-tab">
             <div class="weui-navbar">
-                <div class="weui-navbar__item weui-bar__item_on" ontouchend="change_tab(0)">請假</div>
-                <div class="weui-navbar__item" id="test" ontouchend="change_tab(1)">加班</div>
+                <div class="weui-navbar__item weui-bar__item_on" onclick="change_tab(0)">請假</div>
+                <div class="weui-navbar__item" id="test" onclick="change_tab(1)">加班</div>
             </div>
             <div class="weui-tab__panel">
                 <div>
@@ -75,8 +75,8 @@
                             <div>
                                 <form class="col-12" method="POST">
                                     {{ csrf_field() }}
-                                    <!-- <div id="useridfield" style="display:none"></div>
-                                    <div class="form-group form-inline">    
+                                    <div id="useridfield" style="display:none"></div>
+                                    <!-- <div class="form-group form-inline">    
                                         <label class="col-3">假別</label>
                                         <select id="leaveType" class="form-control col-9">
                                             @foreach($leavetypes as $type)
