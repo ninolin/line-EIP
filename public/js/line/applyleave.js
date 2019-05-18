@@ -18,25 +18,25 @@ const apply_leave = () => {
         "endDate": $("#endDate").val()
     }
     alert(JSON.stringify(post_data));
-    for (k in post_data) {
-        if(post_data[k] == "") {
-            alert("資料不正確");
-            return;
-        }
-    }
-    post_data.comment = $("#comment").val();
-    promise_call({
-        url: "./api/applyleave", 
-        data: post_data, 
-        method: "post"
-    })
-    .then(v => {
-        if(v.status == "successful") {
-            liff.closeWindow();
-        } else {
-            alert(v.message);
-        }
-    })
+    // for (k in post_data) {
+    //     if(post_data[k] == "") {
+    //         alert("資料不正確");
+    //         return;
+    //     }
+    // }
+    // post_data.comment = $("#comment").val();
+    // promise_call({
+    //     url: "./api/applyleave", 
+    //     data: post_data, 
+    //     method: "post"
+    // })
+    // .then(v => {
+    //     if(v.status == "successful") {
+    //         liff.closeWindow();
+    //     } else {
+    //         alert(v.message);
+    //     }
+    // })
 }
 
 const change_tab = (p) => {
