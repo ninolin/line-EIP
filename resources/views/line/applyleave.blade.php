@@ -13,14 +13,7 @@
         <link href="{{ asset('css/applyLeave.css') }}" rel="stylesheet">
     </head>
     <body>
-        <div class="weui-tab">
-            <div class="weui-navbar">
-                <div class="weui-navbar__item weui-bar__item_on" ontouchend="change_tab(0)">請假</div>
-                <div class="weui-navbar__item" id="test" ontouchend="change_tab(1)">加班</div>
-            </div>
-            <div class="weui-tab__panel">
-                <div>
-                <div class="weui-cells weui-cells_form">
+    <div class="weui-cells weui-cells_form">
                         <div class="weui-cell weui-cell_vcode">
                             <div class="weui-cell__hd"><label class="weui-label">假別</label></div>
                             <div class="weui-cell__bd">
@@ -64,8 +57,61 @@
                         </div>
                     </div>
                     <div class="weui-btn-area">
-    <a class="weui-btn weui-btn_primary" href="javascript:" id="showTooltips" onclick="apply_leave()">确定</a>
-</div>
+                        <a class="weui-btn weui-btn_primary" href="javascript:" id="showTooltips" onclick="apply_leave()">确定</a>
+                    </div>
+        <div class="weui-tab">
+            <div class="weui-navbar">
+                <div class="weui-navbar__item weui-bar__item_on" ontouchend="change_tab(0)">請假</div>
+                <div class="weui-navbar__item" id="test" ontouchend="change_tab(1)">加班</div>
+            </div>
+            <div class="weui-tab__panel">
+                <div>
+                    <div class="weui-cells weui-cells_form">
+                        <div class="weui-cell weui-cell_vcode">
+                            <div class="weui-cell__hd"><label class="weui-label">假別</label></div>
+                            <div class="weui-cell__bd">
+                                <select id="leaveType" class="weui-select">
+                                    @foreach($leavetypes as $type)
+                                        <option value="{{$type->name}}">{{$type->name}}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                        <div class="weui-cell weui-cell_vcode">
+                            <div class="weui-cell__hd">
+                                <label class="weui-label">代理人</label>
+                            </div>
+                            <div class="weui-cell__bd">
+                                <select id="leaveAgent" class="weui-select">
+                                    @foreach($users as $user)
+                                        <option value="{{$user->NO}}">{{$user->cname}}-{{$user->username}}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                        <div class="weui-cell">
+                            <div class="weui-cell__hd"><label for="" class="weui-label">開始時間</label></div>
+                            <div class="weui-cell__bd">
+                                <input class="weui-input" type="datetime-local" value="" placeholder=""/>
+                            </div>
+                        </div>
+                        <div class="weui-cell">
+                            <div class="weui-cell__hd"><label for="" class="weui-label">結束時間</label></div>
+                            <div class="weui-cell__bd">
+                                <input class="weui-input" type="datetime-local" value="" placeholder=""/>
+                            </div>
+                        </div>
+                        <div class="weui-cells weui-cells_form">
+                            <div class="weui-cell">
+                                <div class="weui-cell__bd">
+                                    <textarea class="weui-textarea" placeholder="請假事由" rows="3"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="weui-btn-area">
+                        <a class="weui-btn weui-btn_primary" href="javascript:" id="showTooltips" onclick="apply_leave()">确定</a>
+                    </div>
                     <!-- <div class="weui-btn-area">
                     <button type="button" class="btn-c" onclick="apply_leave()"><i class="fas fa-sign-in-alt"></i>請假申請</button>
                     </div> -->
