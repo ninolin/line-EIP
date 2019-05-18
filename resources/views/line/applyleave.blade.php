@@ -64,7 +64,7 @@
                         </div>
                     </div>
                     <div class="weui-btn-area">
-                        <a href="javascript:;" class="weui-btn weui-btn_primary">提出申請</a>
+                        <a href="javascript:;" class="weui-btn weui-btn_primary">請假申請</a>
                     </div>
                     <!-- <div class="text-center">
                         <div class="main-section">
@@ -161,23 +161,6 @@
                 <div style="display:none">
                     <div class="weui-cells weui-cells_form">
                         <div class="weui-cell">
-                            <div class="weui-cell__hd"><label class="weui-label">qq</label></div>
-                            <div class="weui-cell__bd">
-                                <input class="weui-input" type="number" pattern="[0-9]*" placeholder="请输入qq号"/>
-                            </div>
-                        </div>
-                        <div class="weui-cell weui-cell_vcode">
-                            <div class="weui-cell__hd">
-                                <label class="weui-label">手机号</label>
-                            </div>
-                            <div class="weui-cell__bd">
-                                <input class="weui-input" type="tel" placeholder="请输入手机号">
-                            </div>
-                            <div class="weui-cell__ft">
-                                <a href="javascript:;" class="weui-vcode-btn">获取验证码</a>
-                            </div>
-                        </div>
-                        <div class="weui-cell">
                             <div class="weui-cell__hd"><label for="" class="weui-label">加班日</label></div>
                             <div class="weui-cell__bd">
                                 <input class="weui-input" type="date" value=""/>
@@ -189,14 +172,15 @@
                                 <input class="weui-input" type="datetime-local" value="" placeholder=""/>
                             </div>
                         </div>
-                        <div class="weui-cell weui-cell_vcode">
-                            <div class="weui-cell__hd"><label class="weui-label">验证码</label></div>
-                            <div class="weui-cell__bd">
-                                <input class="weui-input" type="number" placeholder="请输入验证码"/>
+                        <div class="weui-cells weui-cells_form">
+                            <div class="weui-cell">
+                                <div class="weui-cell__bd">
+                                    <textarea class="weui-textarea" placeholder="加班事由" rows="3"></textarea>
+                                </div>
                             </div>
-                            <div class="weui-cell__ft">
-                                <img class="weui-vcode-img" src="./images/vcode.jpg" />
-                            </div>
+                        </div>
+                        <div class="weui-btn-area">
+                            <a href="javascript:;" class="weui-btn weui-btn_primary">加班申請</a>
                         </div>
                     </div>
                 </div>
