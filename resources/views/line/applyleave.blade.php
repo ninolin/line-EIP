@@ -42,7 +42,7 @@
                 <div class="weui-cell">
                     <div class="weui-cell__hd"><label for="" class="weui-label">開始時間</label></div>
                     <div class="weui-cell__bd">
-                        <input class="weui-input" type="datetime-local" value="" placeholder=""/>
+                        <input class="weui-input" type="datetime-local" min="2019-05-18T15:53" value="" placeholder=""/>
                     </div>
                 </div>
                 <div class="weui-cell">
