@@ -11,9 +11,12 @@
         <link href="https://unpkg.com/gijgo@1.9.13/css/gijgo.min.css" rel="stylesheet" type="text/css" />
         <link href="{{ asset('css/weui.min.css') }}" rel="stylesheet">
         <link href="{{ asset('css/applyLeave.css') }}" rel="stylesheet">
+        <link href="{{ asset('css/public.css') }}" rel="stylesheet">
     </head>
     <body>
-        <div>
+        <div class="weui-flex">
+            <div class="weui-flex__item mobile_topbar">請假申請</div>
+        </div>
             <div id="useridfield" style="display:none"></div>
             <div class="weui-cells weui-cells_form">
                 <div class="weui-cell weui-cell_vcode">
@@ -56,13 +59,13 @@
                     </div>
                 </div>
                 <div class="weui-btn-area">
-                    <a class="weui-btn weui-btn_primary" href="javascript:" id="showTooltips" onclick="apply_leave()">确定</a>
+                    <a class="weui-btn weui-btn_primary mobile_btn" href="javascript:" id="showTooltips" onclick="apply_leave()">送出請假</a>
                 </div>
                 <!-- <div class="weui-btn-area">
                     <button type="button" class="btn-c" onclick="apply_leave()"><i class="fas fa-sign-in-alt"></i>申請</button>
                 </div> -->
             </div>
-        </div>
+        <!--</div>-->
                 <!-- <div style="display:none">
                     <div class="weui-cells weui-cells_form">
                         <div class="weui-cell">
