@@ -39,3 +39,15 @@ const apply_leave = () => {
         }
     })
 }
+
+$('.weui-navbar__item').click(function(){
+    $(".weui-navbar__item").removeClass("weui-bar__item_on");
+    $(this).addClass("weui-bar__item_on");
+    $(".weui-navbar__item").get().map((item, index) => {
+        if(item == this) {
+            $($(".weui-tab__panel").children('div')[index]).show()
+        } else {
+            $($(".weui-tab__panel").children('div')[index]).hide();
+        }
+    })
+});

@@ -9,100 +9,200 @@
         <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/solid.css" integrity="sha384-+0VIRx+yz1WBcCTXBkVQYIBVNEFH1eP6Zknm16roZCyeNg2maWEpk/l/KsyFKs7G" crossorigin="anonymous">
         <link href="{{ asset('js/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
         <link href="https://unpkg.com/gijgo@1.9.13/css/gijgo.min.css" rel="stylesheet" type="text/css" />
+        <link href="{{ asset('css/weui.min.css') }}" rel="stylesheet">
         <link href="{{ asset('css/applyLeave.css') }}" rel="stylesheet">
     </head>
     <body>
-        <div class="text-center">
-            <div class="main-section">
+        <div class="weui-tab">
+            <div class="weui-navbar">
+                <div class="weui-navbar__item weui-bar__item_on">請假</div>
+                <div class="weui-navbar__item">加班</div>
+            </div>
+            <div class="weui-tab__panel">
                 <div>
-                    <form class="col-12" method="POST">
-                        {{ csrf_field() }}
-                        <div id="useridfield" style="display:none"></div>
-                        <div class="form-group form-inline">    
-                            <label class="col-3">假別</label>
-                            <select id="leaveType" class="form-control col-9">
-                                @foreach($leavetypes as $type)
-                                    <option value="{{$type->name}}">{{$type->name}}</option>
-                                @endforeach
-                            </select>
+                <div class="weui-cells weui-cells_form">
+                        <div class="weui-cell weui-cell_vcode">
+                            <div class="weui-cell__hd"><label class="weui-label">假別</label></div>
+                            <div class="weui-cell__bd">
+                                <select id="leaveType" class="weui-select">
+                                    @foreach($leavetypes as $type)
+                                        <option value="{{$type->name}}">{{$type->name}}</option>
+                                    @endforeach
+                                </select>
+                            </div>
                         </div>
-                        <div class="form-group form-inline">    
-                            <label class="col-3">代理人</label>
-                            <select id="leaveAgent" class="form-control col-9">
-                                @foreach($users as $user)
-                                    <option value="{{$user->NO}}">{{$user->cname}}-{{$user->username}}</option>
-                                @endforeach
-                            </select>
+                        <div class="weui-cell weui-cell_vcode">
+                            <div class="weui-cell__hd">
+                                <label class="weui-label">代理人</label>
+                            </div>
+                            <div class="weui-cell__bd">
+                                <select id="leaveAgent" class="weui-select">
+                                    @foreach($users as $user)
+                                        <option value="{{$user->NO}}">{{$user->cname}}-{{$user->username}}</option>
+                                    @endforeach
+                                </select>
+                            </div>
                         </div>
-                        <div class="form-group form-inline">  
-                            <label class="col-3">起日</label>  
-                            <input class="col-6" id="startDate" type="date"/>
-                            <select class="form-control col-3" id="startTime">
-                                <option>00:00</option>
-                                <option>01:00</option>
-                                <option>02:00</option>
-                                <option>03:00</option>
-                                <option>04:00</option>
-                                <option>05:00</option>
-                                <option>06:00</option>
-                                <option>07:00</option>
-                                <option>08:00</option>
-                                <option>09:00</option>
-                                <option>10:00</option>
-                                <option>11:00</option>
-                                <option>12:00</option>
-                                <option>13:00</option>
-                                <option>14:00</option>
-                                <option>15:00</option>
-                                <option>16:00</option>
-                                <option>17:00</option>
-                                <option>18:00</option>
-                                <option>19:00</option>
-                                <option>20:00</option>
-                                <option>21:00</option>
-                                <option>22:00</option>
-                                <option>23:00</option>
-                            </select>
+                        <div class="weui-cell">
+                            <div class="weui-cell__hd"><label for="" class="weui-label">開始時間</label></div>
+                            <div class="weui-cell__bd">
+                                <input class="weui-input" type="datetime-local" value="" placeholder=""/>
+                            </div>
                         </div>
-                        <div class="form-group form-inline">  
-                            <label class="col-3">迄日</label>  
-                            <input class="col-6" id="endDate" type="date"/>
-                            <select class="form-control col-3" id="endTime">
-                                <option>00:00</option>
-                                <option>01:00</option>
-                                <option>02:00</option>
-                                <option>03:00</option>
-                                <option>04:00</option>
-                                <option>05:00</option>
-                                <option>06:00</option>
-                                <option>07:00</option>
-                                <option>08:00</option>
-                                <option>09:00</option>
-                                <option>10:00</option>
-                                <option>11:00</option>
-                                <option>12:00</option>
-                                <option>13:00</option>
-                                <option>14:00</option>
-                                <option>15:00</option>
-                                <option>16:00</option>
-                                <option>17:00</option>
-                                <option>18:00</option>
-                                <option>19:00</option>
-                                <option>20:00</option>
-                                <option>21:00</option>
-                                <option>22:00</option>
-                                <option>23:00</option>
-                            </select>
+                        <div class="weui-cell">
+                            <div class="weui-cell__hd"><label for="" class="weui-label">結束時間</label></div>
+                            <div class="weui-cell__bd">
+                                <input class="weui-input" type="datetime-local" value="" placeholder=""/>
+                            </div>
                         </div>
-                        <div class="form-group form-inline">
-                            <label class="col-3">備註</label>  
-                            <textarea class=" col-9 form-control" rows="3" id="comment"></textarea>
+                        <div class="weui-cells weui-cells_form">
+                            <div class="weui-cell">
+                                <div class="weui-cell__bd">
+                                    <textarea class="weui-textarea" placeholder="請假事由" rows="3"></textarea>
+                                </div>
+                            </div>
                         </div>
-                        <button type="button" class="btn-c" onclick="apply_leave()"><i class="fas fa-sign-in-alt"></i>申請</button>
-                    </form>
+                    </div>
+                    <div class="weui-btn-area">
+                        <a href="javascript:;" class="weui-btn weui-btn_primary">提出申請</a>
+                    </div>
+                    <!-- <div class="text-center">
+                        <div class="main-section">
+                            <div>
+                                <form class="col-12" method="POST">
+                                    {{ csrf_field() }}
+                                    <div id="useridfield" style="display:none"></div>
+                                    <div class="form-group form-inline">    
+                                        <label class="col-3">假別</label>
+                                        <select id="leaveType" class="form-control col-9">
+                                            @foreach($leavetypes as $type)
+                                                <option value="{{$type->name}}">{{$type->name}}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                    <div class="form-group form-inline">    
+                                        <label class="col-3">代理人</label>
+                                        <select id="leaveAgent" class="form-control col-9">
+                                            @foreach($users as $user)
+                                                <option value="{{$user->NO}}">{{$user->cname}}-{{$user->username}}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                    <div class="form-group form-inline">  
+                                        <label class="col-3">起日</label>  
+                                        <input class="col-6" id="startDate" type="date"/>
+                                        <select class="form-control col-3" id="startTime">
+                                            <option>00:00</option>
+                                            <option>01:00</option>
+                                            <option>02:00</option>
+                                            <option>03:00</option>
+                                            <option>04:00</option>
+                                            <option>05:00</option>
+                                            <option>06:00</option>
+                                            <option>07:00</option>
+                                            <option>08:00</option>
+                                            <option>09:00</option>
+                                            <option>10:00</option>
+                                            <option>11:00</option>
+                                            <option>12:00</option>
+                                            <option>13:00</option>
+                                            <option>14:00</option>
+                                            <option>15:00</option>
+                                            <option>16:00</option>
+                                            <option>17:00</option>
+                                            <option>18:00</option>
+                                            <option>19:00</option>
+                                            <option>20:00</option>
+                                            <option>21:00</option>
+                                            <option>22:00</option>
+                                            <option>23:00</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group form-inline">  
+                                        <label class="col-3">迄日</label>  
+                                        <input class="col-6" id="endDate" type="date"/>
+                                        <select class="form-control col-3" id="endTime">
+                                            <option>00:00</option>
+                                            <option>01:00</option>
+                                            <option>02:00</option>
+                                            <option>03:00</option>
+                                            <option>04:00</option>
+                                            <option>05:00</option>
+                                            <option>06:00</option>
+                                            <option>07:00</option>
+                                            <option>08:00</option>
+                                            <option>09:00</option>
+                                            <option>10:00</option>
+                                            <option>11:00</option>
+                                            <option>12:00</option>
+                                            <option>13:00</option>
+                                            <option>14:00</option>
+                                            <option>15:00</option>
+                                            <option>16:00</option>
+                                            <option>17:00</option>
+                                            <option>18:00</option>
+                                            <option>19:00</option>
+                                            <option>20:00</option>
+                                            <option>21:00</option>
+                                            <option>22:00</option>
+                                            <option>23:00</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group form-inline">
+                                        <label class="col-3">備註</label>  
+                                        <textarea class=" col-9 form-control" rows="3" id="comment"></textarea>
+                                    </div>
+                                    <button type="button" class="btn-c" onclick="apply_leave()"><i class="fas fa-sign-in-alt"></i>申請</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div> -->
+                </div>
+                <div style="display:none">
+                    <div class="weui-cells weui-cells_form">
+                        <div class="weui-cell">
+                            <div class="weui-cell__hd"><label class="weui-label">qq</label></div>
+                            <div class="weui-cell__bd">
+                                <input class="weui-input" type="number" pattern="[0-9]*" placeholder="请输入qq号"/>
+                            </div>
+                        </div>
+                        <div class="weui-cell weui-cell_vcode">
+                            <div class="weui-cell__hd">
+                                <label class="weui-label">手机号</label>
+                            </div>
+                            <div class="weui-cell__bd">
+                                <input class="weui-input" type="tel" placeholder="请输入手机号">
+                            </div>
+                            <div class="weui-cell__ft">
+                                <a href="javascript:;" class="weui-vcode-btn">获取验证码</a>
+                            </div>
+                        </div>
+                        <div class="weui-cell">
+                            <div class="weui-cell__hd"><label for="" class="weui-label">加班日</label></div>
+                            <div class="weui-cell__bd">
+                                <input class="weui-input" type="date" value=""/>
+                            </div>
+                        </div>
+                        <div class="weui-cell">
+                            <div class="weui-cell__hd"><label for="" class="weui-label">加班小時</label></div>
+                            <div class="weui-cell__bd">
+                                <input class="weui-input" type="datetime-local" value="" placeholder=""/>
+                            </div>
+                        </div>
+                        <div class="weui-cell weui-cell_vcode">
+                            <div class="weui-cell__hd"><label class="weui-label">验证码</label></div>
+                            <div class="weui-cell__bd">
+                                <input class="weui-input" type="number" placeholder="请输入验证码"/>
+                            </div>
+                            <div class="weui-cell__ft">
+                                <img class="weui-vcode-img" src="./images/vcode.jpg" />
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
+        
         <script src="{{ asset('js/jquery/jquery.min.js') }}"></script>
         <script src="{{ asset('js/bootstrap/js/bootstrap.min.js') }}"></script>
         <script src="{{ asset('js/line/applyleave.js') }}"></script>
