@@ -69,7 +69,6 @@ class Receive extends Controller
                     } else {
                         LineServiceProvider::replyTextMsgWithChannel($sender_userid, $sender_replyToken, $line_channel, "歡迎初次使用EIP系統，請輸入認證碼來讓我知道你是誰");
                     }
-
                     //LineServiceProvider::pushTextMsg($sender_userid, explode("http://", $text)[1]);
                 } else {
                     LineServiceProvider::pushTextMsg($sender_userid, "圖片辨識失敗");

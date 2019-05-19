@@ -10,6 +10,7 @@ function initializeApp(data) {
 }
 
 const apply_leave = () => {
+    
     const post_data = {
         "userId": document.getElementById('useridfield').textContent,
         "leaveType": $("#leaveType").val(),
@@ -25,7 +26,6 @@ const apply_leave = () => {
         return;
     } 
     //alert(JSON.stringify(post_data));
-
     for (k in post_data) {
         if(post_data[k] == "") {
             $("#error_alert").find(".weui-dialog__bd").html("欄位填寫錯誤");
@@ -33,14 +33,15 @@ const apply_leave = () => {
             return;
         }
     }
-
     post_data.comment = $("#comment").val();
+    $("#toast").show();
     promise_call({
         url: "./api/applyleave", 
         data: post_data, 
         method: "post"
     })
     .then(v => {
+        $("#toast").hide();
         if(v.status == "successful") {
             liff.closeWindow();
         } else {

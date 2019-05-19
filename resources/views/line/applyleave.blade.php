@@ -102,6 +102,14 @@
                         </div>
                     </div>
                 </div>
+                <div id="toast" style="display: none;">
+                    <div class="weui-mask_transparent"></div>
+                    <div class="weui-mask"></div>
+                    <div class="weui-toast">
+                        <i class="weui-loading weui-icon_toast"></i>
+                        <p class="weui-toast__content">送出中...</p>
+                    </div>
+                </div>
         <script src="{{ asset('js/jquery/jquery.min.js') }}"></script>
         <script src="{{ asset('js/bootstrap/js/bootstrap.min.js') }}"></script>
         <script src="{{ asset('js/line/applyleave.js') }}"></script>
