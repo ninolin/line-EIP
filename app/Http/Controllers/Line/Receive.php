@@ -51,6 +51,11 @@ class Receive extends Controller
                 $filename = LineServiceProvider::getImage($sender_userid, $image_id);
                 $qrcode = new QrReader(storage_path("app/line_image/".$filename));
                 $text = $qrcode->text();
+                if(strpos($text, "http://")) {
+                    LineServiceProvider::pushTextMsg($sender_userid, explode("http://", $text)[1]);
+                } else {
+                    LineServiceProvider::pushTextMsg($sender_userid, "圖片辨識失敗");
+                }
                 log::info("text");
                 log::info($text);
             }
