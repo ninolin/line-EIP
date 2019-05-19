@@ -49,6 +49,10 @@ class Receive extends Controller
             if($action == "show_apply_detail") {
                 LineServiceProvider::sendShowApplyDetailFlexMeg($sender_userid, explode("&",$postback_data)[1]);
             }
+        } else if ($sender_msg_type == "image") {
+            $image_id = $json_obj->events[0]->message->id; //取得圖片訊息編號
+            $filename = LineServiceProvider::getImage($sender_userid, $image_id);
+            
         }
         
         return response()->json([

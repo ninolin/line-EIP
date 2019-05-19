@@ -336,6 +336,22 @@ class LineServiceProvider extends ServiceProvider
         $result = self::sendPushMsg($line_channel_access_token, $response);
     }
     
+    public static function getImage($line_id, $image_id) {
+        $line_channel_access_token = self::findAccessToken($line_id);
+       
+        $ch = curl_init("https://api.line.me/v2/bot/message/".$image_id."/content");
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+            'Authorization: Bearer '. $line_channel_access_token
+        ));
+        $json_content = curl_exec($ch);
+        curl_close($ch);
+        $imagefile = fopen($image_id.".jpeg", "w+") or die("Unable to open file!"); //取得圖片
+        fwrite($imagefile, $json_content); 
+        fclose($imagefile); //將圖片存在自己server上
+        return $image_id;
+    }
+
     //綁定失敗時用reply回給user
     public static function replyTextMsgWithChannel($line_id, $reply_token, $line_channel, $msg) {
         //尋找該用戶所屬line_channel的access_token
