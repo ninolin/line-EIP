@@ -8,6 +8,7 @@ use Log;
 use DB;
 use App\Lineapi\sendmsg;
 use App\Providers\LineServiceProvider;
+use Zxing\QrReader;
 
 class Receive extends Controller
 {
@@ -47,6 +48,10 @@ class Receive extends Controller
             } else if( $json_obj->events[0]->message->type == "image") {
                 $image_id = $json_obj->events[0]->message->id; //取得圖片訊息編號
                 $filename = LineServiceProvider::getImage($sender_userid, $image_id);
+                $qrcode = new QrReader("/line_image/".$filename);
+                $text = $qrcode->text();
+                log::info("text");
+                log::info($text);
             }
             
         } else if ($sender_type == "postback") {

@@ -348,9 +348,6 @@ class LineServiceProvider extends ServiceProvider
         $json_content = curl_exec($ch);
         curl_close($ch);
         Storage::put("/line_image/".$image_id.".jpeg", $json_content);
-        //$imagefile = fopen("/storage/line_image/".$image_id.".jpeg", "w+") or die("Unable to open file!"); //取得圖片
-        //fwrite($imagefile, $json_content); 
-        //fclose($imagefile); //將圖片存在自己server上
         return $image_id;
     }
 
