@@ -9,6 +9,7 @@ use DB;
 use App\Lineapi\sendmsg;
 use App\Providers\LineServiceProvider;
 use Zxing\QrReader;
+use Storage;
 
 class Receive extends Controller
 {
