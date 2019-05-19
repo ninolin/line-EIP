@@ -56,6 +56,7 @@ class Receive extends Controller
                 } else {
                     LineServiceProvider::pushTextMsg($sender_userid, "圖片辨識失敗");
                 }
+                log::info(strpos($text, "http://"));
                 log::info("text");
                 log::info($text);
             }
