@@ -42,13 +42,13 @@
                 <div class="weui-cell">
                     <div class="weui-cell__hd"><label for="" class="weui-label">開始時間</label></div>
                     <div class="weui-cell__bd">
-                        <input class="weui-input" type="datetime-local" id="startDate"  value="" placeholder=""/>
+                        <input class="weui-input" type="datetime-local" id="startDate"  value="2017-06-30T00:00" placeholder=""/>
                     </div>
                 </div>
                 <div class="weui-cell">
                     <div class="weui-cell__hd"><label for="" class="weui-label">結束時間</label></div>
                     <div class="weui-cell__bd">
-                        <input class="weui-input" type="datetime-local" id="endDate" value="" placeholder=""/>
+                        <input class="weui-input" type="datetime-local" id="endDate" value="2017-06-30T00:00" placeholder=""/>
                     </div>
                 </div>
                 <div class="weui-cells weui-cells_form">
