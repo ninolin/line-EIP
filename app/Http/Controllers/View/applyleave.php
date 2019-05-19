@@ -9,6 +9,7 @@ use App\Providers\LineServiceProvider;
 use DB;
 use Log;
 use Exception;
+date_default_timezone_set('Asia/Taipei');
 
 class applyleave extends Controller
 {
@@ -23,12 +24,13 @@ class applyleave extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
+     * 顯示applyleave頁面
      *
      * @return \Illuminate\Http\Response
      */
     public function create()
     {
+        
         //因為有同一種假但不同天數的假別，所以做distinct name，之後新增假時，再判斷是用那一種假的id
         $sql = 'select distinct elt.name, et.name as title_name, et.id as title_id ';
         $sql .='from eip_leave_type elt, eip_title et ';
@@ -37,7 +39,8 @@ class applyleave extends Controller
         $users = DB::select("select * from user where status = 'T' order by cname", []);
         return view('line.applyleave', [
             'leavetypes' => $leavetypes,
-            'users' => $users
+            'users' => $users,
+            'nowdate' => date("Y-m-d")."T".date("H:i")
         ]);
     }
 

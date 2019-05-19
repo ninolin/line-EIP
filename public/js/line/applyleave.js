@@ -17,26 +17,36 @@ const apply_leave = () => {
         "startDate": $("#startDate").val(),
         "endDate": $("#endDate").val()
     }
-    alert(JSON.stringify(post_data));
-    // for (k in post_data) {
-    //     if(post_data[k] == "") {
-    //         alert("資料不正確");
-    //         return;
-    //     }
-    // }
-    // post_data.comment = $("#comment").val();
-    // promise_call({
-    //     url: "./api/applyleave", 
-    //     data: post_data, 
-    //     method: "post"
-    // })
-    // .then(v => {
-    //     if(v.status == "successful") {
-    //         liff.closeWindow();
-    //     } else {
-    //         alert(v.message);
-    //     }
-    // })
+    const start_time = new Date($("#startDate").val());
+    const end_time = new Date($("#endDate").val());
+    if(start_time >= end_time) {
+        $("#error_alert").find(".weui-dialog__bd").html("結束時間需大於開始時間");
+        $("#error_alert").show();
+        return;
+    } 
+    //alert(JSON.stringify(post_data));
+
+    for (k in post_data) {
+        if(post_data[k] == "") {
+            $("#error_alert").find(".weui-dialog__bd").html("欄位填寫錯誤");
+            $("#error_alert").show();
+            return;
+        }
+    }
+
+    post_data.comment = $("#comment").val();
+    promise_call({
+        url: "./api/applyleave", 
+        data: post_data, 
+        method: "post"
+    })
+    .then(v => {
+        if(v.status == "successful") {
+            liff.closeWindow();
+        } else {
+            alert(v.message);
+        }
+    })
 }
 
 const change_tab = (p) => {
@@ -50,4 +60,8 @@ const change_tab = (p) => {
             $($(".weui-tab__panel").children('div')[index]).hide();
         }
     })
+}
+
+const close_dialog = () => {
+    $("#error_alert").hide();
 }
