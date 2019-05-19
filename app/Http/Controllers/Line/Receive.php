@@ -55,7 +55,7 @@ class Receive extends Controller
                 log::info(strpos($text, "http://"));
                 log::info("text");
                 log::info($text);
-                if(strpos($text, "http://") == 0) {
+                if(strpos($text, "http://") !== false) {
                     LineServiceProvider::pushTextMsg($sender_userid, explode("http://", $text)[1]);
                 } else {
                     LineServiceProvider::pushTextMsg($sender_userid, "圖片辨識失敗");
