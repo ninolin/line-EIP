@@ -348,7 +348,7 @@ class LineServiceProvider extends ServiceProvider
         $json_content = curl_exec($ch);
         curl_close($ch);
         Storage::put("/line_image/".$image_id.".jpeg", $json_content);
-        return $image_id;
+        return $image_id.".jpeg";
     }
 
     //綁定失敗時用reply回給user
