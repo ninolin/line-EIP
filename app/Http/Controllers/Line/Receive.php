@@ -49,7 +49,7 @@ class Receive extends Controller
             } else if( $json_obj->events[0]->message->type == "image") {
                 $image_id = $json_obj->events[0]->message->id; //取得圖片訊息編號
                 $filename = LineServiceProvider::getImage($sender_userid, $image_id);
-                $qrcode = new QrReader(Storage::disk('local')->url("line_image/".$filename));
+                $qrcode = new QrReader(Storage::disk('local')->url("app/line_image/".$filename));
                 $text = $qrcode->text();
                 log::info("text");
                 log::info($text);
