@@ -56,7 +56,21 @@ class Receive extends Controller
                 log::info("text");
                 log::info($text);
                 if(count(explode("http://", $text)) > 1) {
-                    LineServiceProvider::pushTextMsg($sender_userid, explode("http://", $text)[1]);
+                    $sender_txt = explode("http://", $text)[1];
+                    if (preg_match("/[a-z0-9]{32}/", $sender_txt)) {
+                        $unlink_user = DB::select("select * from user where status = 'T' and (line_id = '' or line_id is null) and MD5(CONCAT(NO, dd)) = ?", [$sender_txt]);
+                        foreach ($unlink_user as $v) {
+                            if(DB::update("update user set line_id =?, line_channel = ? where NO =?", [$sender_userid, $line_channel, $v->NO]) == 1) {
+                                LineServiceProvider::pushTextMsg($sender_userid, "恭喜".$v->cname."成功加入，歡迎使用");
+                            } else {
+                                LineServiceProvider::replyTextMsgWithChannel($sender_userid, $sender_replyToken, $line_channel, "綁定失敗:更新db失敗");
+                            }
+                        }
+                    } else {
+                        LineServiceProvider::replyTextMsgWithChannel($sender_userid, $sender_replyToken, $line_channel, "歡迎初次使用EIP系統，請輸入認證碼來讓我知道你是誰");
+                    }
+
+                    //LineServiceProvider::pushTextMsg($sender_userid, explode("http://", $text)[1]);
                 } else {
                     LineServiceProvider::pushTextMsg($sender_userid, "圖片辨識失敗");
                 }
