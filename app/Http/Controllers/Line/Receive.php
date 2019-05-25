@@ -93,7 +93,7 @@ class Receive extends Controller
                 'message'=> 1
             ]);
         } catch (Exception $e) {
-            log::info('receive throw error: '.$e);
+            log::info('receive throw error: '.$e->getMessage());
         }
     }
 
