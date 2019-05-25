@@ -10,6 +10,7 @@ use App\Lineapi\sendmsg;
 use App\Providers\LineServiceProvider;
 use Zxing\QrReader;
 use Storage;
+use \Exception;
 
 class Receive extends Controller
 {
