@@ -10,7 +10,7 @@ use App\Lineapi\sendmsg;
 use App\Providers\LineServiceProvider;
 use Zxing\QrReader;
 use Storage;
-use \Exception;
+use Exception;
 
 class Receive extends Controller
 {
@@ -93,7 +93,7 @@ class Receive extends Controller
                 'status' => 'successful',
                 'message'=> 1
             ]);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             log::info('receive throw error: '.$e->getMessage());
         }
     }
