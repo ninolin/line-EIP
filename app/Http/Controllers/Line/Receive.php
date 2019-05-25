@@ -26,9 +26,11 @@ class Receive extends Controller
             $sender_replyToken = $json_obj->events[0]->replyToken; //取得訊息的replyToken
             $sender_userid = $json_obj->events[0]->source->userId; //取得訊息發送者的id
             $sender_type = $json_obj->events[0]->type; //取得訊息的type
+            log::info($bodyContent);
             //寫入eip_line_message紀錄
             $user = DB::select('select * from user where line_id =? and line_channel =?', [$sender_userid, $line_channel]);
             $sql = "insert into eip_line_message (username, line_channel, line_id, message, time) value (?, ?, ?, ?, UNIX_TIMESTAMP(NOW())) ";
+            log::info($sql);
             if(count($user) == 0) {
                 if(DB::update($sql, [null, $line_channel, $sender_userid, $bodyContent]) != 1) {throw new Exception('insert eip_line_message failed(1)');}
             } else if(count($user) == 1){
@@ -43,7 +45,7 @@ class Receive extends Controller
                 'status' => 'successful',
                 'message'=> 1
             ]);
-            
+
             // if($sender_type == "message") {
             //     if( $json_obj->events[0]->message->type == "text") {
             //         $sender_txt = $json_obj->events[0]->message->text; //取得訊息內容
