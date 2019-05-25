@@ -34,7 +34,7 @@ class Receive extends Controller
             if(count($user) == 0) {
                 if(DB::update($sql, [null, $line_channel, $sender_userid, $bodyContent]) != 1) {throw new Exception('insert eip_line_message failed(1)');}
             } else if(count($user) == 1){
-                foreach ($link_user as $v) {
+                foreach ($user as $v) {
                     if(DB::update($sql, [$v->username, $line_channel, $sender_userid, $bodyContent]) != 1) {throw new Exception('insert eip_line_message failed(2)');}
                 }
             } else {
