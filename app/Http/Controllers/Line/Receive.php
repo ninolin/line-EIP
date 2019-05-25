@@ -17,7 +17,7 @@ class Receive extends Controller
     {
         $line_channel = "1635106062";
         //$request_uri = empty($value)$_GET['channel_id'];
-        log::info('get channel id:'.$_GET['channel_id']);
+        log::info('get channel id:'.$_GET['channel']);
         $bodyContent = $request->getContent(); //取得request的body內容
         log::info($bodyContent);
         $json_obj = json_decode($bodyContent); //轉成json格式
