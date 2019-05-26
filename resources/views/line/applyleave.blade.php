@@ -102,6 +102,16 @@
                         </div>
                     </div>
                 </div>
+                <div style="display: none;" id="no_bind_alert">
+                    <div class="weui-mask"></div>
+                    <div class="weui-dialog">
+                        <div class="weui-dialog__hd"><strong class="weui-dialog__title">錯誤</strong></div>
+                        <div class="weui-dialog__bd">目前未完成綁定，無法使用Everplast員工服務</div>
+                        <div class="weui-dialog__ft">
+                            <a href="javascript:;" class="weui-dialog__btn weui-dialog__btn_primary" onclick="close_no_bind_alert()">確定</a>
+                        </div>
+                    </div>
+                </div>
                 <div id="toast" style="display: none;">
                     <div class="weui-mask_transparent"></div>
                     <div class="weui-mask"></div>

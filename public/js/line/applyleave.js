@@ -8,7 +8,7 @@ window.onload = function (e) {
 function initializeApp(data) {
     document.getElementById('useridfield').textContent = data.context.userId;
     promise_call({
-        url: "./api/checklineid/"+data.context.userId, 
+        url: "./api/userlist/checklineid/"+data.context.userId, 
         method: "get"
     })
     .then(v => {
@@ -16,7 +16,6 @@ function initializeApp(data) {
             $("#error_alert").find(".weui-dialog__bd").html("目前未完成綁定，無法使用Everplast員工服務");
             $("#error_alert").show();
             return;
-            //alert('目前未完成綁定，無法使用Everplast員工服務系統');
         } 
     })
 }
@@ -77,4 +76,8 @@ const change_tab = (p) => {
 
 const close_dialog = () => {
     $("#error_alert").hide();
+}
+
+const close_no_bind_alert = () => {
+    liff.closeWindow();
 }
