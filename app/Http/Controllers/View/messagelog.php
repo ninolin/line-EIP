@@ -32,9 +32,19 @@ class messagelog extends Controller
         $order_col = Input::get('order_col', 'username');
         $order_type = Input::get('order_type', 'DESC');
         $threedaybefore = time() - 86400*3;
-        
-        $messages = DB::select('select * from eip_line_message where time > ? order by time DESC limit ?,10 ', [$threedaybefore, ($page-1)*10]);
-        $total_messages = DB::select('select * from eip_line_message where time > ?', [$threedaybefore]);
+        $sql = "select * from eip_line_message where time > ? ";
+        if($search != '') {
+            $sql .= 'and username like "%'.$search.'%" ';
+        }
+        $sql .= "order by time DESC limit ?,10";
+        $messages = DB::select($sql, [$threedaybefore, ($page-1)*10]);
+
+        $page_sql = 'select * from eip_line_message where time > ? ';
+        if($search != '') {
+            $page_sql .= 'and username like "%'.$search.'%" ';
+        }
+
+        $total_messages = DB::select($page_sql, [$threedaybefore]);
         $total_pages = ceil(count($total_messages)/10);
         return view('contents.messagelog', [
             'search' => $search,

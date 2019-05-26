@@ -2,12 +2,12 @@
 @section('title', 'Home')
 @section('content')
 <div class="container-fluid pt-lg-4">
-  <form id="search_form" method="POST" action="{{ route('userlist') }}">
+  <form id="search_form" method="POST" action="{{ route('messagelog') }}">
     {{ csrf_field() }}
     <div class="row">
       <div class="col-sm-4 form-row">
         <div class="col-auto">
-          <input type="text" name="search" class="form-control" placeholder="帳號或Email或名稱" value="{{ $search }}">
+          <input type="text" name="search" class="form-control" placeholder="帳號或lineId" value="{{ $search }}">
         </div>
         <div class="col-auto">
           <button type="button" class="btn-c"  onclick="reload_page(1, '{{$order_col}}', '{{$order_type}}', 'search')">搜尋</button>

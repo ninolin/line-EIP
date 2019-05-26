@@ -36,7 +36,7 @@ class applyleave extends Controller
         $sql .='from eip_leave_type elt, eip_title et ';
         $sql .='where elt.approved_title_id = et.id ';
         $leavetypes = DB::select($sql, []);
-        $users = DB::select("select * from user where status = 'T' order by cname", []);
+        $users = DB::select("select * from user where status = 'T' and line_id != '' order by cname", []);
         return view('line.applyleave', [
             'leavetypes' => $leavetypes,
             'users' => $users,
