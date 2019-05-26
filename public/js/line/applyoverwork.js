@@ -6,6 +6,16 @@ window.onload = function (e) {
 
 function initializeApp(data) {
     document.getElementById('useridfield').textContent = data.context.userId;
+    promise_call({
+        url: "./api/userlist/checklineid/"+data.context.userId, 
+        method: "get"
+    })
+    .then(v => {
+        if(v.status == "successful" && v.data.length == 0) {
+            $("#no_bind_alert").show();
+            return;
+        } 
+    })
 }
 
 const apply_overwork = () => {
