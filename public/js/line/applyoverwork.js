@@ -45,3 +45,8 @@ const apply_overwork = () => {
         }
     })
 }
+
+const close_no_bind_alert = () => {
+    $("#no_bind_alert").hide();
+    liff.closeWindow();
+}
