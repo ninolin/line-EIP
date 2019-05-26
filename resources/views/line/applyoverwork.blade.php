@@ -107,7 +107,7 @@
                             </div>
                         </div>
                         <div class="weui-btn-area">
-                            <a href="javascript:;" class="weui-btn weui-btn_primary">加班申請</a>
+                            <a href="javascript:;" class="weui-btn weui-btn_primary mobile_btn">加班申請</a>
                         </div>
                     </div>
             </div>
