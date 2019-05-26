@@ -26,8 +26,12 @@ class Receive extends Controller
             $json_obj = json_decode($bodyContent); //轉成json格式
             $sender_replyToken = $json_obj->events[0]->replyToken; //取得訊息的replyToken
             $sender_userid = $json_obj->events[0]->source->userId; //取得訊息發送者的id
-            $sender_type = $json_obj->events[0]->type; //取得訊息的type
-            $sender_txt = $json_obj->events[0]->message->text; //取得訊息內容
+            $sender_type = $json_obj->events[0]->message->type; //取得訊息的type
+            if($sender_type == 'text') {
+                $sender_txt = $json_obj->events[0]->message->text; //取得訊息內容
+            } else {
+                $sender_txt = $json_obj->events[0]->message->id; //取得訊息內容
+            }
             //寫入eip_line_message紀錄
             $user = DB::select('select * from user where line_id =? and line_channel =?', [$sender_userid, $line_channel]);
             $sql = "insert into eip_line_message (username, line_channel, line_id, body, type, message, time) value (?, ?, ?, ?, ?, ?, UNIX_TIMESTAMP(NOW())) ";
