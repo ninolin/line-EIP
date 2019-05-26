@@ -18,6 +18,7 @@ Route::get('userlist', 'View\userlist@index');
 Route::put('userlist/{id}', 'View\userlist@update');
 Route::put('userlist/bindlineid/{id}', 'View\userlist@bindlineid');
 Route::put('userlist/unbindlineid/{id}', 'View\userlist@unbindlineid');
+Route::get('userlist/checklineid/{id}', 'View\userlist@checklineid');
 
 Route::get('titlelist', 'View\titlelist@index');
 Route::post('titlelist', 'View\titlelist@store');

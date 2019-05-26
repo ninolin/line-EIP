@@ -7,6 +7,15 @@ window.onload = function (e) {
 
 function initializeApp(data) {
     document.getElementById('useridfield').textContent = data.context.userId;
+    promise_call({
+        url: "./api/checklineid/"+data.context.userId, 
+        method: "get"
+    })
+    .then(v => {
+        if(v.status == "successful" && v.data.length == 0) {
+            alert('目前未完成綁定，無法使用Everplast員工服務系統');
+        } 
+    })
 }
 
 const apply_leave = () => {

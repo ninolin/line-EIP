@@ -149,6 +149,14 @@ class userlist extends Controller
         }
     }
 
+    public function checklineid(Request $request, $id)
+    {
+        $user = DB::select("select * from user where line_id =?", [$id]);
+        return response()->json([
+            'status' => 'successful',
+            'data' => $user
+        ]);
+    }
     /**
      * Remove the specified resource from storage.
      *
