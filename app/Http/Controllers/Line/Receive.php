@@ -22,6 +22,7 @@ class Receive extends Controller
             }
             $line_channel = $_GET['channel_id'];
             $bodyContent = $request->getContent(); //取得request的body內容
+            log::info($bodyContent);
             $json_obj = json_decode($bodyContent); //轉成json格式
             $sender_replyToken = $json_obj->events[0]->replyToken; //取得訊息的replyToken
             $sender_userid = $json_obj->events[0]->source->userId; //取得訊息發送者的id
