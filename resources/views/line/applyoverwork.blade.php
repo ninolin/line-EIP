@@ -19,6 +19,7 @@
         </div>
         <div class="text-center">
             <div class="main-section">
+                <div id="useridfield" style="display:none"></div>
                     <!-- <form class="col-12" method="POST">
                         {{ csrf_field() }}
                         <div id="useridfield" style="display:none"></div>
