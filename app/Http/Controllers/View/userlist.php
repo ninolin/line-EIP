@@ -152,6 +152,7 @@ class userlist extends Controller
     public function checklineid(Request $request, $id)
     {
         $user = DB::select("select * from user where line_id =?", [$id]);
+        log::info("here is checklineid");
         return response()->json([
             'status' => 'successful',
             'data' => $user

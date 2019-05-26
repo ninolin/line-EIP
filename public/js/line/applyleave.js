@@ -13,7 +13,10 @@ function initializeApp(data) {
     })
     .then(v => {
         if(v.status == "successful" && v.data.length == 0) {
-            alert('目前未完成綁定，無法使用Everplast員工服務系統');
+            $("#error_alert").find(".weui-dialog__bd").html("目前未完成綁定，無法使用Everplast員工服務");
+            $("#error_alert").show();
+            return;
+            //alert('目前未完成綁定，無法使用Everplast員工服務系統');
         } 
     })
 }
