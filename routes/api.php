@@ -16,6 +16,8 @@ use Illuminate\Http\Request;
 //Route::middleware('auth:api')->get('/user', function (Request $request) {return $request->user();});
 Route::get('userlist', 'View\userlist@index');
 Route::put('userlist/{id}', 'View\userlist@update');
+Route::put('userlist/bindlineid/{id}', 'View\userlist@bindlineid');
+Route::put('userlist/unbindlineid/{id}', 'View\userlist@unbindlineid');
 
 Route::get('titlelist', 'View\titlelist@index');
 Route::post('titlelist', 'View\titlelist@store');

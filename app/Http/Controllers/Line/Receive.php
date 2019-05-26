@@ -37,6 +37,7 @@ class Receive extends Controller
             $sql = "insert into eip_line_message (username, line_channel, line_id, body, type, message, time) value (?, ?, ?, ?, ?, ?, UNIX_TIMESTAMP(NOW())) ";
             if(count($user) == 0) {
                 if(DB::insert($sql, [null, $line_channel, $sender_userid, $bodyContent, $sender_type, $sender_txt]) != 1) {throw new Exception('insert eip_line_message failed(1)');}
+                LineServiceProvider::replyTextMsgWithChannel($sender_userid, $sender_replyToken, $line_channel, "歡迎加入 Everplast 員工服務系統, 請自行輸入員工對應代碼或輸入部門名稱與員工姓名後請人事總務或資訊同仁協助處理.");
             } else if(count($user) == 1) {
                 foreach ($user as $v) {
                     if(DB::insert($sql, [$v->username, $line_channel, $sender_userid, $bodyContent, $sender_type, $sender_txt]) != 1) {throw new Exception('insert eip_line_message failed(2)');}

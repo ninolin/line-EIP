@@ -111,5 +111,5 @@
     </div>
   </div>
 </div>
-<script src="{{ asset('js/views/userlist.js') }}"></script>
+<script src="{{ asset('js/views/messagelog.js') }}"></script>
 @endsection

@@ -120,6 +120,35 @@ class userlist extends Controller
         }
     }
 
+    public function bindlineid(Request $request, $id)
+    {
+        $line_id = $request->get('line_id');
+        if(DB::update("update user set line_id =? where NO =?", [$line_id, $id]) == 1) {
+            return response()->json([
+                'status' => 'successful'
+            ]);
+        } else {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'update error'
+            ]);
+        }
+    }
+
+    public function unbindlineid(Request $request, $id)
+    {
+        if(DB::update("update user set line_id ='' where NO =?", [$id]) == 1) {
+            return response()->json([
+                'status' => 'successful'
+            ]);
+        } else {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'update error'
+            ]);
+        }
+    }
+
     /**
      * Remove the specified resource from storage.
      *

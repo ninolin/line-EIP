@@ -37,6 +37,50 @@ const showSetModal = async (user_no, title_id, upper_user_no) => {
     }
 }
 
+const showBindLineId = (user_no, usercname) => {
+    $("#bindLineModal").find(".modal-title").html("綁定"+usercname.trim()+"的LineId");
+    $("#bindLineModal").find(".todo").attr("onclick", "bindLineId('"+user_no+"')");
+    $('#bindLineModal').modal('toggle');
+}
+
+const showUnbindLineId = (user_no, usercname) => {
+    $("#unbindLineModal").find(".modal-title").html("解除綁定"+usercname.trim()+"的LineId");
+    $("#unbindLineModal").find(".todo").attr("onclick", "unbindLineId('"+user_no+"')");
+    $('#unbindLineModal').modal('toggle');
+}
+
+const bindLineId = (user_no) => {
+    promise_call({
+        url: "./api/userlist/bindlineid/"+user_no, 
+        data: {
+            "line_id": $("#line_id_input").val()
+        }, 
+        method: "put"
+    })
+    .then(v => {
+        if(v.status == "successful") {
+            window.location.reload();
+        } else {
+            $('#bindLineModal').modal('toggle');
+        }
+    })
+}
+
+const unbindLineId = (user_no) => {
+    promise_call({
+        url: "./api/userlist/unbindlineid/"+user_no, 
+        data: {}, 
+        method: "put"
+    })
+    .then(v => {
+        if(v.status == "successful") {
+            window.location.reload();
+        } else {
+            $('#unbindLineModal').modal('toggle');
+        }
+    })
+}
+
 const get_all_title = () => {
     return promise_call({
         url: "./api/titlelist", 

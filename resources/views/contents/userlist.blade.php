@@ -7,7 +7,7 @@
     <div class="row">
       <div class="col-sm-4 form-row">
         <div class="col-auto">
-          <input type="text" name="search" class="form-control" placeholder="帳號或Email或名稱" value="{{ $search }}">
+          <input type="text" name="search" class="form-control" placeholder="帳號或名稱" value="{{ $search }}">
         </div>
         <div class="col-auto">
           <button type="button" class="btn-c"  onclick="reload_page(1, '{{$order_col}}', '{{$order_type}}', 'search')">搜尋</button>
@@ -23,10 +23,6 @@
             @if ($order_col == 'username' && $order_type == 'DESC') <div class="angle-down"></div> @endif
             @if ($order_col == 'username' && $order_type == 'ASC') <div class="angle-up"></div> @endif
           </th>
-          <th scope="col" onclick="reload_page({{$page}}, 'email', '{{$order_type}}', 'col')">Email
-            @if ($order_col == 'email' && $order_type == 'DESC') <div class="angle-down"></div> @endif
-            @if ($order_col == 'email' && $order_type == 'ASC') <div class="angle-up"></div> @endif
-          </th>
           <th scope="col" onclick="reload_page({{$page}}, 'cname', '{{$order_type}}', 'col')">名稱
             @if ($order_col == 'cname' && $order_type == 'DESC') <div class="angle-down"></div> @endif
             @if ($order_col == 'cname' && $order_type == 'ASC') <div class="angle-up"></div> @endif
@@ -39,7 +35,7 @@
             @if ($order_col == 'upper_user_no' && $order_type == 'DESC') <div class="angle-down"></div> @endif
             @if ($order_col == 'upper_user_no' && $order_type == 'ASC') <div class="angle-up"></div> @endif
           </th>
-          <th scope="col" onclick="reload_page({{$page}}, 'line_id', '{{$order_type}}', 'col')">已加入line
+          <th scope="col" onclick="reload_page({{$page}}, 'line_id', '{{$order_type}}', 'col')">lineId
             @if ($order_col == 'line_id' && $order_type == 'DESC') <div class="angle-down"></div> @endif
             @if ($order_col == 'line_id' && $order_type == 'ASC') <div class="angle-up"></div> @endif
           </th>
@@ -50,18 +46,17 @@
         @foreach($users as $user)
           <tr>
             <td> {{$user->username}} </td>
-            <td> {{$user->email}} </td>
             <td> {{$user->cname}} </td>
             <td> {{$user->title}} </td>
             <td> {{$user->upper_cname}} </td>
-            <td> 
-              @if ($user->line_id != '') 
-                是
-              @else 
-                否
+            <td> {{$user->line_id}} </td>
+            <td>
+              @if ($user->line_id == '') 
+                <button type="button" class="btn btn-outline-success btn-sm" onclick="showBindLineId({{$user->NO}}, '{{$user->cname}}')">綁定lineId</button>
+              @else
+                <button type="button" class="btn btn-outline-danger btn-sm" onclick="showUnbindLineId({{$user->NO}}, '{{$user->cname}}', '{{$user->line_id}}')">解除lineId</button>
               @endif
-            <td>  
-             <button type="button" class="btn btn-outline-primary btn-sm" onclick="showSetModal({{$user->NO}}, {{$user->title_id}}, {{$user->upper_user_no}})">設定</button>
+              <button type="button" class="btn btn-outline-primary btn-sm" onclick="showSetModal({{$user->NO}}, {{$user->title_id}}, {{$user->upper_user_no}})">設定</button>
             </td>
           </tr>
         @endforeach
@@ -89,7 +84,7 @@
 </nav>
 </div>
 <!-- Modal -->
-<div class="modal fade" id="setModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+<div class="modal fade" id="setModal" tabindex="-1" role="dialog" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered" role="document">
     <div class="modal-content">
       <div class="modal-header">
@@ -119,6 +114,57 @@
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
         <button type="button" class="btn btn-primary todo">新增</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal fade" id="bindLineModal" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">綁定LineId</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form>
+          <div class="form-group container-fluid">
+            <div class="row">
+              <label for="title-name" class="col-form-label col-md-4">LineId:</label>
+              <input type="text" class="form-control col-md-8" id="line_id_input">
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
+        <button type="button" class="btn btn-primary todo">綁定</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal fade" id="unbindLineModal" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">解除綁定LineId</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form>
+          <div class="form-group container-fluid">
+            <div class="row">
+              確定要解除綁定LineId嗎，解除綁定該用戶無法透過Line使用EIP功能
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
+        <button type="button" class="btn btn-danger todo">解除</button>
       </div>
     </div>
   </div>
