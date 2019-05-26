@@ -26,16 +26,15 @@ class Receive extends Controller
             $sender_replyToken = $json_obj->events[0]->replyToken; //取得訊息的replyToken
             $sender_userid = $json_obj->events[0]->source->userId; //取得訊息發送者的id
             $sender_type = $json_obj->events[0]->type; //取得訊息的type
-            log::info($bodyContent);
+            $sender_txt = $json_obj->events[0]->message->text; //取得訊息內容
             //寫入eip_line_message紀錄
             $user = DB::select('select * from user where line_id =? and line_channel =?', [$sender_userid, $line_channel]);
-            $sql = "insert into eip_line_message (username, line_channel, line_id, message, time) value (?, ?, ?, ?, UNIX_TIMESTAMP(NOW())) ";
-            log::info($sql);
+            $sql = "insert into eip_line_message (username, line_channel, line_id, body, type, message, time) value (?, ?, ?, ?, ?, ?, UNIX_TIMESTAMP(NOW())) ";
             if(count($user) == 0) {
-                if(DB::insert($sql, [null, $line_channel, $sender_userid, $bodyContent]) != 1) {throw new Exception('insert eip_line_message failed(1)');}
-            } else if(count($user) == 1){
+                if(DB::insert($sql, [null, $line_channel, $sender_userid, $bodyContent, $sender_type, $sender_txt]) != 1) {throw new Exception('insert eip_line_message failed(1)');}
+            } else if(count($user) == 1) {
                 foreach ($user as $v) {
-                    if(DB::insert($sql, [$v->username, $line_channel, $sender_userid, $bodyContent]) != 1) {throw new Exception('insert eip_line_message failed(2)');}
+                    if(DB::insert($sql, [$v->username, $line_channel, $sender_userid, $bodyContent, $sender_type, $sender_txt]) != 1) {throw new Exception('insert eip_line_message failed(2)');}
                 }
             } else {
                 throw new Exception('insert eip_line_message failed(3)');
