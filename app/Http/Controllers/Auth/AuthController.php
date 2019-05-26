@@ -19,7 +19,7 @@ class AuthController extends Controller
         $account = $request->input('account');
         $password = $request->input('password');
         //debug(md5($password));
-        $users = DB::select('select * from user where email = ? and password = ?', [$account, md5($password)]);
+        $users = DB::select('select * from user where username = ? and password = ?', [$account, md5($password)]);
         if(sizeof($users) == 1 ) {
             if ($this->auth->setVerified()) {
                 return $this->auth->redirect();
