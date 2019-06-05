@@ -14,9 +14,7 @@
         <link href="{{ asset('css/public.css') }}" rel="stylesheet">
     </head>
     <body>
-        <div class="weui-flex">
-            <div class="weui-flex__item mobile_topbar">請假申請</div>
-        </div>
+        <div class="weui-flex"><div class="weui-flex__item mobile_topbar">請假申請</div></div>
             <div id="useridfield" style="display:none"></div>
             <div class="weui-cells weui-cells_form">
                 <div class="weui-cell weui-cell_vcode">

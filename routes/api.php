@@ -41,7 +41,7 @@ Route::get('applyoverwork/{id}', 'View\applyoverwork@show');
 
 Route::post('receive', 'Line\Receive@receive');
 Route::get('validateleave/{id}', 'View\validateleave@index');
-Route::post('validateleave/{id}', 'View\validateleave@update');
+Route::put('validateleave/{id}', 'View\validateleave@update');
 
 Route::get('individuallog/{id}', 'View\individuallog@index');
 

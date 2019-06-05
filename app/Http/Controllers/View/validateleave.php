@@ -97,13 +97,9 @@ class validateleave extends Controller
         try {
             $apply_id = $id;
             $line_id = $request->get('userId');
-            $validate = $request->get('validate');
+            $is_validate = $request->get('is_validate');
             $apply_type = $request->get('apply_type');
             $reject_reason = $request->get('reject_reason');
-            $is_validate = 0; //rejeact
-            if($validate == 'agree') {
-                $is_validate = 1; //agree
-            }
             $users = DB::select('select NO, title_id, upper_user_no from user where line_id = ?', [$line_id]);
             $NO = "";                   //審核人NO
             $title_id = "";             //審核人title_id
@@ -116,6 +112,7 @@ class validateleave extends Controller
             }
 
             $apply_user = json_decode(LeaveApplyProvider::getLeaveApply($apply_id));
+            log::info(print_r($apply_user, true));
             //echo $apply_user->id;
             if(is_null($apply_user)) { throw new Exception('The line_id is not exist in the EIP');  }
             if($reject_reason == "null") {$reject_reason = null;}
@@ -136,9 +133,9 @@ class validateleave extends Controller
                     ]);
                 } else {
                     if($apply_user->apply_type == 'L') {
-                        LineServiceProvider::sendNotifyFlexMeg($apply_user->$apply_user_line_id, array_merge(["請假不通過","原因:".$reject_reason,"假別:".$apply_user->leave_name,"起日:".$apply_user->start_date ." ".$apply_user->start_time,"迄日:".$apply_user->end_date ." ".$apply_user->end_time,"備註:". $apply_user->comment]));
+                        LineServiceProvider::sendNotifyFlexMeg($apply_user->apply_user_line_id, array_merge(["請假不通過","原因:".$reject_reason,"假別:".$apply_user->leave_name,"起日:".$apply_user->start_date ." ".$apply_user->start_time,"迄日:".$apply_user->end_date ." ".$apply_user->end_time,"備註:". $apply_user->comment]));
                     } else {
-                        LineServiceProvider::sendNotifyFlexMeg($apply_user->$apply_user_line_id, array_merge(["加班不通過","原因:".$reject_reason,"加班日:".$apply_user->over_work_date,"加班小時:".$apply_user->over_work_hours,"備註:". $apply_user->comment]));
+                        LineServiceProvider::sendNotifyFlexMeg($apply_user->apply_user_line_id, array_merge(["加班不通過","原因:".$reject_reason,"加班日:".$apply_user->over_work_date,"加班小時:".$apply_user->over_work_hours,"備註:". $apply_user->comment]));
                     }
                     return response()->json([
                         'status' => 'successful'
@@ -163,9 +160,9 @@ class validateleave extends Controller
                         ]);
                     } else {
                         if($apply_user->apply_type == 'L') {
-                            LineServiceProvider::sendNotifyFlexMeg($apply_user->$apply_user_line_id, array_merge(["請假已通過","假別:".$apply_user->leave_name,"起日:".$apply_user->start_date ." ".$apply_user->start_time,"迄日:".$apply_user->end_date ." ".$apply_user->end_time,"備註:". $apply_user->comment]));
+                            LineServiceProvider::sendNotifyFlexMeg($apply_user->apply_user_line_id, array_merge(["請假已通過","假別:".$apply_user->leave_name,"起日:".$apply_user->start_date ." ".$apply_user->start_time,"迄日:".$apply_user->end_date ." ".$apply_user->end_time,"備註:". $apply_user->comment]));
                         } else {
-                            LineServiceProvider::sendNotifyFlexMeg($apply_user->$apply_user_line_id, array_merge(["加班已通過","加班日:".$apply_user->over_work_date,"加班小時:".$apply_user->over_work_hours,"備註:". $apply_user->comment]));
+                            LineServiceProvider::sendNotifyFlexMeg($apply_user->apply_user_line_id, array_merge(["加班已通過","加班日:".$apply_user->over_work_date,"加班小時:".$apply_user->over_work_hours,"備註:". $apply_user->comment]));
                         }
                         return response()->json([
                             'status' => 'successful'
