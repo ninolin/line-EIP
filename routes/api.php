@@ -46,3 +46,4 @@ Route::put('validateleave/{id}', 'View\validateleave@update');
 Route::get('individuallog/{id}', 'View\individuallog@index');
 
 Route::get('leavelog/{id}', 'View\leavelog@index');
+Route::get('test', 'Line\Test@show');

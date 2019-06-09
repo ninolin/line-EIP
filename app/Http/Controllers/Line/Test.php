@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Line;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
+use App\Providers\HelperServiceProvider;
+use DateTime;
 
 class Test extends Controller
 {
@@ -47,7 +49,13 @@ class Test extends Controller
      */
     public function show()
     {
-        echo "aaa";
+        $d = new DateTime();
+        $timeMin = rawurlencode($d->format('Y-m-d\TH:i:sP'));
+        HelperServiceProvider::get_req("https://www.googleapis.com/calendar/v3/calendars/zh-tw.taiwan%23holiday%40group.v.calendar.google.com/events?key=AIzaSyB0ZMfTWE_h_qAVNRWpZFnDUOPaiT-a7xo&timeMin=".$timeMin);
+        
+        return response()->json([
+            'status' => 's'
+        ]);
     }
 
     /**

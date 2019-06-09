@@ -68,8 +68,6 @@ class applyleave extends Controller
             $comment = $request->input('comment');              //備註
             if($comment == "") $comment = "-";
 
-            //透過假別名稱、起日、迄日找到假別id
-            $leave_days = round((strtotime($end_date)-strtotime($start_date))/3600/24); //請假天數
             //echo $leave_days;
             $leave_type_arr = DB::select('select * from eip_leave_type where name =? order by day ASC', [$leavename]);
             $leave_type_id = "";
@@ -112,7 +110,33 @@ class applyleave extends Controller
                 $upper_user_no = $v->NO; 
             }
             if($upper_line_id == "") throw new Exception('請假失敗:未設定簽核人或簽核人的line未加入EIP中');
-            
+            //計算請假小時
+            $leave_hours = (strtotime($end_date) - strtotime($start_date))/60/60;
+            if($leave_hours == 0) { //當天請假
+                $leave_hours = (strtotime($end_time) - strtotime($start_time))/(60*60);
+                if($leave_hours >= 4) {
+                    $leave_hours--;
+                }
+            } else if($leave_hours == 24) {
+                $leave_hours = ((strtotime("17:00") - strtotime($start_time))/(60*60)) + ((strtotime($end_time) - strtotime("08:00"))/(60*60));
+            } else {
+                date('Y-m-d', strtotime('+1 days', strtotime($start_time)));
+            }
+            $d = new DateTime($start_date);
+            $timeMin = rawurlencode($start_date."T00:00:00Z");
+            $d = new DateTime($end_date);
+            $timeMax = rawurlencode($d->format('Y-m-d\TH:i:sP'));
+            $calevents_str = HelperServiceProvider::get_req("https://www.googleapis.com/calendar/v3/calendars/nino.dev.try%40gmail.com/events?key=AIzaSyB0ZMfTWE_h_qAVNRWpZFnDUOPaiT-a7xo&timeMin=".$timeMin."&timeMax=".$timeMax);
+            $calevents = json_decode($calevents_str) -> items;
+            $leave_days = 0;
+            foreach ($calevents as $v) {
+                if($v->summary == "休息日"){
+                    
+                }
+                $agent_line_id = $v->line_id;
+            }
+            //$leave_days = round((strtotime($end_date)-strtotime($start_date))/3600/24); //請假天數
+
             //寫入請假紀錄
             $sql = "insert into eip_leave_apply ";
             $sql .= "(apply_user_no, apply_type, agent_user_no, type_id, start_date, start_time, end_date, end_time, comment) ";
