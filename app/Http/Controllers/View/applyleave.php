@@ -215,10 +215,11 @@ class applyleave extends Controller
         $hours = (strtotime($time2) - strtotime($time1))/(60*60);
         log::info("cal_timediff:".$hours);
         if($hours >= 5) {
-            $leave_hours = $leave_hours-1;
-        } else if($leave_hours > 4) {
-            $leave_hours = 4;
+            $hours = $hours-1;
+        } else if($hours > 4) {
+            $hours = 4;
         }
+        return $hours;
     }
 
     /**
