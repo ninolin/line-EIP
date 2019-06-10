@@ -210,6 +210,8 @@ class applyleave extends Controller
      * @return float 
      */
     static protected function cal_timediff($time1, $time2) {
+        log::info("time1:".$time1);
+        log::info("time2:".$time2);
         $hours = (strtotime($time2) - strtotime($time1))/(60*60);
         log::info("cal_timediff:".$hours);
         if($hours >= 5) {
