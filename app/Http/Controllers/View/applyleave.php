@@ -57,14 +57,14 @@ class applyleave extends Controller
     public function store(Request $request)
     {
         try {
-            $apply_user_line_id = $request->get('userId');      //申請者的line_id
-            $leave_agent_user_no = $request->get('leaveAgent'); //代理人的user_NO
-            $leavename = $request->get('leaveType');            //假別名稱
-            $start_date = $request->get('startDate');           //起日
-            $start_time = $request->get('startTime');           //起時
-            $end_date = $request->get('endDate');               //迄日
-            $end_time = $request->get('endTime');               //迄時
-            $comment = $request->input('comment');              //備註
+            $apply_user_line_id = $request->get('userId');                  //申請者的line_id
+            $leave_agent_user_no = $request->get('leaveAgent');             //代理人的user_NO
+            $leavename = $request->get('leaveType');                        //假別名稱
+            $start_date = explode("T",$request->get('startDate'))[0];       //起日
+            $start_time = explode("T",$request->get('startDate'))[1].":00"; //起時
+            $end_date = explode("T",$request->get('endDate'))[0];           //迄日
+            $end_time = explode("T",$request->get('endDate'))[1].":00";     //迄時
+            $comment = $request->input('comment');                          //備註
             if($comment == "") $comment = "-";
 
             //取得假別的id
