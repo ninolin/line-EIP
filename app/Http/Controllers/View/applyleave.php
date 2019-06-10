@@ -252,15 +252,15 @@ class applyleave extends Controller
         log::info("https://www.googleapis.com/calendar/v3/calendars/nino.dev.try%40gmail.com/events?key=AIzaSyB0ZMfTWE_h_qAVNRWpZFnDUOPaiT-a7xo&timeMin=".$timeMin."&timeMax=".$timeMax);
         $calevents = json_decode($calevents_str) -> items;
         //return $calevents;
-        $offhours = 0;
+        $offhours = 8;
         foreach ($calevents as $e) {
             if($e-> status == "confirmed") {
                 if(strpos($e-> summary,'休息日') !== false && $e-> start-> date == $check_date) {
-                    $offhours = $offhours + 8;
+                    $offhours = $offhours - 8;
                 }
             }
             if($e-> status == "cancelled") {
-                $offhours = $offhours - 8;
+                $offhours = $offhours + 8;
             }
         }
         return $offhours;
