@@ -67,6 +67,7 @@ class applyleave extends Controller
             if($comment == "") $comment = "-";
 
             //取得假別的id
+            $leave_days = count(self::dates2array($start_date, $end_date));
             $leave_type_arr = DB::select('select * from eip_leave_type where name =? order by day ASC', [$leavename]);
             $leave_type_id = "";
             $i = 0;
