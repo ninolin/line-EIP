@@ -137,10 +137,10 @@ class applyleave extends Controller
             
             //寫入請假紀錄
             $sql = "insert into eip_leave_apply ";
-            $sql .= "(apply_user_no, apply_type, agent_user_no, type_id, start_date, start_time, end_date, end_time, comment) ";
+            $sql .= "(apply_user_no, apply_type, agent_user_no, leave_type, start_date, end_date, leave_hours, comment) ";
             $sql .= "value ";
             $sql .= "(?, ?, ?, ?, ?, ?, ?, ?, ?) ";
-            if(DB::insert($sql, [$apply_user_no, 'L', $leave_agent_user_no, $leave_type_id, $start_date, $start_time, $end_date, $end_time, $comment]) != 1) {
+            if(DB::insert($sql, [$apply_user_no, 'L', $leave_agent_user_no, $leave_type_id, $start_date, $end_date, $leave_hours, $comment]) != 1) {
                 throw new Exception('請假失敗:insert eip_leave_apply error'); 
             }
             //取得剛剛寫入的請假紀錄id
