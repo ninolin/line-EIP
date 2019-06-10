@@ -240,7 +240,7 @@ class applyleave extends Controller
      * @return int
      */
     static protected function is_offday_by_gcalendar($check_date) {
-        og::info($check_date);
+        log::info($check_date);
         $timeMin = rawurlencode($check_date."T00:00:00Z");
         $timeMax = rawurlencode(date('Y-m-d', strtotime('+1 days', strtotime($check_date)))."T00:00:00Z");
         $calevents_str = HelperServiceProvider::get_req("https://www.googleapis.com/calendar/v3/calendars/nino.dev.try%40gmail.com/events?key=AIzaSyB0ZMfTWE_h_qAVNRWpZFnDUOPaiT-a7xo&timeMin=".$timeMin."&timeMax=".$timeMax);
