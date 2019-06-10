@@ -112,7 +112,6 @@ class applyleave extends Controller
             if($upper_line_id == "") throw new Exception('請假失敗:未設定簽核人或簽核人的line未加入EIP中');
             //計算請假小時(目前先預設工時是早8晚5,30m為1單位)
             $dates = self::dates2array($start_date, $end_date);
-            log::info("count_dates:". count($dates));
             $leave_hours = 0;
             if(count($dates) == 1) { 
                 //只請一天
@@ -210,10 +209,7 @@ class applyleave extends Controller
      * @return float 
      */
     static protected function cal_timediff($time1, $time2) {
-        log::info("time1:".$time1);
-        log::info("time2:".$time2);
         $hours = (strtotime($time2) - strtotime($time1))/(60*60);
-        log::info("cal_timediff:".$hours);
         if($hours >= 5) {
             $hours = $hours-1;
         } else if($hours > 4) {
@@ -245,14 +241,10 @@ class applyleave extends Controller
      * @return int
      */
     static protected function is_offday_by_gcalendar($check_date) {
-        log::info($check_date);
         $timeMin = rawurlencode($check_date."T00:00:00Z");
         $timeMax = rawurlencode(date('Y-m-d', strtotime('+1 days', strtotime($check_date)))."T00:00:00Z");
         $calevents_str = HelperServiceProvider::get_req("https://www.googleapis.com/calendar/v3/calendars/nino.dev.try%40gmail.com/events?key=AIzaSyB0ZMfTWE_h_qAVNRWpZFnDUOPaiT-a7xo&timeMin=".$timeMin."&timeMax=".$timeMax);
-        log::info("calevents_str");
-        log::info("https://www.googleapis.com/calendar/v3/calendars/nino.dev.try%40gmail.com/events?key=AIzaSyB0ZMfTWE_h_qAVNRWpZFnDUOPaiT-a7xo&timeMin=".$timeMin."&timeMax=".$timeMax);
         $calevents = json_decode($calevents_str) -> items;
-        //return $calevents;
         $offhours = 8;
         foreach ($calevents as $e) {
             if($e-> status == "confirmed") {
