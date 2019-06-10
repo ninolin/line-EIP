@@ -139,7 +139,7 @@ class applyleave extends Controller
             $sql = "insert into eip_leave_apply ";
             $sql .= "(apply_user_no, apply_type, agent_user_no, leave_type, start_date, end_date, leave_hours, comment) ";
             $sql .= "value ";
-            $sql .= "(?, ?, ?, ?, ?, ?, ?, ?, ?) ";
+            $sql .= "(?, ?, ?, ?, ?, ?, ?, ?) ";
             if(DB::insert($sql, [$apply_user_no, 'L', $leave_agent_user_no, $leave_type_id, $start_date, $end_date, $leave_hours, $comment]) != 1) {
                 throw new Exception('請假失敗:insert eip_leave_apply error'); 
             }
