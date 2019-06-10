@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Input;
 use App\Providers\LineServiceProvider;
+use App\Providers\HelperServiceProvider;
 use DB;
 use Log;
 use Exception;
