@@ -244,7 +244,7 @@ class applyleave extends Controller
         $timeMax = rawurlencode(date('Y-m-d', strtotime('+1 days', strtotime($check_date)))."T00:00:00Z");
         $calevents_str = HelperServiceProvider::get_req("https://www.googleapis.com/calendar/v3/calendars/nino.dev.try%40gmail.com/events?key=AIzaSyB0ZMfTWE_h_qAVNRWpZFnDUOPaiT-a7xo&timeMin=".$timeMin."&timeMax=".$timeMax);
         log::info("calevents_str");
-        log::info($calevents_str);
+        log::info("https://www.googleapis.com/calendar/v3/calendars/nino.dev.try%40gmail.com/events?key=AIzaSyB0ZMfTWE_h_qAVNRWpZFnDUOPaiT-a7xo&timeMin=".$timeMin."&timeMax=".$timeMax);
         $calevents = json_decode($calevents_str) -> items;
         //return $calevents;
         $offhours = 0;
