@@ -112,11 +112,12 @@ class applyleave extends Controller
             if($upper_line_id == "") throw new Exception('請假失敗:未設定簽核人或簽核人的line未加入EIP中');
             //計算請假小時(目前先預設工時是早8晚5,30m為1單位)
             $dates = self::dates2array($start_date, $end_date);
+            log::info("dates:".$dates);
             $leave_hours = 0;
             if(count($dates) == 1) { 
                 //只請一天
                 if(self::is_offday_by_gcalendar($start_date) == 8) { //先確定當天是不是休息日，不是休息日的話再來算請假小時
-                    $leave_hours += self::cal_timediff($start_time, $end_tim);
+                    $leave_hours += self::cal_timediff($start_time, $end_time);
                 }
             } else {    
                 //請超過一天
