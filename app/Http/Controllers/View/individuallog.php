@@ -34,7 +34,7 @@ class individuallog extends Controller
         $sql .= 'left join user as u1 ';
         $sql .= 'on a.agent_user_no = u1.NO ';
         $sql .= 'left join eip_leave_type ';
-        $sql .= 'on a.type_id = eip_leave_type.id ';
+        $sql .= 'on a.leave_type = eip_leave_type.id ';
         $sql .= 'left join user as u2 ';
         $sql .= 'on a.apply_user_no = u2.NO ';
         $leaves = DB::select($sql, [$id]);
