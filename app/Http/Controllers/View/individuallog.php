@@ -36,7 +36,7 @@ class individuallog extends Controller
         $sql .= 'left join eip_leave_type ';
         $sql .= 'on a.leave_type = eip_leave_type.id ';
         $sql .= 'left join user as u2 ';
-        $sql .= 'on a.apply_user_no = u2.NO ';
+        $sql .= 'on a.apply_user_no = u2.NO order by id desc';
         $leaves = DB::select($sql, [$id]);
         return response()->json([
             'status' => 'successful',

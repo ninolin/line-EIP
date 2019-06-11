@@ -1,15 +1,15 @@
 window.onload = function (e) {
-    // liff.init(function (data) {
-    //     initializeApp(data);
-    // });
-    initializeApp({})
+    liff.init(function (data) {
+        initializeApp(data);
+    });
+    //initializeApp({})
 };
 
 function initializeApp(data) {
-    //document.getElementById('useridfield').textContent = data.context.userId;
+    document.getElementById('useridfield').textContent = data.context.userId;
     promise_call({
-        //url: "./api/individuallog/"+data.context.userId, 
-        url: "./api/individuallog/U8d41dfb18097f57080858e39b929ce39", 
+        url: "./api/individuallog/"+data.context.userId, 
+        //url: "./api/individuallog/U8d41dfb18097f57080858e39b929ce39", 
         method: "get"
     })
     .then(v => {
@@ -26,7 +26,15 @@ function initializeApp(data) {
                 } else {
                     $html += '    <label class="weui-form-preview__label" style="color: black;">加班</label>';
                 }
-                $html += '    <em class="weui-form-preview__value" style="color: black;font-size: 1.2em;">已審核</em>';
+                $html += '    <em class="weui-form-preview__value" style="color: black;font-size: 1.2em;">';
+                if(item.apply_status == 'P') {
+                    $html += '簽核中';
+                } else if(item.apply_status == 'Y') {
+                    $html += '已簽核';
+                } else {
+                    $html += '已拒絕';
+                }
+                $html += '</em>';
                 $html += '</div>';
                 $html += '<div class="weui-form-preview__bd" style="padding: 5px 16px;">';
                 if(item.apply_type == 'L') {
