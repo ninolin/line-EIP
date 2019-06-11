@@ -149,11 +149,21 @@ class applyleave extends Controller
             foreach ($last_appy_record as $v) {
                 $last_appy_id = $v->last_id;
             }
-            //寫入簽核流程紀錄(該table沒有紀錄申請人和簽核人的line_id是因為可能會有換line帳號的情況發生)
-            if(DB::insert("insert into eip_leave_apply_process (apply_id, apply_type, apply_user_no, upper_user_no) value (?, ?, ?, ?)", [$last_appy_id, 'L', $apply_user_no, $upper_user_no]) != 1) {
-                DB::delete("delete from eip_leave_apply where id = ?", [$last_appy_id]);
-                throw new Exception('insert db error'); 
+            $upper_users = self::find_upper($apply_user_no, [], $leave_type_id);
+            foreach ($upper_users as $u) {
+                //寫入簽核流程紀錄(該table沒有紀錄申請人和簽核人的line_id是因為可能會有換line帳號的情況發生)
+                if(DB::insert("insert into eip_leave_apply_process (apply_id, apply_type, apply_user_no, upper_user_no) value (?, ?, ?, ?)", [$last_appy_id, 'L', $apply_user_no, $u]) != 1) {
+                    DB::delete("delete from eip_leave_apply where id = ?", [$last_appy_id]);
+                    DB::delete("delete from eip_leave_apply_process where apply_id = ?", [$last_appy_id]);
+                    throw new Exception('insert db error'); 
+                }
             }
+
+            //寫入簽核流程紀錄(該table沒有紀錄申請人和簽核人的line_id是因為可能會有換line帳號的情況發生)
+            // if(DB::insert("insert into eip_leave_apply_process (apply_id, apply_type, apply_user_no, upper_user_no) value (?, ?, ?, ?)", [$last_appy_id, 'L', $apply_user_no, $upper_user_no]) != 1) {
+            //     DB::delete("delete from eip_leave_apply where id = ?", [$last_appy_id]);
+            //     throw new Exception('insert db error'); 
+            // }
             //通知申請人、代理人、第一簽核人
             Log::info("agent_line_id:".$agent_line_id);
             Log::info("upper_line_id:".$upper_line_id);
@@ -199,6 +209,28 @@ class applyleave extends Controller
             'status' => 'successful',
             'data' => $leaves
         ]);
+    }
+
+    /**
+     * 回傳下一個簽核人
+     *
+     * @param  int      $user_no
+     * @param  array    $array
+     * @param  int      $approved_title_id
+     * @return array    
+     */
+    static protected function find_upper($user_no, $array, $approved_title_id) {
+        $users = DB::select('select title_id, upper_user_no from user where NO =?', [$user_no]);
+        if($users > 0) {
+            foreach ($users as $u) {
+                if($u-> upper_user_no != 0 && $u-> title_id != $approved_title_id) {
+                    array_push($array, $u-> upper_user_no);
+                    return self::find_upper($u-> upper_user_no, $array, $approved_title_id);
+                } else {
+                    return $array;
+                }
+            }
+        }
     }
 
     /**
