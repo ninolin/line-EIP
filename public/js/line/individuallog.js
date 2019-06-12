@@ -1,3 +1,5 @@
+import { resolve } from "path";
+
 window.onload = function (e) {
     liff.init(function (data) {
         initializeApp(data);
@@ -6,7 +8,7 @@ window.onload = function (e) {
 };
 
 function initializeApp(data) {
-    document.getElementById('useridfield').textContent = data.context.userId;
+    //document.getElementById('useridfield').textContent = data.context.userId;
     promise_call({
         url: "./api/individuallog/"+data.context.userId, 
         //url: "./api/individuallog/U8d41dfb18097f57080858e39b929ce39", 
@@ -17,7 +19,7 @@ function initializeApp(data) {
             alert("get data error");
         } else {
             //alert(JSON.stringify(v));
-            if(v.data.length > 0)  $("#leave_data").html("");
+            //if(v.data.length > 0)  resolve();
             v.data.map(item => {     
                 $html =  '<div class="weui-form-preview mb-3" onclick="show_process_history('+item.id+')">';
                 $html += '<div class="weui-form-preview__hd" style="padding: 5px 16px;">';

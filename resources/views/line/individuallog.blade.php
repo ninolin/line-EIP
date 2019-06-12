@@ -15,8 +15,10 @@
         <div class="weui-flex"><div class="weui-flex__item mobile_topbar">工時紀錄</div></div>
         <div class="text-center">
             <div class="main-section" id="leave_data">
-                <div id="useridfield" style="display:none"></div>
-                <div id="result"></div>
+                <img src="./image/folder.png" style="margin-top:30px;">
+                <div>目前無資料</div>
+                <!-- <div id="useridfield" style="display:none"></div>
+                <div id="result"></div> -->
             </div>
         </div>
         <div style="display: none;" id="logs_history">
