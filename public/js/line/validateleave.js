@@ -1,23 +1,21 @@
 window.onload = function (e) {
-    // liff.init(function (data) {
-    //     initializeApp(data);
-    // });
-    initializeApp({})
+    liff.init(function (data) {
+        initializeApp(data);
+    });
+    //initializeApp({})
 };
 
 function initializeApp(data) {
-    //document.getElementById('useridfield').textContent = data.context.userId;
+    document.getElementById('useridfield').textContent = data.context.userId;
     promise_call({
-        //url: "./api/validateleave/"+data.context.userId, 
-        url: "./api/validateleave/U8d41dfb18097f57080858e39b929ce39", 
+        url: "./api/validateleave/"+data.context.userId, 
+        //url: "./api/validateleave/U8d41dfb18097f57080858e39b929ce39", 
         method: "get"
     })
     .then(v => {
-        console.log(v);
         if(v.status != 'successful') {
             alert("get data error");
         } else {
-            //alert(JSON.stringify(v));
             if(v.data.length > 0)  $("#leave_data").html("");
             v.data.map(item => {
                 $html =  '<div class="weui-form-preview mb-3" id="apply_'+item.id+'">';
@@ -70,22 +68,6 @@ function initializeApp(data) {
                 $html += '</div>';
                 $html += '</div>';
                 $html += '</div>';
-                // $html =  "<tr>";
-                // $html += "<td>"+item.cname+"</td>";
-               
-                // if(item.apply_type == 'L') {
-                //     $html += "<td>"+item.agent_cname+"</td>";
-                //     $html += "<td>"+item.leave_name+"</td>";
-                //     $html += "<td>"+item.start_date+" "+item.start_time+"</td>";
-                //     $html += "<td>"+item.end_date+" "+item.end_time+"</td>";
-                // } else {
-                //     $html += "<td>-</td>";
-                //     $html += "<td>加班</td>";
-                //     $html += "<td>"+item.over_work_date+"("+item.over_work_hours+"小時)</td>";
-                //     $html += "<td>-</td>";
-                // }
-                // $html += "<td><button type='button' class='btn btn-primary btn-sm' onclick='show_leave("+item.id+", \""+item.apply_type+"\")'>查</button></td>";
-                // $html += "</tr>";
                 $("#leave_data").append($html);
             })
         }
@@ -141,8 +123,8 @@ const show_reject_dialog = (apply_id, apply_type, cname, leave_name) => {
 const validate_leave = (apply_id, apply_type, is_validate) => {
 
     const post_data = {
-        //"userId": document.getElementById('useridfield').textContent,
-        "userId": "U8d41dfb18097f57080858e39b929ce39", 
+        "userId": document.getElementById('useridfield').textContent,
+        //"userId": "U8d41dfb18097f57080858e39b929ce39", 
         "is_validate": is_validate,    // 0=reject or 1=agree
         "apply_type": apply_type //L or O
     }

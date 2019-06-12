@@ -13,7 +13,7 @@ use Log;
 class validateleave extends Controller
 {
     /**
-     * 顯示待審核清單資料
+     * 顯示LIFF待審核清單資料
      * @author nino
      * @return \Illuminate\Http\Response
      */
@@ -43,46 +43,13 @@ class validateleave extends Controller
     }
 
     /**
-     * 顯示待審核清單頁面
+     * 顯示LIFF待審核清單頁面
      * @author nino
      * @return \Illuminate\Http\Response
      */
     public function create()
     {
         return view('line.validateleave', []);
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        
     }
 
     /**
@@ -105,25 +72,21 @@ class validateleave extends Controller
             $title_id = "";             //審核人title_id
             $upper_user_no = "";        //審核人的下一個審核人的user_no
             foreach ($users as $v) {
-                //echo "vvv".$v->NO;
                 $NO = $v->NO;
                 $title_id = $v->title_id;
                 $upper_user_no = $v->upper_user_no;
             }
 
             $apply_user = json_decode(LeaveApplyProvider::getLeaveApply($apply_id));
-            log::info(print_r($apply_user, true));
-            //echo $apply_user->id;
             if(is_null($apply_user)) { throw new Exception('The line_id is not exist in the EIP');  }
             if($reject_reason == "null") {$reject_reason = null;}
             if(DB::update("update eip_leave_apply_process set is_validate =?, reject_reason =? where apply_id =? and upper_user_no =?", [$is_validate, $reject_reason, $apply_id, $NO]) != 1) {
-                //echo "bbb";
                 return response()->json([
                     'status' => 'error',
                     'message' => 'update error'
                 ]);
             }
-            //echo "ccc";
+
             if($is_validate == 0) {
                 //拒絕審核
                 if(DB::update("update eip_leave_apply set apply_status =? where id =?", ['N', $apply_id]) != 1) {
@@ -133,7 +96,7 @@ class validateleave extends Controller
                     ]);
                 } else {
                     if($apply_user->apply_type == 'L') {
-                        LineServiceProvider::sendNotifyFlexMeg($apply_user->apply_user_line_id, array_merge(["請假不通過","原因:".$reject_reason,"假別:".$apply_user->leave_name,"起日:".$apply_user->start_date ." ".$apply_user->start_time,"迄日:".$apply_user->end_date ." ".$apply_user->end_time,"備註:". $apply_user->comment]));
+                        LineServiceProvider::sendNotifyFlexMeg($apply_user->apply_user_line_id, array_merge(["請假不通過","原因:".$reject_reason,"假別:".$apply_user->leave_name,"起日:".$apply_user->start_date,"迄日:".$apply_user->end_date,"備註:". $apply_user->comment]));
                     } else {
                         LineServiceProvider::sendNotifyFlexMeg($apply_user->apply_user_line_id, array_merge(["加班不通過","原因:".$reject_reason,"加班日:".$apply_user->over_work_date,"加班小時:".$apply_user->over_work_hours,"備註:". $apply_user->comment]));
                     }
@@ -143,16 +106,14 @@ class validateleave extends Controller
                 }
             } else {
                 //同意審核
-                $leave_types = DB::select('select approved_title_id from eip_leave_type where id in (select leave_type from eip_leave_apply where id =?)', [$apply_id]);
-                $approved_title_id = "";
-                foreach ($leave_types as $v) {
-                    $approved_title_id = $v->approved_title_id;
+                $processes = DB::select('select upper_user_no from eip_leave_apply_process where apply_id = ? order by id desc limit 1', [$apply_id]);
+                $last_approved_user_no = 0;
+                foreach ($processes as $v) {
+                    $last_approved_user_no = $v->upper_user_no;
                 }
             
-                if($approved_title_id == $title_id) {
+                if($last_approved_user_no == $NO) {
                     //全部審核完了
-                    log::info("update eip_leave_apply set apply_status =? where id =?");
-                    log::info($apply_id);
                     if(DB::update("update eip_leave_apply set apply_status =? where id =?", ['Y', $apply_id]) != 1) {
                         return response()->json([
                             'status' => 'error',
@@ -160,7 +121,7 @@ class validateleave extends Controller
                         ]);
                     } else {
                         if($apply_user->apply_type == 'L') {
-                            LineServiceProvider::sendNotifyFlexMeg($apply_user->apply_user_line_id, array_merge(["請假已通過","假別:".$apply_user->leave_name,"起日:".$apply_user->start_date ." ".$apply_user->start_time,"迄日:".$apply_user->end_date ." ".$apply_user->end_time,"備註:". $apply_user->comment]));
+                            LineServiceProvider::sendNotifyFlexMeg($apply_user->apply_user_line_id, array_merge(["請假已通過","假別:".$apply_user->leave_name,"起日:".$apply_user->start_date,"迄日:".$apply_user->end_date,"備註:". $apply_user->comment]));
                         } else {
                             LineServiceProvider::sendNotifyFlexMeg($apply_user->apply_user_line_id, array_merge(["加班已通過","加班日:".$apply_user->over_work_date,"加班小時:".$apply_user->over_work_hours,"備註:". $apply_user->comment]));
                         }
@@ -170,26 +131,28 @@ class validateleave extends Controller
                     }
                 } else {
                     //繼續給下一個人審核
-                    if(DB::insert("insert into eip_leave_apply_process (apply_id, apply_type, apply_user_no, upper_user_no) value (?, ?, ?, ?)", [$apply_id, $apply_type, $NO, $upper_user_no]) != 1) {
-                        return response()->json([
-                            'status' => 'error',
-                            'message' => 'insert error'
-                        ]);
-                    } else {
-                        $upper_users = DB::select('select line_id from user where NO = ?', [$upper_user_no]);
-                        $upper_user_line_id = "";   //審核人的下一個審核人的line_id
-                        foreach ($upper_users as $v) {
-                            $upper_user_line_id = $v->line_id;
-                        }
-                        if($apply_user->apply_type == 'L') {
-                            LineServiceProvider::sendNotifyFlexMeg($upper_user_line_id, array_merge(["請審核".$apply_user->apply_user_cname."送出的假單","假別:".$apply_user->leave_name,"起日:".$apply_user->start_date ." ".$apply_user->start_time,"迄日:".$apply_user->end_date ." ".$apply_user->end_time,"備註:". $apply_user->comment]));
-                        } else {
-                            LineServiceProvider::sendNotifyFlexMeg($upper_user_line_id, ["請審核".$apply_user->apply_user_cname."送出的加班","加班日:".$apply_user->over_work_date,"加班小時:".$apply_user->over_work_hours,"備註:". $apply_user->comment]);
-                        }
-                        return response()->json([
-                            'status' => 'successful'
-                        ]);
+                    $next_process_sql  = "select upper_user_no from eip_leave_apply_process where apply_id = ? ";
+                    $next_process_sql .= "and id > ( select id from eip_leave_apply_process where apply_id = ? and upper_user_no =?) ";
+                    $next_process_sql .= "order by id desc limit 1 ";
+                    $next_process = DB::select($next_process_sql, [$apply_id, $apply_id, $NO]);
+                    $next_approved_user_no = 0;
+                    foreach ($next_process as $v) {
+                        $next_approved_user_no = $v->upper_user_no;
                     }
+
+                    $upper_users = DB::select('select line_id from user where NO = ?', [$next_approved_user_no]);
+                    $upper_user_line_id = "";   //審核人的下一個審核人的line_id
+                    foreach ($upper_users as $v) {
+                        $upper_user_line_id = $v->line_id;
+                    }
+                    if($apply_user->apply_type == 'L') {
+                        LineServiceProvider::sendNotifyFlexMeg($upper_user_line_id, array_merge(["請審核".$apply_user->apply_user_cname."送出的假單","假別:".$apply_user->leave_name,"起日:".$apply_user->start_date,"迄日:".$apply_user->end_date,"備註:". $apply_user->comment]));
+                    } else {
+                        LineServiceProvider::sendNotifyFlexMeg($upper_user_line_id, ["請審核".$apply_user->apply_user_cname."送出的加班","加班日:".$apply_user->over_work_date,"加班小時:".$apply_user->over_work_hours,"備註:". $apply_user->comment]);
+                    }
+                    return response()->json([
+                        'status' => 'successful'
+                    ]);
                 }
             }
         } catch (Exception $e) {
@@ -200,14 +163,4 @@ class validateleave extends Controller
         }
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
-    {
-        //
-    }
 }

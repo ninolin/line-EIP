@@ -37,7 +37,7 @@ class LeaveApplyProvider extends ServiceProvider
         $sql .= 'left join user as u1 '; //u1是agent user
         $sql .= 'on a.agent_user_no = u1.NO ';
         $sql .= 'left join eip_leave_type ';
-        $sql .= 'on a.type_id = eip_leave_type.id ';
+        $sql .= 'on a.leave_type = eip_leave_type.id ';
         $sql .= 'left join user as u2 '; //u2是apply user
         $sql .= 'on a.apply_user_no = u2.NO ';
         $apply = DB::select($sql, [$apply_id]);
