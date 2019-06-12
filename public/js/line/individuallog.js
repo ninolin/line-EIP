@@ -18,8 +18,6 @@ function initializeApp(data) {
         if(v.status != 'successful') {
             alert("get data error");
         } else {
-            //alert(JSON.stringify(v));
-            //if(v.data.length > 0)  resolve();
             v.data.map(item => {     
                 $html =  '<div class="weui-form-preview mb-3" onclick="show_process_history('+item.id+')">';
                 $html += '<div class="weui-form-preview__hd" style="padding: 5px 16px;">';

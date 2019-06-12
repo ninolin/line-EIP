@@ -15,7 +15,10 @@
         <div class="weui-flex"><div class="weui-flex__item mobile_topbar">工時簽核</div></div>
         <div class="text-center">
             <div class="main-section">
-                <div id="leave_data"></div>
+                <div id="leave_data">
+                    <img src="./image/folder.png" style="margin-top:30px;">
+                    <div>目前無資料</div>
+                </div>
                 <div id="useridfield" style="display:none"></div>
                 <div id="result"></div>
             </div>

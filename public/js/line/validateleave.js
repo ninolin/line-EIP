@@ -16,7 +16,6 @@ function initializeApp(data) {
         if(v.status != 'successful') {
             alert("get data error");
         } else {
-            if(v.data.length > 0)  $("#leave_data").html("");
             v.data.map(item => {
                 $html =  '<div class="weui-form-preview mb-3" id="apply_'+item.id+'">';
                 $html += '<div class="weui-form-preview__hd" style="padding: 5px 16px;">';
