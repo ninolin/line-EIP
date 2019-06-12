@@ -15,48 +15,18 @@
         <div class="weui-flex"><div class="weui-flex__item mobile_topbar">工時紀錄</div></div>
         <div class="text-center">
             <div class="main-section" id="leave_data">
-                <!-- <div class="weui-form-preview mb-3">
-                    <div class="weui-form-preview__hd" style="padding: 5px 16px;">
-                        <label class="weui-form-preview__label" style="color: black;">事假</label>
-                        <em class="weui-form-preview__value" style="color: black;font-size: 1.2em;">已審核</em>
-                    </div>
-                    <div class="weui-form-preview__bd" style="padding: 5px 16px;">
-                        <div class="weui-form-preview__item">
-                            <span class="weui-form-preview__label">代理人</span>
-                            <span class="weui-form-preview__value">nino</span>
-                        </div>
-                        <div class="weui-form-preview__item">
-                            <span class="weui-form-preview__label">開始時間</span>
-                            <span class="weui-form-preview__value">2019-09-11</span>
-                        </div>
-                        <div class="weui-form-preview__item">
-                            <span class="weui-form-preview__label">結束時間</span>
-                            <span class="weui-form-preview__value">2019-09-11</span>
-                        </div>
-                        <div class="weui-form-preview__item">
-                            <span class="weui-form-preview__label">請假事由</span>
-                            <span class="weui-form-preview__value">2019-09-11</span>
-                        </div>
-                    </div>
-                </div> -->
-                <!-- <div>
-                    <table class="table table-bordered table-striped">
-                        <thead class="table-thead">
-                            <tr>
-                                <th scope="col">代</th>
-                                <th scope="col">假</th>
-                                <th scope="col">起</th>
-                                <th scope="col">迄</th>
-                                <th scope="col">狀</th>
-                            </tr>
-                        </thead>
-                        <tbody id="leave_data">
-                           <tr><td colspan="5">無資料</td></tr>
-                        </tbody>
-                    </table>
-                </div> -->
                 <div id="useridfield" style="display:none"></div>
                 <div id="result"></div>
+            </div>
+        </div>
+        <div style="display: none;" id="logs_history">
+            <div class="weui-mask"></div>
+            <div class="weui-dialog">
+                <div class="weui-dialog__hd"><strong class="weui-dialog__title">簽核歷程</strong></div>
+                <div class="weui-dialog__bd"></div>
+                <div class="weui-dialog__ft">
+                    <a onclick="javascript:$('#logs_history').hide();" href="javascript:;" class="weui-dialog__btn weui-dialog__btn_primary">確定</a>
+                </div>
             </div>
         </div>
     </body>

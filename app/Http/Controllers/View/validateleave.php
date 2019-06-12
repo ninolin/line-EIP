@@ -30,7 +30,7 @@ class validateleave extends Controller
         $sql .= 'left join user as u1 ';
         $sql .= 'on a.agent_user_no = u1.NO ';
         $sql .= 'left join eip_leave_type ';
-        $sql .= 'on a.type_id = eip_leave_type.id ';
+        $sql .= 'on a.leave_type = eip_leave_type.id ';
         $sql .= 'left join user as u2 ';
         $sql .= 'on a.apply_user_no = u2.NO ';
         debug($sql);
@@ -143,7 +143,7 @@ class validateleave extends Controller
                 }
             } else {
                 //同意審核
-                $leave_types = DB::select('select approved_title_id from eip_leave_type where id in (select type_id from eip_leave_apply where id =?)', [$apply_id]);
+                $leave_types = DB::select('select approved_title_id from eip_leave_type where id in (select leave_type from eip_leave_apply where id =?)', [$apply_id]);
                 $approved_title_id = "";
                 foreach ($leave_types as $v) {
                     $approved_title_id = $v->approved_title_id;

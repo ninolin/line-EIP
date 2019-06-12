@@ -49,14 +49,14 @@
             </td>
             <td> 
               @if ($log->apply_type == 'L')
-                {{$log->start_date}} {{$log->start_time}}
+                {{$log->start_date}}
               @else
                 {{$log->over_work_date}} ({{$log->over_work_hours}}小時)
               @endif
             </td>
             <td>
               @if ($log->apply_type == 'L') 
-                {{$log->end_date}} {{$log->end_time}}
+                {{$log->end_date}}
               @else
                 -
               @endif

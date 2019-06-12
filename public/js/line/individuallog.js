@@ -19,22 +19,20 @@ function initializeApp(data) {
             //alert(JSON.stringify(v));
             if(v.data.length > 0)  $("#leave_data").html("");
             v.data.map(item => {     
-                $html =  '<div class="weui-form-preview mb-3">';
+                $html =  '<div class="weui-form-preview mb-3" onclick="show_process_history('+item.id+')">';
                 $html += '<div class="weui-form-preview__hd" style="padding: 5px 16px;">';
                 if(item.apply_type == 'L') {
                     $html += '    <label class="weui-form-preview__label" style="color: black;">'+item.leave_name+'</label>';
                 } else {
                     $html += '    <label class="weui-form-preview__label" style="color: black;">加班</label>';
                 }
-                $html += '    <em class="weui-form-preview__value" style="color: black;font-size: 1.2em;">';
                 if(item.apply_status == 'P') {
-                    $html += '簽核中';
+                    $html += '    <em class="weui-form-preview__value" style="color: black;font-size: 1.2em;">簽核中</em>';
                 } else if(item.apply_status == 'Y') {
-                    $html += '已簽核';
+                    $html += '    <em class="weui-form-preview__value" style="color: green;font-size: 1.2em;">已簽核</em>';
                 } else {
-                    $html += '已拒絕';
+                    $html += '    <em class="weui-form-preview__value" style="color: red;font-size: 1.2em;">已拒絕</em>';
                 }
-                $html += '</em>';
                 $html += '</div>';
                 $html += '<div class="weui-form-preview__bd" style="padding: 5px 16px;">';
                 if(item.apply_type == 'L') {
@@ -70,29 +68,28 @@ function initializeApp(data) {
                 }
                 $html += '</div>';
                 $html += '</div>';
-                // $html =  "<tr>";             
-                // if(item.apply_type == 'L') {
-                //     $html += "<td>"+item.agent_cname+"</td>";
-                //     $html += "<td>"+item.leave_name+"</td>";
-                //     $html += "<td>"+item.start_date+" "+item.start_time+"</td>";
-                //     $html += "<td>"+item.end_date+" "+item.end_time+"</td>";
-                // } else {
-                //     $html += "<td>-</td>";
-                //     $html += "<td>加班</td>";
-                //     $html += "<td>"+item.over_work_date+"("+item.over_work_hours+"小時)</td>";
-                //     $html += "<td>-</td>";
-                // }
-                // if(item.apply_status == 'P') {
-                //     $html += "<td>簽核中</td>";
-                // } else if(item.apply_status == 'Y') {
-                //     $html += "<td>已通過</td>";
-                // } else {
-                //     $html += "<td>已拒絕</td>";
-                // }
-                
-                // $html += "</tr>";
                 $("#leave_data").append($html);
             })
         }
+    })
+}
+
+function show_process_history(apply_id) {
+    promise_call({
+        url: "./api/leavelog/"+apply_id, 
+        method: "get"
+    }).then(v => {
+        if(v.data.length > 0) $("#logs_history").find(".weui-dialog__bd").html("");
+        $html = "<table style='width: 100%;'><tr><th>簽核人</th><th>簽核時間</th><th>簽核狀態</th></tr>";
+        v.data.map(item => {
+            if(!item.is_validate) item.is_validate = "-";
+            if(item.is_validate == 0) item.is_validate = "拒絕("+item.reject_reason+")";
+            if(item.is_validate == 1) item.is_validate = "同意";
+            if(!item.validate_time) item.validate_time = "-";
+            $html += "<tr><td>"+item.cname+"</td><td>"+item.validate_time+"</td><td>"+item.is_validate+"</td></tr>"
+        });
+        $html +="</table>"
+        $("#logs_history").find(".weui-dialog__bd").html($html);
+        $("#logs_history").show();
     })
 }

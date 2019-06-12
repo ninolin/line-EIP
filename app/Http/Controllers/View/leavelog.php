@@ -10,6 +10,17 @@ use Log;
 
 class leavelog extends Controller
 {
+    public function list_logs($id)
+    {
+        $sql  = "select elap.*, u.cname ";
+        $sql .= "from eip_leave_apply_process elap, user u ";
+        $sql .= "where elap.upper_user_no = u.NO and elap.apply_id = ?";
+        $processes = DB::select($sql, [$id]);
+        return response()->json([
+            'status' => 'successful',
+            'data' => $processes
+        ]);
+    }
     /**
      * Display a listing of the resource.
      *
@@ -17,9 +28,9 @@ class leavelog extends Controller
      */
     public function index($id)
     {
-        $sql =  "select approved_title_id from eip_leave_type where id in (select type_id from eip_leave_apply where id = ? and apply_type = 'L')";
+        $sql =  "select approved_title_id from eip_leave_type where id in (select leave_type from eip_leave_apply where id = ? and apply_type = 'L')";
         $sql .= "union ";
-        $sql .= "select approved_title_id from eip_overwork_type where id in (select type_id from eip_leave_apply where id = ? and apply_type = 'O')";
+        $sql .= "select approved_title_id from eip_overwork_type where id in (select leave_type from eip_leave_apply where id = ? and apply_type = 'O')";
         $leavetypes = DB::select($sql, [$id, $id]);
         $approved_title_id = ""; //該假別最後審核人的職等
         foreach ($leavetypes as $v) {
@@ -98,7 +109,7 @@ class leavelog extends Controller
         $sql .= 'left join user as u1 ';
         $sql .= 'on a.agent_user_no = u1.NO ';
         $sql .= 'left join eip_leave_type ';
-        $sql .= 'on a.type_id = eip_leave_type.id ';
+        $sql .= 'on a.leave_type = eip_leave_type.id ';
         $sql .= 'left join user as u2 ';
         $sql .= 'on a.apply_user_no = u2.NO ';
         $sql .= 'limit ?,10 ';
@@ -194,7 +205,7 @@ class leavelog extends Controller
             }
         } else {
             //同意審核
-            $leave_types = DB::select('select approved_title_id from eip_leave_type where id in (select leave_type_id from eip_leave_apply where id =?)', [$leave_apply_id]);
+            $leave_types = DB::select('select approved_title_id from eip_leave_type where id in (select leave_type from eip_leave_apply where id =?)', [$leave_apply_id]);
             $approved_title_id = "";
             foreach ($leave_types as $v) {
                 $approved_title_id = $v->approved_title_id;
