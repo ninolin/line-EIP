@@ -33,7 +33,7 @@
                 <input id="reject_reason" class="weui-input" type="text" placeholder="請輸入拒絕原因"/>
             </div>
             <div class="weui-dialog__ft">
-                <a href="javascript:;" class="weui-dialog__btn weui-dialog__btn_default">取消</a>
+                <a href="javascript:$('#reject_dialog').hide();" class="weui-dialog__btn weui-dialog__btn_default">取消</a>
                 <a href="javascript:;" class="weui-dialog__btn weui-dialog__btn_primary todo">拒絕</a>
             </div>
         </div>

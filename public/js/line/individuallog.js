@@ -1,5 +1,3 @@
-import { resolve } from "path";
-
 window.onload = function (e) {
     liff.init(function (data) {
         initializeApp(data);
