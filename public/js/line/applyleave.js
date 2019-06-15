@@ -1,7 +1,7 @@
 var isMobile = false;
 window.onload = function (e) {
-    $("#startTime").val("08:00");
-    $("#endTime").val("17:00");
+    $("#startTime").html("08:00");
+    $("#endTime").html("17:00");
     
     liff.init(function (data) {
         initializeApp(data);
@@ -57,7 +57,7 @@ const setTime = (id) => {
         {
         defaultValue: defaultValue,
         onConfirm: function (result) {
-            $("#"+id).val(result[0].value + ":" + result[1].value);
+            $("#"+id).html(result[0].value + ":" + result[1].value);
         },
         id: id
         }
@@ -66,11 +66,12 @@ const setTime = (id) => {
 const apply_leave = () => {
     
     const post_data = {
-        "userId": document.getElementById('useridfield').textContent,
+        //"userId": document.getElementById('useridfield').textContent,
+        "userId": "U8d41dfb18097f57080858e39b929ce39",
         "leaveType": $("#leaveType").val(),
         "leaveAgent": $("#leaveAgent").val(),
-        "startDate": $("#startDate").val()+"T"+$("#startTime").val(),
-        "endDate": $("#endDate").val()+"T"+$("#endTime").val()
+        "startDate": $("#startDate").val()+"T"+$("#startTime").html(),
+        "endDate": $("#endDate").val()+"T"+$("#endTime").html()
     }
     const start_time = new Date(post_data.startDate);
     const end_time = new Date(post_data.endDate);

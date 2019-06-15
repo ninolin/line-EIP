@@ -142,7 +142,7 @@ class applyleave extends Controller
             $sql .= "(apply_user_no, apply_type, agent_user_no, leave_type, start_date, end_date, leave_hours, comment) ";
             $sql .= "value ";
             $sql .= "(?, ?, ?, ?, ?, ?, ?, ?) ";
-            if(DB::insert($sql, [$apply_user_no, 'L', $leave_agent_user_no, $leave_type_id, $start_date, $end_date, $leave_hours, $comment]) != 1) {
+            if(DB::insert($sql, [$apply_user_no, 'L', $leave_agent_user_no, $leave_type_id, $start_date."T".$start_time, $end_date."T".$end_time, $leave_hours, $comment]) != 1) {
                 throw new Exception('請假失敗:insert eip_leave_apply error'); 
             }
             //取得剛剛寫入的請假紀錄id
@@ -271,14 +271,19 @@ class applyleave extends Controller
      */
     static protected function is_offday_by_gcalendar($check_date) {
         $gcalendar_key = Config::get('eip.gcalendar_key');
+        log::info("gcalendar_key");
+        log::info($gcalendar_key);
         $timeMin = rawurlencode($check_date."T00:00:00Z");
-        $timeMax = rawurlencode(date('Y-m-d', strtotime('+1 days', strtotime($check_date)))."T00:00:00Z");
-        $calevents_str = HelperServiceProvider::get_req("https://www.googleapis.com/calendar/v3/calendars/nino.dev.try%40gmail.com/events?key=".$gcalendar_key."=".$timeMin."&timeMax=".$timeMax);
+        $timeMax = rawurlencode($check_date."T01:00:00Z");
+        //$timeMax = rawurlencode(date('Y-m-d', strtotime('+1 days', strtotime($check_date)))."T01:00:00Z");
+        $calevents_str = HelperServiceProvider::get_req("https://www.googleapis.com/calendar/v3/calendars/nino.dev.try%40gmail.com/events?key=".$gcalendar_key."&timeMin=".$timeMin."&timeMax=".$timeMax);
+        log::info("https://www.googleapis.com/calendar/v3/calendars/nino.dev.try%40gmail.com/events?key=".$gcalendar_key."&timeMin=".$timeMin."&timeMax=".$timeMax);
         $calevents = json_decode($calevents_str) -> items;
         $offhours = 8;
         foreach ($calevents as $e) {
             if($e-> status == "confirmed") {
-                if(strpos($e-> summary,'休息日') !== false && $e-> start-> date == $check_date) {
+                //if(strpos($e-> summary,'休息日') !== false && $e-> start-> date == $check_date) {
+                if(strpos($e-> summary,'休息日') !== false) {
                     $offhours = $offhours - 8;
                 }
             }
@@ -286,6 +291,7 @@ class applyleave extends Controller
                 $offhours = $offhours + 8;
             }
         }
+        log::info($offhours);
         return $offhours;
     }
 }

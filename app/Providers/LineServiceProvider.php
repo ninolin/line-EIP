@@ -131,8 +131,8 @@ class LineServiceProvider extends ServiceProvider
                 )
             )
         );
-        log::info($line_channel_access_token);
-        log::info($response);
+        //log::info($line_channel_access_token);
+        //log::info($response);
         $result = self::sendPushMsg($line_channel_access_token, $response);
     }
 
@@ -240,8 +240,8 @@ class LineServiceProvider extends ServiceProvider
                 )
             )
         );
-        log::info($line_channel_access_token);
-        log::info($response);
+        //log::info($line_channel_access_token);
+        //log::info($response);
         $result = self::sendPushMsg($line_channel_access_token, $response);
     }
 
@@ -318,8 +318,8 @@ class LineServiceProvider extends ServiceProvider
                 )
             )
         );
-        log::info($line_channel_access_token);
-        log::info($response);
+        //log::info($line_channel_access_token);
+        //log::info($response);
         $result = self::sendPushMsg($line_channel_access_token, $response);
     }
 

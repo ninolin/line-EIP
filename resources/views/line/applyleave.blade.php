@@ -41,14 +41,14 @@
                     <div class="weui-cell__hd"><label for="" class="weui-label">開始時間</label></div>
                     <div class="weui-cell__bd weui-flex">
                         <input class="weui-input weui-flex__item" type="date" id="startDate" min="{{$nowdate}}" value="{{$nowdate}}" placeholder=""/>
-                        <input class="weui-input weui-flex__item" id="startTime" onclick="setTime('startTime')" value=""/>
+                        <div class="weui-input weui-flex__item" id="startTime" onclick="setTime('startTime')" value=""></div>
                     </div>
                 </div>
                 <div class="weui-cell">
                     <div class="weui-cell__hd"><label for="" class="weui-label">結束時間</label></div>
                     <div class="weui-cell__bd weui-flex">
                         <input class="weui-input weui-flex__item" type="date" id="endDate"  min="{{$nowdate}}" value="{{$nowdate}}" placeholder=""/>
-                        <input class="weui-input weui-flex__item" id="endTime" onclick="setTime('endTime')" value=""/>
+                        <div class="weui-input weui-flex__item" id="endTime" onclick="setTime('endTime')"></div>
                     </div>
                 </div>
                 <div class="weui-cell">
