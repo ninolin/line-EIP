@@ -10,6 +10,8 @@ use App\Providers\HelperServiceProvider;
 use DB;
 use Log;
 use Exception;
+use Config;
+
 date_default_timezone_set('Asia/Taipei');
 
 class applyleave extends Controller
@@ -40,7 +42,7 @@ class applyleave extends Controller
         return view('line.applyleave', [
             'leavetypes' => $leavetypes,
             'users' => $users,
-            'nowdate' => date("Y-m-d")."T".date("H:i")
+            'nowdate' => date("Y-m-d")
         ]);
     }
 
@@ -57,14 +59,14 @@ class applyleave extends Controller
     public function store(Request $request)
     {
         try {
-            $apply_user_line_id = $request->get('userId');                  //申請者的line_id
-            $leave_agent_user_no = $request->get('leaveAgent');             //代理人的user_NO
-            $leavename = $request->get('leaveType');                        //假別名稱
-            $start_date = explode("T",$request->get('startDate'))[0];       //起日
-            $start_time = explode("T",$request->get('startDate'))[1].":00"; //起時
-            $end_date = explode("T",$request->get('endDate'))[0];           //迄日
-            $end_time = explode("T",$request->get('endDate'))[1].":00";     //迄時
-            $comment = $request->input('comment');                          //備註
+            $apply_user_line_id = $request->get('userId');            //申請者的line_id
+            $leave_agent_user_no = $request->get('leaveAgent');       //代理人的user_NO
+            $leavename = $request->get('leaveType');                  //假別名稱
+            $start_date = explode("T",$request->get('startDate'))[0]; //起日
+            $start_time = explode("T",$request->get('startDate'))[1]; //起時
+            $end_date = explode("T",$request->get('endDate'))[0];     //迄日
+            $end_time = explode("T",$request->get('endDate'))[1];     //迄時
+            $comment = $request->input('comment');                    //備註
             if($comment == "") $comment = "-";
 
             //取得假別的id
@@ -119,7 +121,7 @@ class applyleave extends Controller
                     $leave_hours += self::cal_timediff($start_time, $end_time);
                 }
             } else {    
-                //請超過一天
+                //請超過一天(正常上班時間為08:00-17:00)
                 foreach ($dates as $key=>$d) {
                     if($key == 0) {
                         if(self::is_offday_by_gcalendar($start_date) == 8) {
@@ -264,13 +266,14 @@ class applyleave extends Controller
     /**
      * 檢查日期的上班小時
      *
-     * @param  string  $check_date
+     * @param  string  $check_date Y-m-d
      * @return int
      */
     static protected function is_offday_by_gcalendar($check_date) {
+        $gcalendar_key = Config::get('eip.gcalendar_key');
         $timeMin = rawurlencode($check_date."T00:00:00Z");
         $timeMax = rawurlencode(date('Y-m-d', strtotime('+1 days', strtotime($check_date)))."T00:00:00Z");
-        $calevents_str = HelperServiceProvider::get_req("https://www.googleapis.com/calendar/v3/calendars/nino.dev.try%40gmail.com/events?key=AIzaSyB0ZMfTWE_h_qAVNRWpZFnDUOPaiT-a7xo&timeMin=".$timeMin."&timeMax=".$timeMax);
+        $calevents_str = HelperServiceProvider::get_req("https://www.googleapis.com/calendar/v3/calendars/nino.dev.try%40gmail.com/events?key=".$gcalendar_key."=".$timeMin."&timeMax=".$timeMax);
         $calevents = json_decode($calevents_str) -> items;
         $offhours = 8;
         foreach ($calevents as $e) {

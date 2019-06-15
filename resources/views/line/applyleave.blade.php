@@ -39,14 +39,22 @@
                 </div>
                 <div class="weui-cell">
                     <div class="weui-cell__hd"><label for="" class="weui-label">開始時間</label></div>
-                    <div class="weui-cell__bd">
-                        <input class="weui-input" type="datetime-local" id="startDate" min="{{$nowdate}}" value="{{$nowdate}}" placeholder=""/>
+                    <div class="weui-cell__bd weui-flex">
+                        <input class="weui-input weui-flex__item" type="date" id="startDate" min="{{$nowdate}}" value="{{$nowdate}}" placeholder=""/>
+                        <input class="weui-input weui-flex__item" id="startTime" onclick="setTime('startTime')" value=""/>
+                    </div>
+                </div>
+                <div class="weui-cell">
+                    <div class="weui-cell__hd"><label for="" class="weui-label">結束時間</label></div>
+                    <div class="weui-cell__bd weui-flex">
+                        <input class="weui-input weui-flex__item" type="date" id="endDate"  min="{{$nowdate}}" value="{{$nowdate}}" placeholder=""/>
+                        <input class="weui-input weui-flex__item" id="endTime" onclick="setTime('endTime')" value=""/>
                     </div>
                 </div>
                 <div class="weui-cell">
                     <div class="weui-cell__hd"><label for="" class="weui-label">結束時間</label></div>
                     <div class="weui-cell__bd">
-                        <input class="weui-input" type="datetime-local" id="endDate"  min="{{$nowdate}}" value="{{$nowdate}}" placeholder=""/>
+                        <input class="weui-input" id="testDate" placeholder=""/>
                     </div>
                 </div>
                 <div class="weui-cells weui-cells_form">
@@ -122,6 +130,7 @@
         <script src="{{ asset('js/bootstrap/js/bootstrap.min.js') }}"></script>
         <script src="{{ asset('js/line/applyleave.js') }}"></script>
         <script src="{{ asset('js/restcall.js') }}"></script>
+        <script type="text/javascript" src="https://res.wx.qq.com/open/libs/weuijs/1.1.4/weui.min.js"></script>
         <script src="https://d.line-scdn.net/liff/1.0/sdk.js"></script>
     </body>
 </html>
