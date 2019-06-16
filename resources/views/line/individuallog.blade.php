@@ -18,6 +18,7 @@
                 <img src="./image/folder.png" style="margin-top:30px;">
                 <div>目前無資料</div>
             </div>
+            <div id="useridfield" style="display:none"></div>
         </div>
         <div style="display: none;" id="logs_history">
             <div class="weui-mask"></div>
