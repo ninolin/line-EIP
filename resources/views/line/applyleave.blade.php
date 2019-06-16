@@ -51,16 +51,10 @@
                         <div class="weui-input weui-flex__item" id="endTime" onclick="setTime('endTime')"></div>
                     </div>
                 </div>
-                <div class="weui-cell">
-                    <div class="weui-cell__hd"><label for="" class="weui-label">結束時間</label></div>
-                    <div class="weui-cell__bd">
-                        <input class="weui-input" id="testDate" placeholder=""/>
-                    </div>
-                </div>
                 <div class="weui-cells weui-cells_form">
                     <div class="weui-cell">
                         <div class="weui-cell__bd">
-                            <textarea class="weui-textarea" placeholder="請假事由" rows="3"></textarea>
+                            <textarea class="weui-textarea" placeholder="請假事由" rows="3" id="comment"></textarea>
                         </div>
                     </div>
                 </div>

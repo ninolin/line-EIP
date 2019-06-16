@@ -80,14 +80,14 @@ class LineServiceProvider extends ServiceProvider
                 "contents": [
                   {
                     "type": "text",
-                    "text": "'.explode(":",$msg[$i])[0]. '",
+                    "text": "'.explode("::",$msg[$i])[0]. '",
                     "size": "sm",
                     "color": "#555555",
                     "flex": 0
                   },
                   {
                     "type": "text",
-                    "text": "'.explode(":",$msg[$i])[1].'",
+                    "text": "'.explode("::",$msg[$i])[1].'",
                     "size": "sm",
                     "color": "#111111",
                     "align": "end"

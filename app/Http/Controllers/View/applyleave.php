@@ -165,7 +165,7 @@ class applyleave extends Controller
             Log::info("agent_line_id:".$agent_line_id);
             Log::info("upper_line_id:".$upper_line_id);
             //echo $agent_line_id;
-            $msg = ["假別:". $leavename,"代理人:".$agent_cname,"起日:".$start_date." ".$start_time,"迄日:". $end_date ." ".$end_time,"備住:". $comment];
+            $msg = ["假別::". $leavename,"代理人::".$agent_cname,"起日::".$start_date." ".$start_time,"迄日::". $end_date ." ".$end_time,"備住::". $comment];
             LineServiceProvider::sendNotifyFlexMeg($apply_user_line_id, array_merge(["假單送出，請等待簽核"], $msg));
             LineServiceProvider::sendNotifyFlexMeg($upper_line_id, array_merge(["請審核".$apply_user_cname."送出的假單"], $msg));
             LineServiceProvider::sendNotifyFlexMeg($agent_line_id, array_merge([$apply_user_cname."指定您為請假代理人"], $msg));

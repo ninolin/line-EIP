@@ -105,7 +105,7 @@ class applyoverwork extends Controller
 
             //通知申請人、代理人、第一簽核人
             Log::info("upper_line_id:".$upper_line_id);
-            $msg = ["加班日:". $overworkDate,"加班小時:".$overworkHour,"備住:". $comment];
+            $msg = ["加班日::". $overworkDate,"加班小時::".$overworkHour,"備住::". $comment];
             LineServiceProvider::sendNotifyFlexMeg($apply_user_line_id, array_merge(["已申請加班，待簽核完成後即完成加班申請"], $msg));
             LineServiceProvider::sendNotifyFlexMeg($upper_line_id, array_merge(["請審核".$apply_user_cname."送出的加班申請"], $msg));
             return response()->json([
