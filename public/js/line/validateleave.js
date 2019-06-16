@@ -114,10 +114,11 @@ function initializeApp(data) {
 //     })
 // }
 
-const show_reject_dialog = (apply_id, apply_type, cname, leave_name) => {
+const show_reject_dialog = (process_id, apply_id, apply_type, cname, leave_name) => {
+    if(apply_type == 'O') leave_name = '加班';
     $("#reject_dialog").find(".weui-dialog__title").html(cname+"的"+leave_name);
     $("#reject_dialog").show();
-    $("#reject_dialog").find(".todo").attr("onclick", "validate_leave('"+apply_id+"','"+apply_type+"', 0)");
+    $("#reject_dialog").find(".todo").attr("onclick", "validate_leave('"+process_id+"', '"+apply_id+"','"+apply_type+"', 0)");
 }
 
 const validate_leave = (process_id, apply_id, apply_type, is_validate) => {

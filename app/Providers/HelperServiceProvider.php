@@ -32,9 +32,25 @@ class HelperServiceProvider extends ServiceProvider
     {
         $ch = curl_init($_url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        $json_content = curl_exec($ch);
+        $result = curl_exec($ch);
         curl_close($ch);
-        return $json_content;
+        return $result;
+        //log::info($json_content);
+    }
+
+    public static function post_req($_url, $_data)
+    {
+        log::info($_url);
+        $header[] = "Content-Type: application/json";
+        $ch = curl_init($_url);
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
+  	    curl_setopt($ch, CURLOPT_POSTFIELDS, $_data);                                                                  
+  	    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);                                                                      
+  	    curl_setopt($ch, CURLOPT_HTTPHEADER, $header);                                                                                                   
+  	    $result = curl_exec($ch);
+        curl_close($ch);
+        log::info($result);
+        return $result;
         //log::info($json_content);
     }
 }
