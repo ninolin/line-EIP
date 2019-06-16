@@ -30,7 +30,7 @@ class individuallog extends Controller
         $sql .= 'from ';
         $sql .= '(select * from eip_leave_apply where apply_user_no IN (  ';
         $sql .= '   select NO from user where line_id =?';
-        $sql .= ')) as a ';
+        $sql .= ') and apply_status != "C") as a ';
         $sql .= 'left join user as u1 ';
         $sql .= 'on a.agent_user_no = u1.NO ';
         $sql .= 'left join eip_leave_type ';
@@ -42,5 +42,32 @@ class individuallog extends Controller
             'status' => 'successful',
             'data' => $leaves
         ]);
+    }
+
+    /**
+     * 取消請假/加班
+     * @author nino
+     * @return \Illuminate\Http\Response
+     */
+    public function cancel($id)
+    {
+        try {
+            $apply_id = $id;   
+            if(DB::update("update eip_leave_apply set apply_status =? where id =?", ['C', $apply_id]) != 1) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'update error'
+                ]);
+            } else {
+                return response()->json([
+                    'status' => 'successful'
+                ]);
+            }
+        } catch (Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => $e->getMessage()
+            ]);
+        }
     }
 }

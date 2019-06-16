@@ -44,6 +44,7 @@ Route::get('validateleave/{id}', 'View\validateleave@index');
 Route::put('validateleave/{id}', 'View\validateleave@update');
 
 Route::get('individuallog/{id}', 'View\individuallog@index');
+Route::put('individuallog/{id}', 'View\individuallog@cancel');
 
 Route::get('leavelog/{id}', 'View\leavelog@list_logs');
 Route::get('test', 'Line\Test@show');

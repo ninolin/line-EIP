@@ -21,6 +21,7 @@ function initializeApp(data) {
 const apply_overwork = () => {
     const post_data = {
         "userId": document.getElementById('useridfield').textContent,
+        //"userId": "U8d41dfb18097f57080858e39b929ce39",
         "overworkDate": $("#overworkDate").val(),
         "overworkHour": $("#overworkHour").val()
     }
@@ -32,12 +33,14 @@ const apply_overwork = () => {
         }
     }
     post_data.comment = $("#comment").val();
+    $("#toast").show();
     promise_call({
         url: "./api/applyoverwork", 
         data: post_data, 
         method: "post"
     })
     .then(v => {
+        $("#toast").hide();
         if(v.status == "successful") {
             liff.closeWindow();
         } else {

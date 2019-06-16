@@ -6,7 +6,7 @@ window.onload = function (e) {
 };
 
 function initializeApp(data) {
-    //document.getElementById('useridfield').textContent = data.context.userId;
+    document.getElementById('useridfield').textContent = data.context.userId;
     promise_call({
         url: "./api/individuallog/"+data.context.userId, 
         //url: "./api/individuallog/U8d41dfb18097f57080858e39b929ce39", 
@@ -16,8 +16,9 @@ function initializeApp(data) {
         if(v.status != 'successful') {
             alert("get data error");
         } else {
+            if(v.data.length > 0) $("#leave_data").html("");
             v.data.map(item => {     
-                $html =  '<div class="weui-form-preview mb-3" onclick="show_process_history('+item.id+')">';
+                $html =  '<div class="weui-form-preview mb-3">';
                 $html += '<div class="weui-form-preview__hd" style="padding: 5px 16px;">';
                 if(item.apply_type == 'L') {
                     $html += '    <label class="weui-form-preview__label" style="color: black;">'+item.leave_name+'</label>';
@@ -32,7 +33,7 @@ function initializeApp(data) {
                     $html += '    <em class="weui-form-preview__value" style="color: red;font-size: 1.2em;">已拒絕</em>';
                 }
                 $html += '</div>';
-                $html += '<div class="weui-form-preview__bd" style="padding: 5px 16px;">';
+                $html += '<div class="weui-form-preview__bd" style="padding: 5px 16px;" onclick="show_process_history('+item.id+')">';
                 if(item.apply_type == 'L') {
                     $html += '    <div class="weui-form-preview__item">';
                     $html += '        <span class="weui-form-preview__label">代理人</span>';
@@ -65,6 +66,29 @@ function initializeApp(data) {
                     $html += '    </div>';
                 }
                 $html += '</div>';
+                if(item.apply_status == 'P') {
+                    $html += '<div class="weui-form-preview__ft">';
+                    $html += '  <button type="button" class="weui-form-preview__btn weui-form-preview__btn_primary" onclick="show_cancel_dialog('+item.id+')"><i class="weui-icon-cancel"></i>取消</button>';
+                    $html += '</div>';
+                } else if(item.apply_status == 'Y' && item.apply_type == 'L') {
+                    const start_date_timestamp = new Date(item.start_date.split('T')[0]).getTime()-28800;
+                    const today_timestamp = new Date().getTime();
+                    //最後取消請假的時間是當天
+                    if(today_timestamp < start_date_timestamp) {
+                        $html += '<div class="weui-form-preview__ft">';
+                        $html += '  <button type="button" class="weui-form-preview__btn weui-form-preview__btn_primary" onclick="show_cancel_dialog('+item.id+')"><i class="weui-icon-cancel"></i>取消</button>';
+                        $html += '</div>';
+                    }
+                } else if(item.apply_status == 'Y' && item.apply_type == 'O') {
+                    const start_date_timestamp = new Date(item.over_work_date).getTime()-28800;
+                    const today_timestamp = new Date().getTime();
+                    //最後取消請假的時間是當天
+                    if(today_timestamp < start_date_timestamp) {
+                        $html += '<div class="weui-form-preview__ft">';
+                        $html += '  <button type="button" class="weui-form-preview__btn weui-form-preview__btn_primary" onclick="show_cancel_dialog('+item.id+')"><i class="weui-icon-cancel"></i>取消</button>';
+                        $html += '</div>';
+                    }
+                }
                 $html += '</div>';
                 $("#leave_data").append($html);
             })
@@ -89,5 +113,19 @@ function show_process_history(apply_id) {
         $html +="</table>"
         $("#logs_history").find(".weui-dialog__bd").html($html);
         $("#logs_history").show();
+    })
+}
+
+function show_cancel_dialog(apply_id) {
+    $("#cancel_dialog").show();
+    $("#cancel_dialog").find(".todo").attr("onclick", "cancel_leave('"+apply_id+"')");
+}
+
+function cancel_leave(apply_id) {
+    promise_call({
+        url: "./api/individuallog/"+apply_id,
+        method: "put"
+    }).then(v => {
+        window.location.reload();
     })
 }

@@ -29,6 +29,19 @@
                 </div>
             </div>
         </div>
+        <div id="cancel_dialog" style="display: none;">
+            <div class="weui-mask"></div>
+            <div class="weui-dialog">
+                <div class="weui-dialog__hd"><strong class="weui-dialog__title">取消</strong></div>
+                <div class="weui-dialog__bd">
+                    確定要取消嗎?
+                </div>
+                <div class="weui-dialog__ft">
+                    <a href="javascript:$('#cancel_dialog').hide();" class="weui-dialog__btn weui-dialog__btn_default">關閉視窗</a>
+                    <a href="javascript:;" class="weui-dialog__btn weui-dialog__btn_primary todo">確定取消</a>
+                </div>
+            </div>
+        </div>
     </body>
     <script src="{{ asset('js/jquery/jquery.min.js') }}"></script>
     <script src="{{ asset('js/bootstrap/js/bootstrap.min.js') }}"></script>
