@@ -35,4 +35,19 @@ class AuthController extends Controller
             return redirect('login');
         }
     }
+
+    public function glogin(Request $request)
+    {   
+        $gmail = $request->input('gmail');
+        $token = $request->input('token');
+        //debug(md5($password));
+        $users = DB::select('select * from user where gmail = ?', [$gmail]);
+        if(sizeof($users) == 1 ) {
+            if ($this->auth->setVerified()) {
+                return $this->auth->redirect();
+            }
+        } else {
+            return redirect('login')->with('login_status', '帳號或密碼錯誤');
+        }
+    }
 }
