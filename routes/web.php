@@ -30,6 +30,6 @@ Route::middleware('auth')->get('/leavelog', 'View\leavelog@create')->name('leave
 Route::middleware('auth')->get('/messagelog', 'View\messagelog@create')->name('messagelog');
 Route::middleware('auth')->post('/messagelog', 'View\messagelog@create')->name('messagelog');
 Route::get('/formmanage', function () {return view('contents.formmanage');})->name('formmanage');
-Route::post('/login', 'Auth\AuthController@login')->name('doLogin'); //一般登入
+Route::post('/login', 'Auth\AuthController@login')->name('doLogin');    //一般登入
 Route::post('/logout', 'Auth\AuthController@logout')->name('doLogout'); //登出
-Route::post('/glogin', 'Auth\AuthController@glogin')->name('doGLogin');; //google登入
+Route::post('/glogin', 'Auth\AuthController@glogin')->name('doGLogin'); //google登入
