@@ -36,7 +36,7 @@ class AuthController extends Controller
         }
     }
 
-    public function glogin(Request $request)
+    public function glogin(Request $request)
     {   
         $gmail = $request->input('gmail');
         $token = $request->input('token');
