@@ -50,7 +50,7 @@
             function onSignIn(googleUser) {     
                 document.getElementsByName('gmail').value = googleUser.getBasicProfile().getEmail();
                 document.getElementsByName('token').value = googleUser.getAuthResponse().id_token;
-                $('form').attr('action', './glogin');
+                $('form').attr('action', '{{ route('doGLogin') }}');
                 $('form').submit();
                 //var profile = googleUser.getBasicProfile();
                 // console.log('ID: ' + profile.getId()); // Do not send to your backend! Use an ID token instead.
