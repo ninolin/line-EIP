@@ -53,7 +53,7 @@
                 //var id_token = googleUser.getAuthResponse().id_token;
                 //console.log('Token: ' + id_token);
                 promise_call({
-                    url: "./glogin/", 
+                    url: "./api/glogin/", 
                     method: "post",
                     data: {
                         gmail: googleUser.getBasicProfile().getEmail(),
