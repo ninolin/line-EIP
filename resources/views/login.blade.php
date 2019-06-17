@@ -3,6 +3,7 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="google-signin-client_id" content="675194260883-t0567hq0tr1gvvd1o4e8enqbq39qmupn.apps.googleusercontent.com">
         <title>EIP</title>
         <!-- Fonts -->
         <link href="https://fonts.googleapis.com/css?family=Nunito:200,600" rel="stylesheet" type="text/css">
@@ -22,6 +23,7 @@
                         <div class="form-group">    
                             <input type="password" name="password" class="form-control" placeholder="Enter Password">
                         </div>
+                        <div class="g-signin2" data-onsuccess="onSignIn"></div>
                         <button type="submit" class="btn-c"><i class="fas fa-sign-in-alt"></i>Login</button>
                         @if (session('login_status'))
                             <div class="alert alert-danger">
@@ -34,5 +36,13 @@
         </div>
         <script src="{{ asset('js/jquery/jquery.min.js') }}"></script>
         <script src="{{ asset('js/bootstrap/js/bootstrap.min.js') }}"></script>
+        <script src="https://apis.google.com/js/platform.js" async defer></script>
+        <script type="text/javascript">
+            var profile = googleUser.getBasicProfile();
+            console.log('ID: ' + profile.getId()); // Do not send to your backend! Use an ID token instead.
+            console.log('Name: ' + profile.getName());
+            console.log('Image URL: ' + profile.getImageUrl());
+            console.log('Email: ' + profile.getEmail()); // This is null if the 'email' scope is not present.
+        </script>
     </body>
 </html>
