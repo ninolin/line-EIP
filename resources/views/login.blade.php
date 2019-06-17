@@ -17,14 +17,19 @@
                 <div class="modal-content">
                     <form class="col-12" method="POST" action="{{ route('doLogin') }}">
                         {{ csrf_field() }}
-                        <div class="form-group">    
+                        <div class="form-group acc-input">    
                             <input type="text" name="account" class="form-control" placeholder="Enter Username">
                         </div>
-                        <div class="form-group">    
+                        <div class="form-group pwd-input ">    
                             <input type="password" name="password" class="form-control" placeholder="Enter Password">
                         </div>
-                        <div class="g-signin2" data-onsuccess="onSignIn"></div>
-                        <button type="submit" class="btn-c"><i class="fas fa-sign-in-alt"></i>Login</button>
+                        <div class="container">
+                            <div class="row">
+                                <div class="col"><button type="submit" class="btn-c"><i class="fas fa-sign-in-alt"></i>一般登入</button></div>
+                                <div class="col"><div class="g-signin2 col" data-onsuccess="onSignIn" data-width="170" data-height="48"></div></div>
+                                
+                            </div>
+                        </div>
                         @if (session('login_status'))
                             <div class="alert alert-danger">
                                 {{ session('login_status') }}
@@ -38,12 +43,14 @@
         <script src="{{ asset('js/bootstrap/js/bootstrap.min.js') }}"></script>
         <script src="https://apis.google.com/js/platform.js" async defer></script>
         <script type="text/javascript">
-            function onSignIn(googleUser) {
+            function onSignIn(googleUser) {                
                 var profile = googleUser.getBasicProfile();
                 console.log('ID: ' + profile.getId()); // Do not send to your backend! Use an ID token instead.
                 console.log('Name: ' + profile.getName());
                 console.log('Image URL: ' + profile.getImageUrl());
                 console.log('Email: ' + profile.getEmail()); // This is null if the 'email' scope is not present.
+                var id_token = googleUser.getAuthResponse().id_token;
+                console.log('Token: ' + id_token);
             }
         </script>
     </body>

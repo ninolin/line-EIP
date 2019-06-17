@@ -22,7 +22,7 @@ body {
     font-size: 18px;
     padding-left: 54px;
 }
-.form-group::before{
+.acc-input::before{
     font-family: 'Font Awesome\ 5 free';
     content: '\f007';
     position: absolute;
@@ -31,23 +31,30 @@ body {
     left: 28px;
     padding-top: 4px;
 }
-.form-group:last-of-type::before{
+.pwd-input::before{
+    font-family: 'Font Awesome\ 5 free';
     content: '\f023';
+    position: absolute;
+    font-size: 22px;
+    color: #555e60;
+    left: 28px;
+    padding-top: 4px;
 }
 button {
-    width: 40%;
-    margin: 5px 0 25px;
+    width: 170px;
+    margin: 5px 0 15px;
 }
 .btn-c {
     background-color: #27c2a5;
     color: #fff;
-    font-size: 19px;
+    font-size: 15px;
     padding: 7px 14px;
     border-radius: 5px;
     border-bottom: 4px solid #219882;
     border-top: 0px;
     border-right: 0px;
     border-left: 0px;
+    font-weight: bold;
 }
 .btn-c:hover, .btn-c:focus {
     background-color: #25a890;
@@ -56,4 +63,18 @@ button {
 .fa-sign-in-alt {
     font-size: 20px;
     margin-right: 7px;
+}
+.abcRioButton.abcRioButtonLightBlue { 
+    background-color: #27c2a5;
+    color: #fff;
+    padding: 0px 40px;
+    border-radius: 5px;
+    border-bottom: 4px solid #219882;
+    border-top: 0px;
+    border-right: 0px;
+    border-left: 0px;
+}
+.g-signin2 {
+    margin-bottom: 10px;
+    margin-top: 5px;
 }
