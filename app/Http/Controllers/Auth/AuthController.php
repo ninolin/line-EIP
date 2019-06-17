@@ -40,6 +40,7 @@ class AuthController extends Controller
     {   
         $gmail = $request->input('gmail');
         $token = $request->input('token');
+        debug($gmail);
         //debug(md5($password));
         $users = DB::select('select * from user where gmail = ?', [$gmail]);
         if(sizeof($users) == 1 ) {
