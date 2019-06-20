@@ -3,7 +3,7 @@
 namespace App\Http\Middleware;
 
 use Closure;
-
+use Log;
 class Authenticate
 {
     const SESSION = 'code';//存放在Session的Key值
@@ -14,6 +14,7 @@ class Authenticate
         $timestamp = session(self::SESSION); //取得在session中的時間
         log::info("timestamp");
         log::info($timestamp);
+        log::info(time());
         if($timestamp and $timestamp >= time()){
             $this->setVerified();
             return $next($request);
