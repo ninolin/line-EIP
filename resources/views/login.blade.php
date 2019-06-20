@@ -24,8 +24,8 @@
                             <input type="password" name="password" class="form-control" placeholder="Enter Password">
                         </div>
                         <div class="form-group" style="display:none">    
-                            <input type="text" name="gmail" value="{{ csrf_token() }}"> 
-                            <input type="text" name="token" value="{{ csrf_token() }}">
+                            <input type="text" name="gmail" value=""> 
+                            <input type="text" name="token" value="">
                         </div>
                         <div class="container">
                             <div class="row">
@@ -60,12 +60,16 @@
                 //var id_token = googleUser.getAuthResponse().id_token;
                 //console.log('Token: ' + id_token);
                 promise_call({
-                    url: "./glogin/", 
+                    url: "./api/glogin/", 
                     method: "post",
                     data: {
                         gmail: googleUser.getBasicProfile().getEmail(),
                         token: googleUser.getAuthResponse().id_token
                     }
+                }).then(res => {
+                    document.getElementsByName('gmail').value = googleUser.getBasicProfile().getEmail();
+                    document.getElementsByName('token').value = googleUser.getAuthResponse().id_token;
+                    $('form').submit();
                 })
             }
         </script>
