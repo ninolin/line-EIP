@@ -47,7 +47,7 @@ class AuthController extends Controller
         $gclient->setAccessType('offline'); // offline access
         $gclient->setIncludeGrantedScopes(true); // incremental auth
         $gclient->addScope([Google_Service_Oauth2::USERINFO_EMAIL, Google_Service_Oauth2::USERINFO_PROFILE]);
-        $gclient->setRedirectUri('https://sporzfy.com'); // 寫憑證設定：「已授權的重新導向 URI 」的網址
+        $gclient->setRedirectUri('https://sporzfy.com/glogin'); // 寫憑證設定：「已授權的重新導向 URI 」的網址
 
         $google_login_url = $gclient->createAuthUrl(); // 取得要點擊登入的網址
     }
