@@ -33,4 +33,4 @@ Route::get('/formmanage', function () {return view('contents.formmanage');})->na
 Route::post('/login', 'Auth\AuthController@login')->name('doLogin');    //一般登入
 Route::post('/logout', 'Auth\AuthController@logout')->name('doLogout'); //登出
 Route::post('/glogin', 'Auth\AuthController@glogin')->name('doGLogin'); //google登入
-Route::get('/getglogin', 'Auth\AuthController@getGloginData')->name('getGLoginData'); //google登入
+Route::get('/glogin', 'Auth\AuthController@getGloginData')->name('getGLoginData'); //google登入

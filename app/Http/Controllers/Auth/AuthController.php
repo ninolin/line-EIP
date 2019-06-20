@@ -9,6 +9,7 @@ use Storage;
 use Google_Client;
 use Google_Service_Oauth2;
 use Google_Service_Oauth2_Resource_Userinfo;
+use Log;
 
 class AuthController extends Controller
 {
@@ -48,6 +49,30 @@ class AuthController extends Controller
         $gclient->setIncludeGrantedScopes(true); // incremental auth
         $gclient->addScope([Google_Service_Oauth2::USERINFO_EMAIL, Google_Service_Oauth2::USERINFO_PROFILE]);
         $gclient->setRedirectUri('https://sporzfy.com/glogin'); // 寫憑證設定：「已授權的重新導向 URI 」的網址
+        $google_login_url = $gclient->createAuthUrl(); // 取得要點擊登入的網址
+        // 登入後，導回來的網址會有 code 的參數
+        if (isset($_GET['code']) && $gclient->authenticate($_GET['code'])) {
+            $token = $gclient->getAccessToken(); // 取得 Token
+            // $token data: [
+            // 'access_token' => string
+            // 'expires_in' => int 3600
+            // 'scope' => string 'https://www.googleapis.com/auth/userinfo.email openid https://www.googleapis.com/auth/userinfo.profile' (length=102)
+            // 'created' => int 1550000000
+            // ];
+            $gclient->setAccessToken($token); // 設定 Token
+
+            $oauth = new Google_Service_Oauth2($gclient);
+            $profile = $oauth->userinfo->get();
+
+            $uid = $profile->id; // Primary key
+            log::info($profile); // 自行取需要的內容來使用囉~
+            return redirect('login');
+        } else {
+            // 直接導向登入網址
+            header('Location: ' . $google_login_url);
+            exit;
+        }
+        
     }
 
     public function getGloginData() {
@@ -69,6 +94,7 @@ class AuthController extends Controller
 
             $uid = $profile->id; // Primary key
             log::info($profile); // 自行取需要的內容來使用囉~
+            return redirect('login');
         } else {
             // 直接導向登入網址
             header('Location: ' . $google_login_url);
