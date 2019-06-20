@@ -8,7 +8,6 @@ use DB;
 use Storage;
 use Google_Client;
 use Google_Service_Oauth2;
-use Google_Service_Oauth2_Resource_Userinfo;
 use Log;
 
 class AuthController extends Controller
@@ -72,7 +71,7 @@ class AuthController extends Controller
             header('Location: ' . $google_login_url);
             exit;
         }
-        
+
     }
 
     public function getGloginData() {
