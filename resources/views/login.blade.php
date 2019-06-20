@@ -50,8 +50,10 @@
         <script type="text/javascript">
             function login(type) {
                 if(type == 'google') {
+                    console.log('{{ route('doGLogin') }}');
                     $('form').attr('action', '{{ route('doGLogin') }}');
                 } else {
+                    console.log('{{ route('doLogin') }}');
                     $('form').attr('action', '{{ route('doLogin') }}');
                 }
                 $('form').submit();
