@@ -48,10 +48,17 @@ class AuthController extends Controller
         $users = DB::select('select * from user where gmail = ?', [$gmail]);
         if(sizeof($users) == 1 ) {
             if ($this->auth->setVerified()) {
-                return $this->auth->redirect();
+                return response()->json([
+                    'status' => 'successful'
+                ]);
+                //return $this->auth->redirect();
             }
         } else {
-            return redirect('login')->with('login_status', '帳號或密碼錯誤');
+            return response()->json([
+                'status' => 'error',
+                'message'=> '帳號或密碼錯誤'
+            ]);
+            //return redirect('login')->with('login_status', '帳號或密碼錯誤');
         }
     }
 }

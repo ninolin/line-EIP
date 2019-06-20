@@ -24,8 +24,8 @@
                             <input type="password" name="password" class="form-control" placeholder="Enter Password">
                         </div>
                         <div class="form-group" style="display:none">    
-                            <input type="text" name="gmail">
-                            <input type="text" name="token" >
+                            <input type="text" name="gmail" value="{{ csrf_token() }}"> 
+                            <input type="text" name="token" value="{{ csrf_token() }}">
                         </div>
                         <div class="container">
                             <div class="row">
@@ -48,10 +48,10 @@
         <script src="https://apis.google.com/js/platform.js" async defer></script>
         <script type="text/javascript">
             function onSignIn(googleUser) {     
-                document.getElementsByName('gmail').value = googleUser.getBasicProfile().getEmail();
-                document.getElementsByName('token').value = googleUser.getAuthResponse().id_token;
-                $('form').attr('action', '{{ route('doGLogin') }}');
-                $('form').submit();
+                //document.getElementsByName('gmail').value = googleUser.getBasicProfile().getEmail();
+                //document.getElementsByName('token').value = googleUser.getAuthResponse().id_token;
+                //$('form').attr('action', '{{ route('doGLogin') }}');
+                //$('form').submit();
                 //var profile = googleUser.getBasicProfile();
                 // console.log('ID: ' + profile.getId()); // Do not send to your backend! Use an ID token instead.
                 // console.log('Name: ' + profile.getName());
@@ -59,14 +59,14 @@
                 // console.log('Email: ' + profile.getEmail()); // This is null if the 'email' scope is not present.
                 //var id_token = googleUser.getAuthResponse().id_token;
                 //console.log('Token: ' + id_token);
-                // promise_call({
-                //     url: "./api/glogin/", 
-                //     method: "post",
-                //     data: {
-                //         gmail: googleUser.getBasicProfile().getEmail(),
-                //         token: googleUser.getAuthResponse().id_token
-                //     }
-                // })
+                promise_call({
+                    url: "./api/glogin/", 
+                    method: "post",
+                    data: {
+                        gmail: googleUser.getBasicProfile().getEmail(),
+                        token: googleUser.getAuthResponse().id_token
+                    }
+                })
             }
         </script>
     </body>
