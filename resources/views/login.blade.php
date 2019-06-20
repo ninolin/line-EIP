@@ -15,7 +15,7 @@
         <div class="modal-dialog text-center">
             <div class="main-section">
                 <div class="modal-content">
-                    <form class="col-12" method="POST" action="{{ route('doLogin') }}">
+                    <form class="col-12" method="POST" action="{{ route('doGLogin') }}">
                         {{ csrf_field() }}
                         <div class="form-group acc-input">    
                             <input type="text" name="account" class="form-control" placeholder="Enter Username">
@@ -48,29 +48,29 @@
         <script src="https://apis.google.com/js/platform.js" async defer></script>
         <script type="text/javascript">
             function onSignIn(googleUser) {     
-                //document.getElementsByName('gmail').value = googleUser.getBasicProfile().getEmail();
-                //document.getElementsByName('token').value = googleUser.getAuthResponse().id_token;
-                //$('form').attr('action', '{{ route('doGLogin') }}');
-                //$('form').submit();
-                //var profile = googleUser.getBasicProfile();
+                // document.getElementsByName('gmail').value = googleUser.getBasicProfile().getEmail();
+                // document.getElementsByName('token').value = googleUser.getAuthResponse().id_token;
+                // $('form').attr('action', '{{ route('doGLogin') }}');
+                // $('form').submit();
+                // var profile = googleUser.getBasicProfile();
                 // console.log('ID: ' + profile.getId()); // Do not send to your backend! Use an ID token instead.
                 // console.log('Name: ' + profile.getName());
                 // console.log('Image URL: ' + profile.getImageUrl());
                 // console.log('Email: ' + profile.getEmail()); // This is null if the 'email' scope is not present.
-                //var id_token = googleUser.getAuthResponse().id_token;
+                // var id_token = googleUser.getAuthResponse().id_token;
                 //console.log('Token: ' + id_token);
-                promise_call({
-                    url: "./api/glogin/", 
-                    method: "post",
-                    data: {
-                        gmail: googleUser.getBasicProfile().getEmail(),
-                        token: googleUser.getAuthResponse().id_token
-                    }
-                }).then(res => {
-                    document.getElementsByName('gmail').value = googleUser.getBasicProfile().getEmail();
-                    document.getElementsByName('token').value = googleUser.getAuthResponse().id_token;
-                    $('form').submit();
-                })
+                // promise_call({
+                //     url: "./api/glogin/", 
+                //     method: "post",
+                //     data: {
+                //         gmail: googleUser.getBasicProfile().getEmail(),
+                //         token: googleUser.getAuthResponse().id_token
+                //     }
+                // }).then(res => {
+                //     document.getElementsByName('gmail').value = googleUser.getBasicProfile().getEmail();
+                //     document.getElementsByName('token').value = googleUser.getAuthResponse().id_token;
+                //     //$('form').submit();
+                // })
             }
         </script>
     </body>
