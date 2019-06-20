@@ -43,7 +43,7 @@ class AuthController extends Controller
     public function glogin()
     {   
         $gclient = new Google_Client();
-        $gclient->setAuthConfig(storage_path('credentials.json'));
+        $gclient->setAuthConfig(storage_path('app/credentials.json'));
         $gclient->setAccessType('offline'); // offline access
         $gclient->setIncludeGrantedScopes(true); // incremental auth
         $gclient->addScope([Google_Service_Oauth2::USERINFO_EMAIL, Google_Service_Oauth2::USERINFO_PROFILE]);
