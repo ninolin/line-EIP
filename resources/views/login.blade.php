@@ -30,7 +30,7 @@
                         <div class="container">
                             <div class="row">
                                 <div class="col"><button type="button" class="btn-c" onclick="login()"><i class="fas fa-sign-in-alt"></i>一般登入</button></div>
-                                <div class="col"><button type="button" class="btn-c" onclick="login('google')"><i class="fas fa-sign-in-alt"></i>一般登入</button></div>
+                                <div class="col"><button type="button" class="btn-c" onclick="login('google')"><i class="fas fa-sign-in-alt"></i>Google登入</button></div>
                                 <!-- <div class="col"><div class="g-signin2 col" data-onsuccess="onSignIn" data-width="170" data-height="48"></div></div> -->
                             </div>
                         </div>

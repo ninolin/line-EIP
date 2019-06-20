@@ -23,7 +23,9 @@ class AuthController extends Controller
     {   
         $account = $request->input('account');
         $password = $request->input('password');
+        deubg($account);
         $users = DB::select('select * from user where username = ? and password = ?', [$account, md5($password)]);
+        deubg(sizeof($users));
         if(sizeof($users) == 1 ) {
             if ($this->auth->setVerified()) {
                 return $this->auth->redirect();
@@ -79,7 +81,7 @@ class AuthController extends Controller
                     return $this->auth->redirect();
                 }
             } else {
-                return redirect('login')->with('login_status', '帳號或密碼錯誤');
+                return redirect('login')->with('login_status', '該用戶不存在');
             }
         } else {
             // 直接導向登入網址
