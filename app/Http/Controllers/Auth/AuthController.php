@@ -59,70 +59,32 @@ class AuthController extends Controller
             // 'created' => int 1550000000
             // ];
             $gclient->setAccessToken($token); // 設定 Token
-
             $oauth = new Google_Service_Oauth2($gclient);
             $profile = $oauth->userinfo->get();
-
-            $uid = $profile->id; // Primary key
-            log::info($profile); // 自行取需要的內容來使用囉~
-            return redirect('login');
+            //$profile data: [
+            //    [email] => a7872278722@gmail.com 
+            //    [familyName] => 林 
+            //    [gender] => 
+            //    [givenName] => 佳誼 
+            //    [hd] => 
+            //    [id] => 113226465993829056826 
+            //    [link] => 
+            //    [locale] => zh-TW 
+            //    [name] => 林佳誼 
+            //    [picture] => https://lh6.googleusercontent.com/-UhiLwamxGBA/AAAAAAAAAAI/AAAAAAAAANc/Qzyb3O94tsA/photo.jpg [verifiedEmail] => 1 [modelData:protected] => Array ( [verified_email] => 1 [given_name] => 佳誼 [family_name] => 林 ) [processed:protected] => Array ( ) )
+            //]
+            $users = DB::select('select * from user where gmail = ?', [$profile->email]);
+            if(sizeof($users) == 1 ) {
+                if ($this->auth->setVerified()) {
+                    return $this->auth->redirect();
+                }
+            } else {
+                return redirect('login')->with('login_status', '帳號或密碼錯誤');
+            }
         } else {
             // 直接導向登入網址
             header('Location: ' . $google_login_url);
             exit;
         }
-
     }
-
-    public function getGloginData() {
-        $gclient = new Google_Client();
-        $google_login_url = $gclient->createAuthUrl(); // 取得要點擊登入的網址
-        // 登入後，導回來的網址會有 code 的參數
-        if (isset($_GET['code']) && $gclient->authenticate($_GET['code'])) {
-            $token = $gclient->getAccessToken(); // 取得 Token
-            // $token data: [
-            // 'access_token' => string
-            // 'expires_in' => int 3600
-            // 'scope' => string 'https://www.googleapis.com/auth/userinfo.email openid https://www.googleapis.com/auth/userinfo.profile' (length=102)
-            // 'created' => int 1550000000
-            // ];
-            $gclient->setAccessToken($token); // 設定 Token
-
-            $oauth = new Google_Service_Oauth2($gclient);
-            $profile = $oauth->userinfo->get();
-
-            $uid = $profile->id; // Primary key
-            log::info($profile); // 自行取需要的內容來使用囉~
-            return redirect('login');
-        } else {
-            // 直接導向登入網址
-            header('Location: ' . $google_login_url);
-            exit;
-        }
-    } 
-    // public function glogin(Request $request)
-    // {   
-    //     $gmail = $request->input('gmail');
-    //     $token = $request->input('token');
-    //     debug($gmail);
-    //     // return response()->json([
-    //     //     'status' => 'successful'
-    //     // ]);
-    //     //debug(md5($password));
-    //     $users = DB::select('select * from user where gmail = ?', [$gmail]);
-    //     if(sizeof($users) == 1 ) {
-    //         if ($this->auth->setVerified()) {
-    //             return response()->json([
-    //                 'status' => 'successful'
-    //             ]);
-    //             //return $this->auth->redirect();
-    //         }
-    //     } else {
-    //         return response()->json([
-    //             'status' => 'error',
-    //             'message'=> '帳號或密碼錯誤'
-    //         ]);
-    //         //return redirect('login')->with('login_status', '帳號或密碼錯誤');
-    //     }
-    // }
 }

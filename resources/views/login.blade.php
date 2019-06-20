@@ -29,8 +29,9 @@
                         </div>
                         <div class="container">
                             <div class="row">
-                                <div class="col"><button type="submit" class="btn-c"><i class="fas fa-sign-in-alt"></i>一般登入</button></div>
-                                <div class="col"><div class="g-signin2 col" data-onsuccess="onSignIn" data-width="170" data-height="48"></div></div>
+                                <div class="col"><button type="button" class="btn-c" onclick="login()"><i class="fas fa-sign-in-alt"></i>一般登入</button></div>
+                                <div class="col"><button type="button" class="btn-c" onclick="login('google')"><i class="fas fa-sign-in-alt"></i>一般登入</button></div>
+                                <!-- <div class="col"><div class="g-signin2 col" data-onsuccess="onSignIn" data-width="170" data-height="48"></div></div> -->
                             </div>
                         </div>
                         @if (session('login_status'))
@@ -47,7 +48,15 @@
         <script src="{{ asset('js/restcall.js') }}"></script>
         <script src="https://apis.google.com/js/platform.js" async defer></script>
         <script type="text/javascript">
-            function onSignIn(googleUser) {     
+            function login(type) {
+                if(type == 'google') {
+                    $('form').attr('action', '{{ route('doGLogin') }}');
+                } else {
+                    $('form').attr('action', '{{ route('doLogin') }}');
+                }
+                $('form').submit();
+            }
+            //function onSignIn(googleUser) {     
                 // document.getElementsByName('gmail').value = googleUser.getBasicProfile().getEmail();
                 // document.getElementsByName('token').value = googleUser.getAuthResponse().id_token;
                 // $('form').attr('action', '{{ route('doGLogin') }}');
@@ -71,7 +80,7 @@
                 //     document.getElementsByName('token').value = googleUser.getAuthResponse().id_token;
                 //     //$('form').submit();
                 // })
-            }
+            //}
         </script>
     </body>
 </html>
