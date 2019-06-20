@@ -12,9 +12,6 @@ class Authenticate
 
     public function handle($request, Closure $next) {
         $timestamp = session(self::SESSION); //取得在session中的時間
-        log::info("timestamp");
-        log::info($timestamp);
-        log::info(time());
         if($timestamp and $timestamp >= time()){
             $this->setVerified();
             return $next($request);

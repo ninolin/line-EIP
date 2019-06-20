@@ -23,9 +23,7 @@ class AuthController extends Controller
     {   
         $account = $request->input('account');
         $password = $request->input('password');
-        deubg($account);
         $users = DB::select('select * from user where username = ? and password = ?', [$account, md5($password)]);
-        deubg(sizeof($users));
         if(sizeof($users) == 1 ) {
             if ($this->auth->setVerified()) {
                 return $this->auth->redirect();
@@ -64,16 +62,15 @@ class AuthController extends Controller
             $oauth = new Google_Service_Oauth2($gclient);
             $profile = $oauth->userinfo->get();
             //$profile data: [
-            //    [email] => a7872278722@gmail.com 
+            //    [email] => xxxx@gmail.com 
             //    [familyName] => 林 
             //    [gender] => 
             //    [givenName] => 佳誼 
             //    [hd] => 
-            //    [id] => 113226465993829056826 
+            //    [id] => 1122334455 
             //    [link] => 
             //    [locale] => zh-TW 
             //    [name] => 林佳誼 
-            //    [picture] => https://lh6.googleusercontent.com/-UhiLwamxGBA/AAAAAAAAAAI/AAAAAAAAANc/Qzyb3O94tsA/photo.jpg [verifiedEmail] => 1 [modelData:protected] => Array ( [verified_email] => 1 [given_name] => 佳誼 [family_name] => 林 ) [processed:protected] => Array ( ) )
             //]
             $users = DB::select('select * from user where gmail = ?', [$profile->email]);
             if(sizeof($users) == 1 ) {
