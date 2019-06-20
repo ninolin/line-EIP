@@ -28,7 +28,7 @@ class Authenticate
             $min = self::EXPIRED_MINS;
         }
         session([self::SESSION => strtotime($min)]);
-        log::info(self::SESSION);
+        log::info(session(self::SESSION));
         return true;
     }
     
