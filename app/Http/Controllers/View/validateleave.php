@@ -132,12 +132,7 @@ class validateleave extends Controller
                 log::info($process_id);
                 if($last_approved_id == $process_id) {
                     //全部審核完了
-                    if(DB::update("update eip_leave_apply set apply_status =? where id =?", ['Y', $apply_id]) != 1) {
-                        return response()->json([
-                            'status' => 'error',
-                            'message' => 'update error'
-                        ]);
-                    } else {
+                    if(DB::update("update eip_leave_apply set apply_status =? where id =?", ['Y', $apply_id]) == 1) {
                         self::insert_event2gcalendar($apply_data->start_date, $apply_data->end_date, $apply_data->apply_user_cname."的".$apply_data->leave_name);
                         if($apply_data->apply_type == 'L') {
                             LineServiceProvider::sendNotifyFlexMeg($apply_data->apply_user_line_id, array_merge(["請假已通過","假別::".$apply_data->leave_name,"起日::".$apply_data->start_date,"迄日::".$apply_data->end_date,"備註::". $apply_data->comment]));
@@ -146,6 +141,11 @@ class validateleave extends Controller
                         }
                         return response()->json([
                             'status' => 'successful'
+                        ]);
+                    } else {
+                        return response()->json([
+                            'status' => 'error',
+                            'message' => 'update error'
                         ]);
                     }
                 } else {
@@ -184,25 +184,25 @@ class validateleave extends Controller
     /**
      * 請假寫入google calendar
      *
-     * @param  string  $check_date
+     * @param  string  $start_date
+     * @param  string  $end_date
+     * @param  string  $title
      * @return int
      */
     static protected function insert_event2gcalendar($start_date, $end_date, $title) {
-        $gcalendar_key = Config::get('eip.gcalendar_key');
-        log::info($gcalendar_key);
+        $gcalendar_appscript_uri = Config::get('eip.gcalendar_appscript_uri');
+        log::info($gcalendar_appscript_uri);
         $json_str = '{
-            "end": {
-             "dateTime": "'.$end_date.':00+08:00",
-             "timeZone": "Asia/Taipei"
-            },
-            "start": {
-             "dateTime": "'.$start_date.':00+08:00",
-             "timeZone": "Asia/Taipei"
-            },
-            "summary": "'.$title.'"
+            "title": "'.$title.'", 
+            "start": "'.$start_date.':00",
+            "end": "'.$end_date.':00"
         }';
         log::info($json_str);
-        $calevents_str = HelperServiceProvider::post_req("https://www.googleapis.com/calendar/v3/calendars/nino.dev.try%40gmail.com/events?key=".$gcalendar_key, $json_str);
-        return $calevents_str;
+        $calevents_str = HelperServiceProvider::post_req($gcalendar_appscript_uri, $json_str);
+        if(strpos($calevents_str,'Exception') !== false){ 
+            return 0;
+        }else{
+            return 1;
+        }
     }
 }
