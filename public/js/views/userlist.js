@@ -1,7 +1,8 @@
 
-const showSetModal = async (user_no, title_id, upper_user_no) => {
+const showSetModal = async (user_no, title_id, upper_user_no, work_class_id) => {
     const titles_res = await get_all_title();
     const users_res = await get_all_user();
+    const class_res = await get_all_class();
     if(titles_res.status == "successful" && users_res.status == "successful") {
         let all_titles = titles_res.data.map(item => {
             item.text = item.name;
@@ -15,6 +16,13 @@ const showSetModal = async (user_no, title_id, upper_user_no) => {
             return item;
         })
         all_users = [{id: 0, text: "不設定"}, ...all_users];
+
+        let all_classes = class_res.data.map(item => {
+            item.id = item.id;
+            item.text = item.name;
+            return item;
+        })
+        all_classes = [{id: 0, text: "不設定"}, ...all_classes];
 
         $("#title_set_select").select2({
             dropdownParent: $("#setModal"),
@@ -30,6 +38,13 @@ const showSetModal = async (user_no, title_id, upper_user_no) => {
 			width: '100%'
         })
         $("#upper_user_set_select").val(upper_user_no).trigger("change");
+        $("#work_class_set_select").select2({
+            dropdownParent: $("#setModal"),
+            data: all_classes,
+            dropdownAutoWidth : false,
+			width: '100%'
+        })
+        $("#work_class_set_select").val(work_class_id).trigger("change");
         $("#setModal").find(".todo").attr("onclick", "update_set('"+user_no+"')").html("修改");
         $('#setModal').modal('toggle');
     } else {
@@ -83,7 +98,7 @@ const unbindLineId = (user_no) => {
 
 const get_all_title = () => {
     return promise_call({
-        url: "./api/titlelist", 
+        url: "./api/title", 
          method: "get"
     })
 }
@@ -91,6 +106,13 @@ const get_all_title = () => {
 const get_all_user = () => {
     return promise_call({
         url: "./api/userlist", 
+        method: "get"
+    })
+}
+
+const get_all_class = () => {
+    return promise_call({
+        url: "/api/workclass/", 
         method: "get"
     })
 }
@@ -104,7 +126,8 @@ const update_set = (user_no) => {
         url: "./api/userlist/"+user_no, 
         data: {
             "title_id": $("#title_set_select").val(),
-            "upper_user_no": $("#upper_user_set_select").val()
+            "upper_user_no": $("#upper_user_set_select").val(),
+            "work_class_id": $("#work_class_set_select").val()
         }, 
         method: "put"
     })

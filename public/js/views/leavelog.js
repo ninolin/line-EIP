@@ -5,8 +5,7 @@ const showDetailModal = async (apply_id) => {
         res.data.map( (item, index) => {
             let html = "<tr>";
             html += "<td>"+(index+1)+"</td>";
-            html += "<td>"+item.user_cname+"</td>";
-            console.log("is_validate:", item.is_validate)
+            html += "<td>"+item.cname+"</td>";
             if(item.is_validate === 1) {
                 html += "<td>同意</td>";
             } else if(item.is_validate === 0){
@@ -19,7 +18,11 @@ const showDetailModal = async (apply_id) => {
             } else {
                 html += "<td>-</td>";
             }
-            html += "<td>"+item.validate_time+"</td>";
+            if(item.validate_time) {
+                html += "<td>"+item.validate_time+"</td>";
+            } else {
+                html += "<td>-</td>";
+            }
             html += "</tr>";
             $("#log_data").append(html);
         })

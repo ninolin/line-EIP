@@ -42,16 +42,16 @@
             </td>
             <td> 
               @if ($log->apply_type == 'L')
-                {{$log->leave_name}}
+                {{$log->leave_name}} ({{$log->leave_hours}}小時)
               @else
-                加班
+                加班 ({{$log->over_work_hours}}小時)
               @endif
             </td>
             <td> 
               @if ($log->apply_type == 'L')
                 {{$log->start_date}}
               @else
-                {{$log->over_work_date}} ({{$log->over_work_hours}}小時)
+                {{$log->over_work_date}} 
               @endif
             </td>
             <td>

@@ -1,15 +1,15 @@
 window.onload = function (e) {
-    liff.init(function (data) {
-        initializeApp(data);
-    });
-    //initializeApp({})
+    // liff.init(function (data) {
+    //     initializeApp(data);
+    // });
+    initializeApp({})
 };
 
 function initializeApp(data) {
-    document.getElementById('useridfield').textContent = data.context.userId;
+    //document.getElementById('useridfield').textContent = data.context.userId;
     promise_call({
-        url: "./api/validateleave/"+data.context.userId, 
-        //url: "./api/validateleave/U8d41dfb18097f57080858e39b929ce39", 
+        //url: "./api/validateleave/"+data.context.userId, 
+        url: "./api/validateleave/U8d41dfb18097f57080858e39b929ce39", 
         method: "get"
     })
     .then(v => {
@@ -124,8 +124,8 @@ const show_reject_dialog = (process_id, apply_id, apply_type, cname, leave_name)
 const validate_leave = (process_id, apply_id, apply_type, is_validate) => {
 
     const post_data = {
-        "userId": document.getElementById('useridfield').textContent,
-        //"userId": "U8d41dfb18097f57080858e39b929ce39", 
+        //"userId": document.getElementById('useridfield').textContent,
+        "userId": "U8d41dfb18097f57080858e39b929ce39", 
         "is_validate": is_validate, // 0=reject or 1=agree
         "apply_type": apply_type,   //L or O
         "process_id": process_id    //apply_process_id

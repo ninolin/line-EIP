@@ -85,14 +85,23 @@ class applyleave extends Controller
                     break;
                 }
             }
-            //取得申請人的NO和別名
-            $users = DB::select('select NO, cname from user where line_id =?', [$apply_user_line_id]);
-            $apply_user_NO = "";    //申請人NO
-            $apply_user_cname = ""; //申請人別名
+            //取得申請人的基本資料
+            $sql = 'select u.NO, u.cname, ewc.* from user as u LEFT JOIN eip_work_class as ewc on u.work_class_id = ewc.id WHERE u.line_id = ?';
+            $users = DB::select($sql, [$apply_user_line_id]);
+            $apply_user_NO = "";            //申請人NO
+            $apply_user_cname = "";         //申請人別名
+            $apply_user_work_start = "";    //申請人的上班開始時間
+            $apply_user_work_end = "";      //申請人的上班結束時間
+            $apply_user_lunch_start = "";   //申請人的午休開始時間
+            $apply_user_lunch_end = "";     //申請人的午休結束時間
             if(count($users) != 1) throw new Exception('請假失敗:請先將您的line加入EIP中'); 
             foreach ($users as $v) {
                 $apply_user_no = $v->NO;
                 $apply_user_cname = $v->cname;
+                $apply_user_work_start = $v->work_start ? $v->work_start : '08:00:00'; 
+                $apply_user_work_end = $v->work_end ? $v->work_end : '17:00:00';
+                $apply_user_lunch_start = $v->lunch_start ? $v->lunch_start : '12:00:00';
+                $apply_user_lunch_end = $v->lunch_end ? $v->lunch_end : '13:00:00';     
             }
             //取得代理人的資料
             $agent_users = DB::select('select cname, line_id from user where NO =?', [$leave_agent_user_no]);
@@ -118,18 +127,18 @@ class applyleave extends Controller
             if(count($dates) == 1) { 
                 //只請一天
                 if(self::is_offday_by_gcalendar($start_date) == 8) { //先確定當天是不是休息日，不是休息日的話再來算請假小時
-                    $leave_hours += self::cal_timediff($start_time, $end_time);
+                    $leave_hours += self::cal_timediff($start_time, $end_time, $apply_user_lunch_start, $apply_user_lunch_end);
                 }
             } else {    
                 //請超過一天(正常上班時間為08:00-17:00)
                 foreach ($dates as $key=>$d) {
                     if($key == 0) {
                         if(self::is_offday_by_gcalendar($start_date) == 8) {
-                            $leave_hours += self::cal_timediff($start_time, "17:00");
+                            $leave_hours += self::cal_timediff($start_time, "17:00", $apply_user_lunch_start, $apply_user_lunch_end);
                         }
                     } else if($key == count($dates)-1) {
                         if(self::is_offday_by_gcalendar($end_date) == 8) {
-                            $leave_hours += self::cal_timediff("08:00", $end_time);
+                            $leave_hours += self::cal_timediff("08:00", $end_time, $apply_user_lunch_start, $apply_user_lunch_end);
                         }
                     } else {
                         $leave_hours += self::is_offday_by_gcalendar($d);
@@ -237,14 +246,16 @@ class applyleave extends Controller
      * @param  string  $time2
      * @return float 
      */
-    static protected function cal_timediff($time1, $time2) {
-        $hours = (strtotime($time2) - strtotime($time1))/(60*60);
-        if($hours >= 5) {
-            $hours = $hours-1;
-        } else if($hours > 4) {
-            $hours = 4;
+    static protected function cal_timediff($time1, $time2, $lunch_start, $lunch_end) {
+        if(strtotime($time1) >= strtotime($lunch_end) || strtotime($time2) <= strtotime($lunch_start)) {
+            return (strtotime($time2) - strtotime($time1))/(60*60);
+        } else if(strtotime($time1) > strtotime($lunch_start) && strtotime($time1) < strtotime($lunch_end)) {
+            return (strtotime($time2) - strtotime($lunch_end))/(60*60);
+        } else if(strtotime($time2) > strtotime($lunch_start) && strtotime($time2) < strtotime($lunch_end)){
+            return (strtotime($lunch_start) - strtotime($time1))/(60*60);
+        } else {
+            return ((strtotime($time2) - strtotime($time1)) - (strtotime($lunch_end) - strtotime($lunch_start)))/(60*60);
         }
-        return $hours;
     }
 
     /**

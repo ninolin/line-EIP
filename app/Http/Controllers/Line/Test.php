@@ -49,21 +49,40 @@ class Test extends Controller
      */
     public function show()
     {
+        return response()->json([
+            'status' => self::find_upper(1, [], 12)
+        ]);
+
         // $d = new DateTime();
         // $timeMin = rawurlencode($d->format('Y-m-d\TH:i:sP'));
         // HelperServiceProvider::get_req("https://www.googleapis.com/calendar/v3/calendars/zh-tw.taiwan%23holiday%40group.v.calendar.google.com/events?key=AIzaSyB0ZMfTWE_h_qAVNRWpZFnDUOPaiT-a7xo&timeMin=".$timeMin);
         
-        $return = self::is_offday_by_gcalendar("2019-06-08");
-        $dates = self::dates2array("2019-06-08", "2019-06-10");
-        $hours = 0;
-        foreach ($dates as $e) {
-            //log::info(self::is_offday_by_gcalendar($e));
-            $hours += self::is_offday_by_gcalendar($e);
-        }
-        return response()->json([
-            'status' => $hours
-        ]);
+        // $return = self::is_offday_by_gcalendar("2019-06-08");
+        // $dates = self::dates2array("2019-06-08", "2019-06-10");
+        // $hours = 0;
+        // foreach ($dates as $e) {
+        //     //log::info(self::is_offday_by_gcalendar($e));
+        //     $hours += self::is_offday_by_gcalendar($e);
+        // }
+        // return response()->json([
+        //     'status' => $hours
+        // ]);
     }
+
+    static protected function find_upper($user_no, $array, $approved_title_id) {
+        $users = DB::select('select title_id, upper_user_no from user where NO =?', [$user_no]);
+        if($users > 0) {
+            foreach ($users as $u) {
+                if($u-> upper_user_no != 0 && $u-> title_id != $approved_title_id) {
+                    array_push($array, $u-> upper_user_no);
+                    return self::find_upper($u-> upper_user_no, $array, $approved_title_id);
+                } else {
+                    return $array;
+                }
+            }
+        }
+    }
+
     static protected function dates2array($date1, $date2) {
         $return= array();
         $diff_date = (strtotime($date2) - strtotime($date1))/ (60*60*24); //計算相差之天數

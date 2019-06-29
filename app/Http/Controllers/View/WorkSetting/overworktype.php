@@ -1,13 +1,14 @@
 <?php
 
-namespace App\Http\Controllers\View;
+namespace App\Http\Controllers\View\WorkSetting;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Validator;
 use DB;
-class titlelist extends Controller
+
+class overworktype extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -16,44 +17,42 @@ class titlelist extends Controller
      */
     public function index()
     {
-        $titles = DB::select('select * from eip_title', []);
-        return response()->json([
-            'status' => 'successful',
-            'data' => $titles
-        ]);
-        
+        //
     }
 
     /**
-     * 顯示職等資料頁面
+     * 顯示加班資料頁面
      * @author nino
      * @return \Illuminate\Http\Response
      */
     public function create()
     {
         $page = Input::get('page', 1);
-        $titles = DB::select('select * from eip_title limit ?,10', [($page-1)*10]);
-        $total_titles = DB::select('select * from eip_title', []);
-        $total_pages = ceil(count($total_titles)/10);
-        return view('contents.titlelist', [
-            'titles' => $titles, 
-            'page' => $page,
-            'total_pages' => $total_pages
+        $types = DB::select('select eot.*, et.name as title_name, et.id as title_id from eip_overwork_type eot, eip_title et where eot.approved_title_id = et.id order by hour limit ?,10 ', [($page-1)*10]);
+        $total_types = DB::select('select * from eip_overwork_type', []);
+        $total_pages = ceil(count($total_types)/10);
+        return view('contents.WorkSetting.overworktype', [
+            'types'         => $types, 
+            'page'          => $page,
+            'total_pages'   => $total_pages,
+            'tab'           => 'overworktype'
         ]);
     }
 
     /**
-     * 新增職等資料
+     * 新增加班資料
      * @author nino
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
     {
-        //debug( $request->get('name'));
+        $hour = $request->get('hour');
+        $approved_title_id = $request->get('approved_title_id');
         //檢查參數格式是否正確
         $validator = Validator::make($request->all(), [
-            'name' => 'required|string|max:32'
+            'hour' => 'required|integer',
+            'approved_title_id' => 'required|integer'
         ]);
         if ($validator->fails()) {
             return response()->json([
@@ -61,17 +60,16 @@ class titlelist extends Controller
                 'message' => $validator->errors()->all()
             ], 400);
         }
-        $name = Input::get('name', '');
-        //檢查一樣名稱的職等是否存在
-        $titles = DB::select('select name from eip_title where name =?', [$name]);
-        if(count($titles) > 0) {
+        //檢查一樣小時的加班是否存在
+        $types = DB::select('select hour from eip_overwork_type where hour =?', [$hour]);
+        if(count($types) > 0) {
             return response()->json([
                 'status' => 'error',
-                'message' => 'name exists'
+                'message' => 'hour exists'
             ], 409);
         }
 
-        if(DB::insert("insert into eip_title (name) values (?)", [$name]) == 1) {
+        if(DB::insert("insert into eip_overwork_type (hour, approved_title_id) values (?, ?)", [$hour, $approved_title_id]) == 1) {
             return response()->json([
                 'status' => 'successful'
             ]);
@@ -106,7 +104,7 @@ class titlelist extends Controller
     }
 
     /**
-     * 修改職等別資料
+     * 修改加班資料
      * @author nino
      * @param  \Illuminate\Http\Request  $request
      * @param  int  $id
@@ -114,10 +112,12 @@ class titlelist extends Controller
      */
     public function update(Request $request, $id)
     {
-
+        $hour = $request->get('hour');
+        $approved_title_id = $request->get('approved_title_id');
         //檢查參數格式是否正確
         $validator = Validator::make($request->all(), [
-            'name' => 'required|string|max:32'
+            'hour' => 'required|integer',
+            'approved_title_id' => 'required|integer'
         ]);
         if ($validator->fails()) {
             return response()->json([
@@ -125,17 +125,16 @@ class titlelist extends Controller
                 'message' => $validator->errors()->all()
             ], 400);
         }
-        $name = $request->get('name');
-        //檢查一樣名稱的職等是否存在
-        $titles = DB::select('select name from eip_title where name =? and id !=?', [$name, $id]);
-        if(count($titles) > 0) {
+        //檢查一樣小時的加班是否存在
+        $types = DB::select('select hour from eip_overwork_type where hour =? and id != ?', [$hour, $id]);
+        if(count($types) > 0) {
             return response()->json([
                 'status' => 'error',
-                'message' => 'name exists'
+                'message' => 'hour exists'
             ], 409);
         }
 
-        if(DB::update("update eip_title set name =? where id =?", [$name, $id]) == 1) {
+        if(DB::update("update eip_overwork_type set hour =?, approved_title_id =? where id =?", [$hour, $approved_title_id, $id]) == 1) {
             return response()->json([
                 'status' => 'successful'
             ]);
@@ -148,14 +147,14 @@ class titlelist extends Controller
     }
 
     /**
-     * 刪除職等資料
+     * 刪除加班資料
      * @author nino
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
     public function destroy($id)
     {
-        if(DB::delete("delete from eip_title where id =?", [$id]) == 1) {
+        if(DB::delete("delete from eip_overwork_type where id =?", [$id]) == 1) {
             return response()->json([
                 'status' => 'successful'
             ]);

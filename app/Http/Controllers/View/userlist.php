@@ -35,10 +35,11 @@ class userlist extends Controller
         $order_col = Input::get('order_col', 'username');
         $order_type = Input::get('order_type', 'DESC');
 
-        $sql =  'select u.*, et.name as title, u2.cname as upper_cname ';
+        $sql =  'select u.*, et.name as title, u2.cname as upper_cname, ewc.name as work_class_name ';
         $sql .= 'from user u ';
         $sql .= 'left join eip_title et on u.title_id = et.id ';
         $sql .= 'left join user u2 on u.upper_user_no = u2.NO ';
+        $sql .= 'left join eip_work_class ewc on u.work_class_id = ewc.id ';
         $sql .= 'where u.status = "T" ';
         if($search != '') {
             $sql .= 'and (u.username like "%'.$search.'%" or u.cname like "%'.$search.'%" or u.email like "%'.$search.'%") ';
@@ -108,7 +109,8 @@ class userlist extends Controller
     {
         $title_id = $request->get('title_id');
         $upper_user_no = $request->get('upper_user_no');
-        if(DB::update("update user set title_id =?, upper_user_no =? where NO =?", [$title_id, $upper_user_no, $id]) == 1) {
+        $work_class_id = $request->get('work_class_id');
+        if(DB::update("update user set title_id =?, upper_user_no =?, work_class_id =? where NO =?", [$title_id, $upper_user_no, $work_class_id, $id]) == 1) {
             return response()->json([
                 'status' => 'successful'
             ]);

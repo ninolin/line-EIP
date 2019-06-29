@@ -35,6 +35,10 @@
             @if ($order_col == 'upper_user_no' && $order_type == 'DESC') <div class="angle-down"></div> @endif
             @if ($order_col == 'upper_user_no' && $order_type == 'ASC') <div class="angle-up"></div> @endif
           </th>
+          <th scope="col" onclick="reload_page({{$page}}, 'work_class_id', '{{$order_type}}', 'col')">班別
+            @if ($order_col == 'upper_user_no' && $order_type == 'DESC') <div class="angle-down"></div> @endif
+            @if ($order_col == 'upper_user_no' && $order_type == 'ASC') <div class="angle-up"></div> @endif
+          </th>
           <th scope="col" onclick="reload_page({{$page}}, 'line_id', '{{$order_type}}', 'col')">lineId
             @if ($order_col == 'line_id' && $order_type == 'DESC') <div class="angle-down"></div> @endif
             @if ($order_col == 'line_id' && $order_type == 'ASC') <div class="angle-up"></div> @endif
@@ -49,6 +53,7 @@
             <td> {{$user->cname}} </td>
             <td> {{$user->title}} </td>
             <td> {{$user->upper_cname}} </td>
+            <td> {{$user->work_class_name}} </td>
             <td> {{$user->line_id}} </td>
             <td>
               @if ($user->line_id == '') 
@@ -56,7 +61,7 @@
               @else
                 <button type="button" class="btn btn-outline-danger btn-sm" onclick="showUnbindLineId({{$user->NO}}, '{{$user->cname}}', '{{$user->line_id}}')">解除lineId</button>
               @endif
-              <button type="button" class="btn btn-outline-primary btn-sm" onclick="showSetModal({{$user->NO}}, {{$user->title_id}}, {{$user->upper_user_no}})">設定</button>
+              <button type="button" class="btn btn-outline-primary btn-sm" onclick="showSetModal({{$user->NO}}, {{$user->title_id}}, {{$user->upper_user_no}}, {{$user->work_class_id}})">設定</button>
             </td>
           </tr>
         @endforeach
@@ -88,7 +93,7 @@
   <div class="modal-dialog modal-dialog-centered" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title">設定職等和第一簽核人</h5>
+        <h5 class="modal-title">設定</h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
@@ -106,6 +111,12 @@
               <label for="title-name" class="col-form-label w-25">第一簽核人:</label>
               <div class="col-form-label w-75">
                 <select id="upper_user_set_select" class="w-75"></select>
+              </div>
+            </div>
+            <div class="row">
+              <label for="title-name" class="col-form-label w-25">班別:</label>
+              <div class="col-form-label w-75">
+                <select id="work_class_set_select" class="w-75"></select>
               </div>
             </div>
           </div>

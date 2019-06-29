@@ -29,7 +29,12 @@ Route::middleware('auth')->get('/overworktypelist', 'View\overworktypelist@creat
 Route::middleware('auth')->get('/leavelog', 'View\leavelog@create')->name('leavelog');
 Route::middleware('auth')->get('/messagelog', 'View\messagelog@create')->name('messagelog');
 Route::middleware('auth')->post('/messagelog', 'View\messagelog@create')->name('messagelog');
+Route::middleware('auth')->get('/work/setting/class', 'View\WorkSetting\workclass@create')->name('ws_class');
+Route::middleware('auth')->get('/work/setting/title', 'View\WorkSetting\title@create')->name('ws_title');
+Route::middleware('auth')->get('/work/setting/leavetype', 'View\WorkSetting\leavetype@create')->name('ws_leavetype');
+Route::middleware('auth')->get('/work/setting/overworktype', 'View\WorkSetting\overworktype@create')->name('ws_overworktype');
 Route::get('/formmanage', function () {return view('contents.formmanage');})->name('formmanage');
+
 Route::post('/login', 'Auth\AuthController@login')->name('doLogin');    //一般登入
 Route::post('/logout', 'Auth\AuthController@logout')->name('doLogout'); //登出
 Route::post('/glogin', 'Auth\AuthController@glogin')->name('doGLogin'); //google登入

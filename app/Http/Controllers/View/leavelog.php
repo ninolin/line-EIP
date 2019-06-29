@@ -93,16 +93,13 @@ class leavelog extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
-     *
+     * 顯示後台工時紀錄
+     * @author nino
      * @return \Illuminate\Http\Response
      */
     public function create()
     {
         $page = Input::get('page', 1);
-        // $sql =  'select ela.*, u1.cname, u2.cname as agent_cname, elt.name as leave_type_name ';
-        // $sql .= 'from eip_leave_apply ela, user as u1, user as u2, eip_leave_type elt ';
-        // $sql .= 'where ela.apply_user_no = u1.NO and ela.agent_user_no = u2.NO and ela.type_id = elt.id ';
         $sql  = 'select a.*, u2.cname as cname, u1.cname as agent_cname, eip_leave_type.name as leave_name ';
         $sql .= 'from ';
         $sql .= '(select * from eip_leave_apply) as a ';
@@ -114,6 +111,14 @@ class leavelog extends Controller
         $sql .= 'on a.apply_user_no = u2.NO ';
         $sql .= 'limit ?,10 ';
         $logs = DB::select($sql, [($page-1)*10]);
+        foreach ($logs as $key => $value) {
+            if($value->apply_type == 'L') {
+                $start_date = str_replace("T", " ", $value->start_date);
+                $end_date = str_replace("T", " ", $value->end_date);
+                $logs[$key]->start_date = $start_date;
+                $logs[$key]->end_date = $end_date;
+            }
+        }
         $total_logs = DB::select('select * from eip_leave_apply', []);
         $total_pages = ceil(count($total_logs)/10);
 

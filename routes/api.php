@@ -20,18 +20,18 @@ Route::put('userlist/bindlineid/{id}', 'View\userlist@bindlineid');
 Route::put('userlist/unbindlineid/{id}', 'View\userlist@unbindlineid');
 Route::get('userlist/checklineid/{id}', 'View\userlist@checklineid');
 
-Route::get('titlelist', 'View\titlelist@index');
-Route::post('titlelist', 'View\titlelist@store');
-Route::put('titlelist/{id}', 'View\titlelist@update');
-Route::delete('titlelist/{id}', 'View\titlelist@destroy');
+Route::get('title', 'View\WorkSetting\title@index');
+Route::post('title', 'View\WorkSetting\title@store');
+Route::put('title/{id}', 'View\WorkSetting\title@update');
+Route::delete('title/{id}', 'View\WorkSetting\title@destroy');
 
-Route::post('leavetypelist', 'View\leavetypelist@store');
-Route::put('leavetypelist/{id}', 'View\leavetypelist@update');
-Route::delete('leavetypelist/{id}', 'View\leavetypelist@destroy');
+Route::post('leavetype', 'View\WorkSetting\leavetype@store');
+Route::put('leavetype/{id}', 'View\WorkSetting\leavetype@update');
+Route::delete('leavetype/{id}', 'View\WorkSetting\leavetype@destroy');
 
-Route::post('overworktypelist', 'View\overworktypelist@store');
-Route::put('overworktypelist/{id}', 'View\overworktypelist@update');
-Route::delete('overworktypelist/{id}', 'View\overworktypelist@destroy');
+Route::post('overworktype', 'View\WorkSetting\overworktype@store');
+Route::put('overworktype/{id}', 'View\WorkSetting\overworktype@update');
+Route::delete('overworktype/{id}', 'View\WorkSetting\overworktype@destroy');
 
 Route::post('applyleave', 'View\applyleave@store');
 Route::get('applyleave/{id}', 'View\applyleave@show');
@@ -49,4 +49,8 @@ Route::put('individuallog/{id}', 'View\individuallog@cancel');
 Route::get('leavelog/{id}', 'View\leavelog@list_logs');
 Route::get('test', 'Line\Test@show');
 
+Route::get('workclass', 'View\WorkSetting\WorkClass@index');
+Route::post('workclass', 'View\WorkSetting\WorkClass@store');
+Route::put('workclass/{id}', 'View\WorkSetting\WorkClass@update');
+Route::delete('workclass/{id}', 'View\WorkSetting\WorkClass@destroy');
 //Route::post('/glogin', 'Auth\AuthController@glogin')->name('doGLogin'); //google登入
