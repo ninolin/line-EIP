@@ -281,6 +281,25 @@ class applyleave extends Controller
      * @return int
      */
     static protected function is_offday_by_gcalendar($check_date) {
+        $gcalendar_appscript_uri = Config::get('eip.gcalendar_appscript_uri');
+        $calevents_str = HelperServiceProvider::get_req($gcalendar_appscript_uri."?checkDate=".$check_date);
+        $calevents = explode(",", $calevents_str);
+        $offhours = 8;
+        foreach ($calevents as $e) {
+            if(strpos($e,'休息日') !== false) {
+                $offhours = $offhours - 8;
+            }
+        }
+        return $offhours;
+    }
+
+    /**
+     * 檢查日期的上班小時(deprecated)
+     *
+     * @param  string  $check_date Y-m-d
+     * @return int
+     */
+    static protected function is_offday_by_gcalendar_by_sdk($check_date) {
         $gcalendar_key = Config::get('eip.gcalendar_key');
         log::info("gcalendar_key");
         log::info($gcalendar_key);

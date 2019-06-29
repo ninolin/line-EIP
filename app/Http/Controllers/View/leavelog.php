@@ -109,6 +109,7 @@ class leavelog extends Controller
         $sql .= 'on a.leave_type = eip_leave_type.id ';
         $sql .= 'left join user as u2 ';
         $sql .= 'on a.apply_user_no = u2.NO ';
+        $sql .= 'order by id DESC ';
         $sql .= 'limit ?,10 ';
         $logs = DB::select($sql, [($page-1)*10]);
         foreach ($logs as $key => $value) {

@@ -7,6 +7,7 @@
                 <a class="angle-down nav-link">工時管理</a>
                 <ul>
                     <div>
+                        <li><a class="@if (Request::is('calendar')) active @endif" href="{{ route('calendar') }}">工時日曆</a></li>
                         <li><a class="@if (Request::is('userlist')) active @endif" href="{{ route('userlist') }}">員工清單</a></li>
                         <li><a class="@if (Request::is('work/setting/title')) active @endif" href="{{ route('ws_title') }}">工時設定</a></li>
                         <!-- <li><a class="@if (Request::is('titlelist')) active @endif" href="{{ route('titlelist') }}">職等設定</a></li>

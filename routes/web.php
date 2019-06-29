@@ -33,6 +33,7 @@ Route::middleware('auth')->get('/work/setting/class', 'View\WorkSetting\workclas
 Route::middleware('auth')->get('/work/setting/title', 'View\WorkSetting\title@create')->name('ws_title');
 Route::middleware('auth')->get('/work/setting/leavetype', 'View\WorkSetting\leavetype@create')->name('ws_leavetype');
 Route::middleware('auth')->get('/work/setting/overworktype', 'View\WorkSetting\overworktype@create')->name('ws_overworktype');
+Route::get('/calendar', function () {return view('contents.calendar');})->name('calendar');
 Route::get('/formmanage', function () {return view('contents.formmanage');})->name('formmanage');
 
 Route::post('/login', 'Auth\AuthController@login')->name('doLogin');    //一般登入
