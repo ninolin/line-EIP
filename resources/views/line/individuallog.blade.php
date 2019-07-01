@@ -51,6 +51,7 @@
     <!-- <script src="{{ asset('js/line/individuallog.js') }}"></script> -->
     <script>
         window.onload = function (e) {
+            alert("aaa");
             liff.init(function (data) {
                 initializeApp(data);
             });
