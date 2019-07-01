@@ -54,6 +54,8 @@
                 alert("bbb");
                 alert(JSON.stringify(data));
                 initializeApp(data);
+            }, function (err) {
+                alert(err);
             });
             //initializeApp({})
         };
