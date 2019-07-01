@@ -73,15 +73,18 @@ class applyleave extends Controller
             $leave_days = count(self::dates2array($start_date, $end_date));
             $leave_type_arr = DB::select('select * from eip_leave_type where name =? order by day ASC', [$leavename]);
             $leave_type_id = "";
+            $leave_approved_title_id = "";
             $i = 0;
             foreach ($leave_type_arr as $v) {
                 $i++;
                 if($leave_days < $v->day) {
                     $leave_type_id = $v->id;
+                    $leave_approved_title_id = $v->approved_title_id;
                     break;
                 }
                 if($leave_type_id == "" && count($leave_type_arr) == $i){
                     $leave_type_id = $v->id;
+                    $leave_approved_title_id = $v->approved_title_id;
                     break;
                 }
             }
@@ -160,7 +163,7 @@ class applyleave extends Controller
             foreach ($last_appy_record as $v) {
                 $last_appy_id = $v->last_id;
             }
-            $upper_users = self::find_upper($apply_user_no, [], $leave_type_id);
+            $upper_users = self::find_upper($apply_user_no, [], $leave_approved_title_id);
             foreach ($upper_users as $u) {
                 //寫入簽核流程紀錄(該table沒有紀錄申請人和簽核人的line_id是因為可能會有換line帳號的情況發生)
                 if(DB::insert("insert into eip_leave_apply_process (apply_id, apply_type, apply_user_no, upper_user_no) value (?, ?, ?, ?)", [$last_appy_id, 'L', $apply_user_no, $u]) != 1) {
