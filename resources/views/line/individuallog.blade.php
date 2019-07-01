@@ -46,7 +46,7 @@
     </body>
     <script src="{{ asset('js/jquery/jquery.min.js') }}"></script>
     <script src="{{ asset('js/bootstrap/js/bootstrap.min.js') }}"></script>
-    <script src="{{ asset('js/line/individuallog.js') }}"></script>
-    <script src="{{ asset('js/restcall.js') }}"></script>
     <script src="https://d.line-scdn.net/liff/1.0/sdk.js"></script>
+    <script src="{{ asset('js/restcall.js') }}"></script>
+    <script src="{{ asset('js/line/individuallog.js') }}"></script>
 </html>
