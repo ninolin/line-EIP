@@ -40,7 +40,7 @@ class validateleave extends Controller
         $sql .= 'from ';
         $sql .= '(  select a.id as process_id, b.* ';
         $sql .= '   from eip_leave_apply_process a, eip_leave_apply b ';
-        $sql .= '   where a.apply_id = b.id and a.is_validate IS NULL and a.upper_user_no IN ';
+        $sql .= '   where b.apply_status != "C" and a.apply_id = b.id and a.is_validate IS NULL and a.upper_user_no IN ';
         $sql .= '   (select NO from user where line_id =?)';
         $sql .= ') as a ';
         $sql .= 'left join user as u1 ';
