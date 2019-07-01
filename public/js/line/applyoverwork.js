@@ -25,7 +25,7 @@ const apply_overwork = () => {
         "overworkDate": $("#overworkDate").val(),
         "overworkHour": $("#overworkHour").val()
     }
-
+    alert(JSON.stringify(post_data));
     for (k in post_data) {
         if(post_data[k] == "") {
             alert("資料不正確");
