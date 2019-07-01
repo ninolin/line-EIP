@@ -53,6 +53,8 @@
         window.onload = function (e) {
             alert("aaa");
             liff.init(function (data) {
+                alert("bbb");
+                alert(JSON.stringify(data));
                 initializeApp(data);
             });
             //initializeApp({})
