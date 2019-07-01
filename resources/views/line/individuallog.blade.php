@@ -59,6 +59,7 @@
         };
 
         function initializeApp(data) {
+            alert(data.context.userId);
             document.getElementById('useridfield').textContent = data.context.userId;
             promise_call({
                 url: "./api/individuallog/"+data.context.userId, 
