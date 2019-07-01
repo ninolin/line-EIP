@@ -49,8 +49,8 @@ Route::put('individuallog/{id}', 'View\individuallog@cancel');
 Route::get('leavelog/{id}', 'View\leavelog@list_logs');
 Route::get('test', 'Line\Test@show');
 
-Route::get('workclass', 'View\WorkSetting\WorkClass@index');
-Route::post('workclass', 'View\WorkSetting\WorkClass@store');
-Route::put('workclass/{id}', 'View\WorkSetting\WorkClass@update');
-Route::delete('workclass/{id}', 'View\WorkSetting\WorkClass@destroy');
+Route::get('workclass', 'View\WorkSetting\workclass@index');
+Route::post('workclass', 'View\WorkSetting\workclass@store');
+Route::put('workclass/{id}', 'View\WorkSetting\workclass@update');
+Route::delete('workclass/{id}', 'View\WorkSetting\workclass@destroy');
 //Route::post('/glogin', 'Auth\AuthController@glogin')->name('doGLogin'); //google登入
