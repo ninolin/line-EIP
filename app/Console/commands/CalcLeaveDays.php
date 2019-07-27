@@ -25,7 +25,7 @@ class CalcLeaveDays extends Command
         foreach ($users as $u) {
             $onboard_date = $u->onboard_date;
             if(!is_null($onboard_date)) {
-                $leave_day = self::calc_leavedays($onboard_date);
+                $leave_day = self::calc_leavedays($onboard_date, date("Y-m-d"));
                 if($leave_day != 10000) {
                     if(DB::update('update user set year_totalleave = ?, year_useleave = 0 where NO =? ', [$leave_day, $u->NO]) != 1) {
                         echo 'now update data';
@@ -35,8 +35,8 @@ class CalcLeaveDays extends Command
         }
     }
 
-    protected function calc_leavedays($onboard_date) {
-        $today = date("Y-m-d");
+    public function calc_leavedays($onboard_date, $today) {
+        //$today = date("Y-m-d");
         //$today = "2018-01-01";
         $date1 = explode('-',$onboard_date);
         $date2 = explode('-',$today);

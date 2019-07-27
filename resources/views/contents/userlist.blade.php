@@ -27,6 +27,14 @@
             @if ($order_col == 'cname' && $order_type == 'DESC') <div class="angle-down"></div> @endif
             @if ($order_col == 'cname' && $order_type == 'ASC') <div class="angle-up"></div> @endif
           </th>
+          <th scope="col" onclick="reload_page({{$page}}, 'onboard_date', '{{$order_type}}', 'col')">到職日
+            @if ($order_col == 'onboard_date' && $order_type == 'DESC') <div class="angle-down"></div> @endif
+            @if ($order_col == 'onboard_date' && $order_type == 'ASC') <div class="angle-up"></div> @endif
+          </th>
+          <th scope="col" onclick="reload_page({{$page}}, 'year_totalleave', '{{$order_type}}', 'col')">已用/全部休假
+            @if ($order_col == 'year_totalleave' && $order_type == 'DESC') <div class="angle-down"></div> @endif
+            @if ($order_col == 'year_totalleave' && $order_type == 'ASC') <div class="angle-up"></div> @endif
+          </th>
           <th scope="col" onclick="reload_page({{$page}}, 'title_id', '{{$order_type}}', 'col')">職等
             @if ($order_col == 'title_id' && $order_type == 'DESC') <div class="angle-down"></div> @endif
             @if ($order_col == 'title_id' && $order_type == 'ASC') <div class="angle-up"></div> @endif
@@ -51,6 +59,8 @@
           <tr>
             <td> {{$user->username}} </td>
             <td> {{$user->cname}} </td>
+            <td> {{$user->onboard_date}} </td>
+            <td> {{isset($user->year_useleave)?$user->year_useleave:0}} / {{isset($user->year_totalleave)?$user->year_totalleave:0}}</td>
             <td> {{$user->title}} </td>
             <td> {{$user->upper_cname}} </td>
             <td> {{$user->work_class_name}} </td>
@@ -61,7 +71,8 @@
               @else
                 <button type="button" class="btn btn-outline-danger btn-sm" onclick="showUnbindLineId({{$user->NO}}, '{{$user->cname}}', '{{$user->line_id}}')">解除lineId</button>
               @endif
-              <button type="button" class="btn btn-outline-primary btn-sm" onclick="showSetModal({{$user->NO}}, {{$user->title_id}}, {{$user->upper_user_no}}, {{$user->work_class_id}})">設定</button>
+              <button type="button" class="btn btn-outline-primary btn-sm" onclick="showSetModal({{$user->NO}}, {{$user->title_id}}, {{$user->upper_user_no}}, {{$user->work_class_id}}, '{{$user->onboard_date}}')">設定</button>
+              <button type="button" class="btn btn-outline-primary btn-sm" onclick="showLeaveDayModal('{{$user->NO}}')">更新休假天數</button>
             </td>
           </tr>
         @endforeach
@@ -102,6 +113,12 @@
         <form>
           <div class="form-group container-fluid">
             <div class="row">
+              <label class="col-form-label w-25">到職日:</label>
+              <div class="col-form-label w-75">
+                <input id="onboard_date" type="date" class="form-control">
+              </div>
+            </div>
+            <div class="row">
               <label for="title-name" class="col-form-label w-25">職等:</label>
               <div class="col-form-label w-75">
                 <select id="title_set_select"></select>
@@ -125,6 +142,40 @@
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
         <button type="button" class="btn btn-primary todo">新增</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal fade" id="setLeaveDayModal" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">設定休假</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form>
+          <div class="form-group container-fluid">
+            <div class="row">
+              <label class="col-form-label col-md-6">今年可休假天數(系統算):</label>
+              <span type="text" class="col-md-6" id="calc_leave_day" style="line-height:38px"></span>
+            </div>
+            <div class="row">
+              <label class="col-form-label col-md-6">今年已休假天數:</label>
+              <span type="text" class="col-md-6" id="year_useleave" style="line-height:38px"><span>
+            </div>
+            <div class="row">
+              <label class="col-form-label col-md-6">設定今年可休假天數:</label>
+              <input type="text" class="form-control col-md-6" id="year_totalleave" style="line-height:38px">
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
+        <button type="button" class="btn btn-primary todo">設定</button>
       </div>
     </div>
   </div>

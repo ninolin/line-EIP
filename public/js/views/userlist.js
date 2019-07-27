@@ -1,5 +1,6 @@
 
-const showSetModal = async (user_no, title_id, upper_user_no, work_class_id) => {
+const showSetModal = async (user_no, title_id, upper_user_no, work_class_id, onboard_date) => {
+    $("#onboard_date").val(onboard_date);
     const titles_res = await get_all_title();
     const users_res = await get_all_user();
     const class_res = await get_all_class();
@@ -50,6 +51,39 @@ const showSetModal = async (user_no, title_id, upper_user_no, work_class_id) => 
     } else {
         alert("get data error");
     }
+}
+
+const showLeaveDayModal = (user_no) => {
+    $("#setLeaveDayModal").find(".todo").attr("onclick", "updateLeaveDay('"+user_no+"')")
+    promise_call({
+        url: "./api/userlist/leaveday/"+user_no, 
+        method: "get"
+    })
+    .then(v => {
+        if(v.status == "successful") {
+            $("#calc_leave_day").html(v.leave_day);
+            $("#year_useleave").html(v.year_useleave);
+            $("#year_totalleave").val(v.year_totalleave);
+        }
+        $('#setLeaveDayModal').modal('toggle');
+    })
+}
+
+const updateLeaveDay = (user_no) => {
+    promise_call({
+        url: "./api/userlist/leaveday/"+user_no, 
+        data: {
+            "leave_day": $("#year_totalleave").val()
+        }, 
+        method: "put"
+    })
+    .then(v => {
+        if(v.status == "successful") {
+            window.location.reload();
+        } else {
+            $('#setLeaveDayModal').modal('toggle');
+        }
+    })
 }
 
 const showBindLineId = (user_no, usercname) => {
@@ -127,7 +161,8 @@ const update_set = (user_no) => {
         data: {
             "title_id": $("#title_set_select").val(),
             "upper_user_no": $("#upper_user_set_select").val(),
-            "work_class_id": $("#work_class_set_select").val()
+            "work_class_id": $("#work_class_set_select").val(),
+            "onboard_date": $("#onboard_date").val()
         }, 
         method: "put"
     })

@@ -6,9 +6,16 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Input;
 use DB;
+use App\Console\commands\CalcLeaveDays;
 
 class userlist extends Controller
 {
+    private $calcL;
+
+    public function __construct(CalcLeaveDays $calcL)
+    {
+        $this->calcL = $calcL;
+    }
     /**
      * Display a listing of the resource.
      *
@@ -110,7 +117,9 @@ class userlist extends Controller
         $title_id = $request->get('title_id');
         $upper_user_no = $request->get('upper_user_no');
         $work_class_id = $request->get('work_class_id');
-        if(DB::update("update user set title_id =?, upper_user_no =?, work_class_id =? where NO =?", [$title_id, $upper_user_no, $work_class_id, $id]) == 1) {
+        $onboard_date = $request->get('onboard_date');
+
+        if(DB::update("update user set title_id =?, upper_user_no =?, work_class_id =?, onboard_date =? where NO =?", [$title_id, $upper_user_no, $work_class_id, $onboard_date, $id]) == 1) {
             return response()->json([
                 'status' => 'successful'
             ]);
@@ -158,6 +167,52 @@ class userlist extends Controller
             'status' => 'successful',
             'data' => $user
         ]);
+    }
+
+    public function calcleaveday(Request $request, $NO)
+    {
+        $leave_day = 0;
+        $year_useleave = 0;
+        $year_totalleave = 0;
+        $users = DB::select("select * from user where NO =?", [$NO]);
+        foreach ($users as $u) {
+            $onboard_date = $u->onboard_date;
+            if(!is_null($u->year_useleave)) {
+                $year_useleave = $u->year_useleave;
+            }
+            if(!is_null($u->year_totalleave)) {
+                $year_totalleave = $u->year_totalleave;
+            }
+            if(!is_null($onboard_date)) {
+                $leave_day = $this->calcL->calc_leavedays($onboard_date, date("Y")."-01-01");
+                if($leave_day == 10000) {
+                    $leave_day = 0;
+                }
+            }
+        }
+        return response()->json([
+            'status' => 'successful',
+            'leave_day' => $leave_day,
+            'year_useleave' => $year_useleave,
+            'year_totalleave' => $year_totalleave
+        ]);
+    }
+
+    public function updateleaveday(Request $request, $NO)
+    {
+        $leave_day = $request->get('leave_day');
+        if(!is_null($leave_day)) {
+            if(DB::update("update user set year_totalleave=? where NO =?", [$leave_day, $NO]) == 1) {
+                return response()->json([
+                    'status' => 'successful'
+                ]);
+            } else {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'update error'
+                ]);
+            }
+        }
     }
     /**
      * Remove the specified resource from storage.
