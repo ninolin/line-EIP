@@ -13,7 +13,7 @@
                         <!-- <li><a class="@if (Request::is('titlelist')) active @endif" href="{{ route('titlelist') }}">職等設定</a></li>
                         <li><a class="@if (Request::is('leavetypelist')) active @endif" href="{{ route('leavetypelist') }}">假別設定</a></li>
                         <li><a class="@if (Request::is('overworktypelist')) active @endif" href="{{ route('overworktypelist') }}">加班設定</a></li> -->
-                        <li><a class="@if (Request::is('leavelog')) active @endif" href="{{ route('leavelog') }}">工時記錄</a></li>
+                        <li><a class="@if (Request::is('leavelog/last')) active @endif" href="{{ route('ll_last') }}">工時記錄</a></li>
                         <li><a class="@if (Request::is('messagelog')) active @endif" href="{{ route('messagelog') }}">訊息記錄</a></li>
                     </div>
                 </ul>

@@ -28,38 +28,6 @@ const showDetailModal = async (apply_id) => {
         })
         $('#logModal').modal('toggle');
     }
-    
-    // const users_res = await get_all_user();
-    // if(titles_res.status == "successful" && users_res.status == "successful") {
-    //     const all_titles = titles_res.data.map(item => {
-    //         item.text = item.name;
-    //         return item;
-    //     })
-    //     const all_users = users_res.data.map(item => {
-    //         item.id = item.NO;
-    //         item.text = item.cname;
-    //         return item;
-    //     })
-       
-    //     $("#title_set_select").select2({
-    //         dropdownParent: $("#setModal"),
-    //         data: all_titles,
-    //         dropdownAutoWidth : false,
-    //         width: '100%',
-    //     })
-    //     $("#title_set_select").val(title_id).trigger("change");
-    //     $("#upper_user_set_select").select2({
-    //         dropdownParent: $("#setModal"),
-    //         data: all_users,
-    //         dropdownAutoWidth : false,
-	// 		width: '100%'
-    //     })
-    //     $("#upper_user_set_select").val(upper_user_no).trigger("change");
-    //     $("#setModal").find(".todo").attr("onclick", "update_set('"+user_no+"')").html("修改");
-    //     $('#setModal').modal('toggle');
-    // } else {
-    //     alert("get data error");
-    // }
 }
 
 const get_apply_path = (apply_id) => {

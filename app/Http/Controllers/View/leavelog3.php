@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Input;
 use DB;
 use Log;
 
-class leavelog extends Controller
+class leavelog3 extends Controller
 {
     public function list_logs($id)
     {
@@ -123,7 +123,7 @@ class leavelog extends Controller
         $total_logs = DB::select('select * from eip_leave_apply', []);
         $total_pages = ceil(count($total_logs)/10);
 
-        return view('contents.leavelog', [
+        return view('contents.LeaveLog.leavelog', [
             'logs' => $logs, 
             'page' => $page,
             'total_pages' => $total_pages

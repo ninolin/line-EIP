@@ -33,9 +33,9 @@ Route::middleware('auth')->get('/work/setting/class', 'View\WorkSetting\workclas
 Route::middleware('auth')->get('/work/setting/title', 'View\WorkSetting\title@create')->name('ws_title');
 Route::middleware('auth')->get('/work/setting/leavetype', 'View\WorkSetting\leavetype@create')->name('ws_leavetype');
 Route::middleware('auth')->get('/work/setting/overworktype', 'View\WorkSetting\overworktype@create')->name('ws_overworktype');
-Route::middleware('auth')->get('/leavelog/dashboard', 'View\LeaveLog\dashboard@dashboard')->name('ws_title');
-Route::middleware('auth')->get('/leavelog/last', 'View\LeaveLog\last@last')->name('ws_leavetype');
-Route::middleware('auth')->get('/leavelog/individual', 'View\LeaveLog\individual@individual')->name('ws_overworktype');
+Route::middleware('auth')->get('/leavelog/last', 'View\LeaveLog\leavelog@show_last')->name('ll_last');
+Route::middleware('auth')->get('/leavelog/individual', 'View\LeaveLog\leavelog@show_individual')->name('ll_individual');
+
 Route::get('/calendar', function () {return view('contents.calendar');})->name('calendar');
 Route::get('/formmanage', function () {return view('contents.formmanage');})->name('formmanage');
 
