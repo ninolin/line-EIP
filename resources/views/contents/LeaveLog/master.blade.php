@@ -4,7 +4,7 @@
   <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
     <div class="navbar-nav">
       <a class="nav-link @if ($tab == 'last') active @endif" href="{{ route('ll_last') }}">最近30天紀錄</a>
-      <a class="nav-link @if ($tab == 'individual') active @endif" href="{{ route('ll_individual') }}">員工工時</a>
+      <a class="nav-link @if ($tab == 'individual') active @endif" href="{{ route('ll_individual') }}">員工紀錄</a>
     </div>
   </div>
 </nav>

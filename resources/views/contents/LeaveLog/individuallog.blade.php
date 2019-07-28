@@ -22,10 +22,12 @@
       </div>
     </div>
   </form>
-  <div class="row p-lg-3">
+  <div class="row p-lg-3" @if ($NO == 0) style="display:none" @endif>
     <table class="table table-bordered table-striped">
       <thead class="table-thead">
         <tr>
+          <th scope="col">員工</th>
+          <th scope="col">到職日:</th>
           @foreach($types as $type)
             <th scope="col">{{$type->name}} (小時/天)</th>
           @endforeach
@@ -33,14 +35,16 @@
       </thead>
       <tbody>
         <tr>
-        @foreach($types as $type)
-          <td> {{$type->hours}} /  {{$type->days}} </td>
-        @endforeach
+          <td scope="col">{{$cname}}</td>
+          <td scope="col">{{$onboard_date}}</td>
+          @foreach($types as $type)
+            <td> {{$type->hours}} /  {{$type->days}} </td>
+          @endforeach
         </tr>
       </tbody>
     </table>
   </div>
-  <div class="row p-lg-3">
+  <div class="row p-lg-3" @if ($NO == 0) style="display:none" @endif>
     <table class="table table-bordered table-striped">
       <thead class="table-thead">
         <tr>
@@ -108,6 +112,7 @@
       </tbody>
     </table>
   </div>
+  <div class="row p-lg-3" @if ($NO != 0 || $search == '') style="display:none" @endif>查無此用戶</div>
 </nav>
 </div>
 <!-- Modal -->

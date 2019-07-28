@@ -30,6 +30,12 @@ class leavelog extends Controller
         ]);
     }
 
+    /**
+     * 顯示最近工時紀錄
+     * @param  string  search
+     * @param  string  leave_year
+     * @return \Illuminate\Http\Response
+     */
     public function show_last()
     {
         $search = Input::get('search', '');
@@ -66,20 +72,28 @@ class leavelog extends Controller
         ]);
     }
 
+    /**
+     * 顯示員工紀錄頁面
+     * @param  string  search
+     * @param  string  leave_year
+     * @return \Illuminate\Http\Response
+     */
     public function show_individual() 
     {
         $search     = Input::get('search', '');
         $leave_year = Input::get('leave_year', date('Y'));
         $logs       = [];
         $types      = [];
-        $sql = 'select NO, onboard_date from user where username like "%'.$search.'%" or cname like "%'.$search.'%" or email like "%'.$search.'%" limit 1'; 
+        $NO = 0;
+        $onboard_date = "";
+        $cname = "";
+        $sql = 'select NO, cname, onboard_date from user where username like "%'.$search.'%" or cname like "%'.$search.'%" or email like "%'.$search.'%" limit 1'; 
         $users = DB::select($sql, []);
-        if(count($users) == 1 ) {
-            $NO = 0;
-            $onboard_date = "";
+        if(count($users) == 1 && $search != '') {
             foreach ($users as $v) {
                 $NO = $v->NO;
                 $onboard_date = $v->onboard_date;
+                $cname = $v->cname;
             }
             $sql  = 'select a.*, u2.cname as cname, u1.cname as agent_cname, eip_leave_type.name as leave_name ';
             $sql .= 'from ';
@@ -124,11 +138,14 @@ class leavelog extends Controller
         
         debug($types);
         return view('contents.LeaveLog.individuallog', [
-            'logs'      => $logs, 
-            'types'     => $types,
-            'leave_year'=> $leave_year,
-            'search'    => $search,
-            'tab'       => 'individual'
+            'NO'            => $NO, 
+            'cname'         => $cname,
+            'onboard_date'  => $onboard_date,
+            'logs'          => $logs, 
+            'types'         => $types,
+            'leave_year'    => $leave_year,
+            'search'        => $search,
+            'tab'           => 'individual'
         ]);
     }
 }

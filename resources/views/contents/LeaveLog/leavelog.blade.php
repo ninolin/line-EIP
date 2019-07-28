@@ -116,11 +116,11 @@
               <table class="table table-bordered table-striped">
                 <thead class="table-thead">
                   <tr>
-                      <th scope="col">簽核順位</th>
-                      <th scope="col">簽核人</th>
-                      <th scope="col">簽核狀態</th>
-                      <th scope="col">拒絕原因</th>
-                      <th scope="col">簽核時間</th>
+                      <th style="width: 13%">簽核順位</th>
+                      <th style="width: 29%">簽核人</th>
+                      <th style="width: 13%">簽核狀態</th>
+                      <th style="width: 20%">拒絕原因</th>
+                      <th style="width: 25%">簽核時間</th>
                   </tr>
                 </thead>
                 <tbody id="log_data">
@@ -145,7 +145,7 @@ const showDetailModal = async (apply_id) => {
         res.data.map( (item, index) => {
             let html = "<tr>";
             html += "<td>"+(index+1)+"</td>";
-            html += "<td>"+item.cname+"</td>";
+            html += "<td>"+item.cname+"<button type='button' style='float:right' class='btn btn-outline-success btn-sm' onclick='change_upper(this)'>更換</button></td>";
             if(item.is_validate === 1) {
                 html += "<td>同意</td>";
             } else if(item.is_validate === 0){
@@ -175,6 +175,18 @@ const get_apply_path = (apply_id) => {
         url: "../api/leavelog/"+apply_id, 
         method: "get"
     })
+}
+
+const get_all_user = () => {
+    return promise_call({
+        url: "../api/userlist", 
+        method: "get"
+    })
+}
+
+async function change_upper(that) {
+  const users_res = await get_all_user();
+  console.log(that);
 }
 </script>
 @endsection
