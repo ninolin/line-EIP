@@ -137,21 +137,59 @@
     </div>
   </div>
 </div>
+
+<div class="modal fade" id="changeModal" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-sm" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-leave">確認</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form>
+          <div class="container-fluid">
+            <div class="row form-group msg">aaa</div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary tocancel" data-dismiss="modal">取消</button>
+        <button type="button" class="btn btn-primary todo">確認</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script>
 const showDetailModal = async (apply_id) => {
+    const users_res = await get_all_user();
+    let all_users = [];
+    if(users_res.status == "successful") {
+      all_users = users_res.data.map(item => {
+        item.id = item.NO;
+        item.text = item.cname;
+        return item;
+      })
+    }
+    
     const res = await get_apply_path(apply_id);
     if(res.status == "successful") {
         if(res.data.length > 0) $("#log_data").html("");
         res.data.map( (item, index) => {
             let html = "<tr>";
             html += "<td>"+(index+1)+"</td>";
-            html += "<td>"+item.cname+"<button type='button' style='float:right' class='btn btn-outline-success btn-sm' onclick='change_upper(this)'>更換</button></td>";
+            //html += "<td><select id='upper_user_select_"+item.id+"'></select></td>";
             if(item.is_validate === 1) {
+                html += "<td>"+item.cname+"</td>";
                 html += "<td>同意</td>";
             } else if(item.is_validate === 0){
+                html += "<td>"+item.cname+"</td>";
                 html += "<td>拒絕</td>";
             } else {
-                html += "<td>未簽核</td>";
+                html += "<td><select id='upper_user_select_"+item.id+"' onchange='confirm_change_upper_user("+item.id+", "+item.upper_user_no+", \""+item.cname+"\")'></select></td>";
+                html += "<td>待簽核</td>";
             }
             if(item.reject_reason) {
                 html += "<td>"+item.reject_reason+"</td>";
@@ -165,6 +203,13 @@ const showDetailModal = async (apply_id) => {
             }
             html += "</tr>";
             $("#log_data").append(html);
+            $("#upper_user_select_"+item.id).select2({
+                dropdownParent: $("#logModal"),
+                data: all_users,
+                dropdownAutoWidth : false,
+                width: '100%'
+            })
+            $("#upper_user_select_"+item.id).val(item.upper_user_no).trigger("change");
         })
         $('#logModal').modal('toggle');
     }
@@ -184,9 +229,28 @@ const get_all_user = () => {
     })
 }
 
-async function change_upper(that) {
-  const users_res = await get_all_user();
-  console.log(that);
+const confirm_change_upper_user = (apply_process_id, old_upper_user_no, old_upper_user_cname) => {
+  //因為用select2要先trigger change一次，所以這邊會要檢查新的簽核人是否跟舊的簽核人不同人，才會去執行換簽核人的程式
+  if(old_upper_user_no != $("#upper_user_select_"+apply_process_id).val()) {
+    const new_cname = $("#upper_user_select_"+apply_process_id).select2('data')[0].cname;
+    $('#changeModal').modal('toggle');
+    $('#changeModal').find('.msg').html("確定要將簽核人從 "+old_upper_user_cname+" 換成 "+new_cname+" 嗎?");
+    $('#changeModal').css('z-index', '1060');
+    $($('.modal-backdrop')[1]).css('z-index', '1051');
+
+    $("#changeModal").find(".todo").attr("onclick", "change_upper_user('"+apply_process_id+"')");
+    $("#changeModal").find(".tocancel").attr("onclick", "cancel_change_upper_user('"+apply_process_id+"', '"+old_upper_user_no+"')");
+  }
 }
+
+const cancel_change_upper_user = (apply_process_id, old_upper_user_no) => {
+  $("#upper_user_select_"+apply_process_id).val(old_upper_user_no).trigger("change");
+  $('#changeModal').modal('toggle');
+}
+
+const change_upper_user = (apply_process_id) => {
+  console.log(apply_process_id, $("#upper_user_select_"+apply_process_id).val());
+}
+
 </script>
 @endsection
