@@ -117,11 +117,14 @@ class leavelog extends Controller
                     $logs[$key]->start_date = $start_date;
                     $logs[$key]->end_date = $end_date;
                 }
-                foreach($types as $tkey => $tvalue) {
-                    if($tvalue->name == $value->leave_name) {
-                        $types[$tkey]->hours = $types[$tkey]->hours + $value->leave_hours;
+                if($value->apply_type == 'L' && $value->apply_status == 'Y') {
+                    foreach($types as $tkey => $tvalue) {
+                        if($tvalue->name == $value->leave_name) {
+                            $types[$tkey]->hours = $types[$tkey]->hours + $value->leave_hours;
+                        }
                     }
                 }
+                
             }
             
             foreach($types as $v) {
@@ -147,5 +150,21 @@ class leavelog extends Controller
             'search'        => $search,
             'tab'           => 'individual'
         ]);
+    }
+
+    public function change_upper_user(Request $request)
+    {
+        $apply_process_id = $request->get('apply_process_id');
+        $user_NO = $request->get('user_NO');
+        if(DB::update("update eip_leave_apply_process set upper_user_no =? where id =?", [$user_NO, $apply_process_id]) == 1) {
+            return response()->json([
+                'status' => 'successful'
+            ]);
+        } else {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'update error'
+            ], 500);
+        }
     }
 }

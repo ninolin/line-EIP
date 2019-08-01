@@ -53,6 +53,13 @@ class individuallog extends Controller
     {
         try {
             $apply_id = $id;   
+            $sql  = 'select event_id from eip_leave_apply where apply_status =? and id =?';
+            $leaves = DB::select($sql, ['Y', $apply_id]);
+            if(count($leaves) > 0) {
+                foreach($leaves as $l) {
+                    self::delete_event2gcalendar($l->event_id);
+                }
+            }
             if(DB::update("update eip_leave_apply set apply_status =? where id =?", ['C', $apply_id]) != 1) {
                 return response()->json([
                     'status' => 'error',
@@ -68,6 +75,28 @@ class individuallog extends Controller
                 'status' => 'error',
                 'message' => $e->getMessage()
             ]);
+        }
+    }
+
+    /**
+     * google calendar刪除
+     *
+     * @param  string  $event_id
+     * @return int
+     */
+    static protected function delete_event2gcalendar($event_id) {
+        $gcalendar_appscript_uri = Config::get('eip.gcalendar_appscript_uri');
+        log::info($gcalendar_appscript_uri);
+        $json_str = '{
+            "type": "delete", 
+            "eventId": "'.$event_id.'"
+        }';
+        log::info($json_str);
+        $calevents_str = HelperServiceProvider::post_req($gcalendar_appscript_uri, $json_str);
+        if(strpos($calevents_str,'Exception') !== false){ 
+            return 0;
+        }else{
+            return 1;
         }
     }
 }

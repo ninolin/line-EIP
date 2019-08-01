@@ -249,7 +249,24 @@ const cancel_change_upper_user = (apply_process_id, old_upper_user_no) => {
 }
 
 const change_upper_user = (apply_process_id) => {
-  console.log(apply_process_id, $("#upper_user_select_"+apply_process_id).val());
+  const user_NO = $("#upper_user_select_"+apply_process_id).val();
+  promise_call({
+    url: "../api/leavelog/change_upper_user", 
+    data: {
+      "apply_process_id": apply_process_id,
+      "user_NO":user_NO
+    }, 
+    method: "put"
+  })
+  .then(v => {
+      if(v.status == "successful") {
+        $("#upper_user_select_"+apply_process_id).val(user_NO).trigger("change");
+        $('#changeModal').modal('toggle');
+      } else {
+        alert(v.message);
+      }
+  })
+  //console.log(apply_process_id, $("#upper_user_select_"+apply_process_id).val());
 }
 
 </script>

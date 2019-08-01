@@ -97,7 +97,7 @@ class validateleave extends Controller
             $apply_data = json_decode(LeaveApplyProvider::getLeaveApply($apply_id));
             if(is_null($apply_data)) { throw new Exception('The line_id is not exist in the EIP');  }
             if($reject_reason == "null") {$reject_reason = null;}
-            if(DB::update("update eip_leave_apply_process set is_validate =?, reject_reason =? where id =?", [$is_validate, $reject_reason, $process_id]) != 1) {
+            if(DB::update("update eip_leave_apply_process set is_validate =?, reject_reason =?, validate_time = now() where id =?", [$is_validate, $reject_reason, $process_id]) != 1) {
                 return response()->json([
                     'status' => 'error',
                     'message' => 'update error'
@@ -132,8 +132,9 @@ class validateleave extends Controller
                 log::info($process_id);
                 if($last_approved_id == $process_id) {
                     //全部審核完了
-                    if(DB::update("update eip_leave_apply set apply_status =? where id =?", ['Y', $apply_id]) == 1) {
-                        self::insert_event2gcalendar($apply_data->start_date, $apply_data->end_date, $apply_data->apply_user_cname."的".$apply_data->leave_name);
+                    $insert_event = self::insert_event2gcalendar($apply_data->start_date, $apply_data->end_date, $apply_data->apply_user_cname."的".$apply_data->leave_name);
+                    if($insert_event == 0){ throw new Exception('Insert to google calendar failed!');  }
+                    if(DB::update("update eip_leave_apply set apply_status =?, event_id =? where id =?", ['Y', $insert_event, $apply_id]) == 1) {
                         if($apply_data->apply_type == 'L') {
                             LineServiceProvider::sendNotifyFlexMeg($apply_data->apply_user_line_id, array_merge(["請假已通過","假別::".$apply_data->leave_name,"起日::".$apply_data->start_date,"迄日::".$apply_data->end_date,"備註::". $apply_data->comment]));
                         } else {
@@ -184,6 +185,7 @@ class validateleave extends Controller
     /**
      * 請假寫入google calendar
      *
+     * @param  string  type
      * @param  string  $start_date
      * @param  string  $end_date
      * @param  string  $title
@@ -193,6 +195,7 @@ class validateleave extends Controller
         $gcalendar_appscript_uri = Config::get('eip.gcalendar_appscript_uri');
         log::info($gcalendar_appscript_uri);
         $json_str = '{
+            "type": "insert", 
             "title": "'.$title.'", 
             "start": "'.$start_date.':00",
             "end": "'.$end_date.':00"
