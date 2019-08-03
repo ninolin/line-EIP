@@ -21,26 +21,27 @@ class validateleave extends Controller
      */
     public function index($id)
     {
-        // $sql  = 'select a.*, u2.cname as cname, u1.cname as agent_cname, eip_leave_type.name as leave_name ';
-        // $sql .= 'from ';
-        // $sql .= '(select * from eip_leave_apply where id IN (  ';
-        // $sql .= '   select apply_id ';
-        // $sql .= '   from eip_leave_apply_process ';
-        // $sql .= '   where is_validate IS NULL and upper_user_no IN ';
-        // $sql .= '   (select NO from user where line_id =?)) ';
-        // $sql .= ') as a ';
-        // $sql .= 'left join user as u1 ';
-        // $sql .= 'on a.agent_user_no = u1.NO ';
-        // $sql .= 'left join eip_leave_type ';
-        // $sql .= 'on a.leave_type = eip_leave_type.id ';
-        // $sql .= 'left join user as u2 ';
-        // $sql .= 'on a.apply_user_no = u2.NO ';
-        
+        $leaves = [];
+        $applies = [];
+        $NO = 0;
+        $sql = 'select NO from user where line_id = ?';
+        $users = DB::select($sql, [$id]);
+        if(count($users) == 0) {
+            return response()->json([
+                'status' => 'successful',
+                'data' => []
+            ]);
+        } else {
+            foreach ($users as $u) {
+                $NO = $u -> NO;
+            }
+        }
+
         $sql  = 'select a.*, u2.cname as cname, u1.cname as agent_cname, eip_leave_type.name as leave_name ';
         $sql .= 'from ';
         $sql .= '(  select a.id as process_id, b.* ';
         $sql .= '   from eip_leave_apply_process a, eip_leave_apply b ';
-        $sql .= '   where b.apply_status != "C" and a.apply_id = b.id and a.is_validate IS NULL and a.upper_user_no IN ';
+        $sql .= '   where b.apply_status = "P" and a.apply_id = b.id and a.is_validate IS NULL and a.upper_user_no IN ';
         $sql .= '   (select NO from user where line_id =?)';
         $sql .= ') as a ';
         $sql .= 'left join user as u1 ';
@@ -48,12 +49,23 @@ class validateleave extends Controller
         $sql .= 'left join eip_leave_type ';
         $sql .= 'on a.leave_type = eip_leave_type.id ';
         $sql .= 'left join user as u2 on a.apply_user_no = u2.NO';
-        debug($sql);
         $leaves = DB::select($sql, [$id]);
-        debug($leaves);
+        $new_leaves = [];
+        foreach ($leaves as $l) {
+            //去檢查這個no是不是這張假單的下一個簽核人
+            $sql = 'select upper_user_no from eip_leave_apply_process ';
+            $sql .='where apply_id = ? and is_validate IS NULL order by id limit 1 ';
+            $next_upper_users = DB::select($sql, [$l->id]);
+            foreach ($next_upper_users as $n) {
+                $upper_user_no = $n -> upper_user_no;
+                if($upper_user_no == $NO) {
+                    array_push($new_leaves, $l);
+                }
+            }
+        }
         return response()->json([
             'status' => 'successful',
-            'data' => $leaves
+            'data' => $new_leaves
         ]);
     }
 
