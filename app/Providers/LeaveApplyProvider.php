@@ -31,7 +31,7 @@ class LeaveApplyProvider extends ServiceProvider
     //取得apply單的資料
     public static function getLeaveApply($apply_id)
     {
-        $sql  = 'select a.*, u2.cname as apply_user_cname, u2.line_id as apply_user_line_id, u1.cname as agent_cname, eip_leave_type.name as leave_name ';
+        $sql  = 'select a.*, u2.cname as apply_user_cname, u2.line_id as apply_user_line_id, u1.cname as agent_cname, u1.line_id as agent_user_line_id, eip_leave_type.name as leave_name ';
         $sql .= 'from ';
         $sql .= '(select * from eip_leave_apply where id = ?) as a ';
         $sql .= 'left join user as u1 '; //u1是agent user

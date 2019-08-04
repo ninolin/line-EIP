@@ -34,7 +34,15 @@
             <td> {{$log->cname}} </td>
             <td> 
               @if ($log->apply_type == 'L') 
-                {{$log->agent_cname}}
+                <select class="blade_select2" id='agent_user_select_{{$log->id}}' onchange='confirm_change_agent_user({{$log->id}},{{$log->agent_user_no}},"{{$log->agent_cname}}")'>
+                  @foreach($agents as $a)
+                    @if ($a->cname == $log->agent_cname) 
+                      <option value='{{$a->NO}}' selected> {{$a->cname}}</option>
+                    @else
+                      <option value='{{$a->NO}}'> {{$a->cname}}</option>
+                    @endif
+                  @endforeach
+                </select>
               @else
                 -
               @endif
@@ -268,6 +276,45 @@ const change_upper_user = (apply_process_id) => {
   })
   //console.log(apply_process_id, $("#upper_user_select_"+apply_process_id).val());
 }
+
+const confirm_change_agent_user = (apply_id, old_agent_user_no, old_agent_user_cname) => {
+  const new_cname = $("#agent_user_select_"+apply_id).select2('data')[0].text;
+  $('#changeModal').modal('toggle');
+  $('#changeModal').find('.msg').html("確定要將簽核人從 "+old_agent_user_cname+" 換成 "+new_cname+" 嗎?");
+  $("#changeModal").find(".todo").attr("onclick", "change_agent_user('"+apply_id+"', '"+old_agent_user_no+"')");
+  $("#changeModal").find(".tocancel").attr("onclick", "cancel_change_agent_user('"+apply_id+"', '"+old_agent_user_no+"')");
+}
+
+const cancel_change_agent_user = (apply_id, old_agent_user_no) => {
+  $("#agent_user_select_"+apply_id).val(old_agent_user_no).trigger("change");
+  $('#changeModal').modal('toggle');
+}
+
+const change_agent_user = (apply_id, old_agent_user_no) => {
+  const user_NO = $("#agent_user_select_"+apply_id).val();
+  promise_call({
+    url: "../api/leavelog/change_agent_user", 
+    data: {
+      "apply_id": apply_id,
+      "user_NO":user_NO
+    }, 
+    method: "put"
+  })
+  .then(v => {
+      if(v.status == "successful") {
+        $("#agent_user_select_"+apply_id).val(user_NO).trigger("change");
+        $('#changeModal').modal('toggle');
+      } else {
+        $("#agent_user_select_"+apply_id).val(old_agent_user_no).trigger("change");
+        $('#changeModal').modal('toggle');
+        alert(v.message);
+      }
+  })
+}
+
+window.onload = function() {
+  $('.blade_select2').select2();
+};
 
 </script>
 @endsection
