@@ -188,7 +188,7 @@ class leavelog extends Controller
 
         $old_agent_user_line_id = $v->agent_user_line_id;
         $sql  = "select start_date from eip_leave_apply where ";
-        $sql .= "apply_user_no = ? and start_date <= ? and end_date >= ?";
+        $sql .= "apply_user_no = ? and start_date <= ? and end_date >= ? and apply_type = 'L' and apply_status IN ('P', 'Y')";
         $overlap = DB::select($sql, [$user_NO, $v->start_date, $v->start_date]);
         if(count($overlap) > 0) { 
             return response()->json([
