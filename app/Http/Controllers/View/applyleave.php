@@ -69,6 +69,25 @@ class applyleave extends Controller
             $comment = $request->input('comment');                    //備註
             if($comment == "") $comment = "-";
 
+            $sql  = "select start_date from eip_leave_apply where ";
+            $sql .= "apply_user_no = ? and start_date <= ? and end_date >= ? and apply_type = 'L' and apply_status IN ('P', 'Y')";
+            $overlap = DB::select($sql, [$leave_agent_user_no, $request->get('startDate'), $request->get('startDate')]);
+            if(count($overlap) > 0) { 
+                return response()->json([
+                    'status' => 'error',
+                    'message' => '失敗:代理人在該假單請假時間中也正在請假'
+                ], 500);
+            }
+
+            $sql  = "select start_date from eip_leave_apply where agent_user_no IN (select NO from user where line_id = ?) ";
+            $sql .= "and start_date <= ? and end_date >= ? and apply_type = 'L' and apply_status IN ('P', 'Y')";
+            $overlap = DB::select($sql, [$apply_user_line_id, $request->get('startDate'), $request->get('startDate')]);
+            if(count($overlap) > 0) { 
+                return response()->json([
+                    'status' => 'error',
+                    'message' => '失敗:請假時間中正在擔任代理人'
+                ], 500);
+            }
             //取得假別的id
             $leave_days = count(self::dates2array($start_date, $end_date));
             $leave_type_arr = DB::select('select * from eip_leave_type where name =? order by day ASC', [$leavename]);
