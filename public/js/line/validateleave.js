@@ -1,15 +1,15 @@
 window.onload = function (e) {
-    // liff.init(function (data) {
-    //     initializeApp(data);
-    // });
-    initializeApp({})
+    liff.init(function (data) {
+        initializeApp(data);
+    });
+    //initializeApp({})
 };
 
 function initializeApp(data) {
-    //document.getElementById('useridfield').textContent = data.context.userId;
+    document.getElementById('useridfield').textContent = data.context.userId;
     promise_call({
-        //url: "./api/validateleave/"+data.context.userId, 
-        url: "./api/validateleave/U8d41dfb18097f57080858e39b929ce39", 
+        url: "./api/validateleave/"+data.context.userId, 
+        //url: "./api/validateleave/Ub298f6326d10027ebdd996a57b731f89", 
         method: "get"
     })
     .then(v => {
@@ -62,10 +62,13 @@ function initializeApp(data) {
                     $html += '        <span class="weui-form-preview__value">'+item.comment+'</span>';
                     $html += '    </div>';
                 }
-                $html += '<div class="weui-form-preview__ft">';
-                $html += '  <button type="button" class="weui-form-preview__btn weui-form-preview__btn_primary" onclick="validate_leave('+item.process_id+', '+item.id+', \''+item.apply_type+'\', 1)"><i class="weui-icon-success"></i>同意</button>';
-                $html += '  <button type="button" class="weui-form-preview__btn weui-form-preview__btn_primary" onclick="show_reject_dialog('+item.process_id+', '+item.id+', \''+item.apply_type+'\', \''+item.cname+'\', \''+item.leave_name+'\')"><i class="weui-icon-cancel"></i>拒絕</button>';
-                $html += '</div>';
+                $html += '  <ul class="weui-media-box__info" style="color:#576B95">';
+                $html += '      <li class="weui-media-box__info__meta" onclick="show_other_leaves('+item.apply_user_no+')">申請人其它請假</li>';
+                $html += '  </ul>';
+                $html += '  <div class="weui-form-preview__ft">';
+                $html += '      <button type="button" class="weui-form-preview__btn weui-form-preview__btn_primary" onclick="validate_leave('+item.process_id+', '+item.id+', \''+item.apply_type+'\', 1)"><i class="weui-icon-success"></i>同意</button>';
+                $html += '      <button type="button" class="weui-form-preview__btn weui-form-preview__btn_primary" onclick="show_reject_dialog('+item.process_id+', '+item.id+', \''+item.apply_type+'\', \''+item.cname+'\', \''+item.leave_name+'\')"><i class="weui-icon-cancel"></i>拒絕</button>';
+                $html += '  </div>';
                 $html += '</div>';
                 $html += '</div>';
                 $("#leave_data").append($html);
@@ -124,8 +127,8 @@ const show_reject_dialog = (process_id, apply_id, apply_type, cname, leave_name)
 const validate_leave = (process_id, apply_id, apply_type, is_validate) => {
 
     const post_data = {
-        //"userId": document.getElementById('useridfield').textContent,
-        "userId": "U8d41dfb18097f57080858e39b929ce39", 
+        "userId": document.getElementById('useridfield').textContent,
+        //"userId": "U8d41dfb18097f57080858e39b929ce39", 
         "is_validate": is_validate, // 0=reject or 1=agree
         "apply_type": apply_type,   //L or O
         "process_id": process_id    //apply_process_id
@@ -149,6 +152,34 @@ const validate_leave = (process_id, apply_id, apply_type, is_validate) => {
             $("#apply_"+apply_id).hide();
             setTimeout('$("#toast").hide();',1000);
             //liff.closeWindow();
+        } 
+    })
+}
+
+const show_other_leaves = (apply_user_no) => {
+    promise_call({
+        url: "./api/validateleave/show_other_leaves/"+apply_user_no, 
+        method: "get"
+    })
+    .then(v => {
+        if(v.status == "successful") {
+            if(v.data.length > 0) $("#other_leaves").find(".weui-dialog__bd").html("");
+            $html = "<table style='width: 100%;'><tr><th>起</th><th>迄</th><th>假別</th><th>狀態</th></tr>";
+            v.data.map(item => {
+                $html += "<tr>";
+                $html += "<td>"+item.start_date+"</td>";
+                $html += "<td>"+item.end_date+"</td>";
+                $html += "<td>"+item.leave_name+"</td>";
+                if(item.apply_status == 'Y') {
+                    $html += "<td>已通過</td>";
+                } else {
+                    $html += "<td>簽核中</td>";
+                }
+                $html += "</tr>";
+            });
+            $html +="</table>"
+            $("#other_leaves").find(".weui-dialog__bd").html($html);
+            $("#other_leaves").show();
         } 
     })
 }

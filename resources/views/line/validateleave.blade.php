@@ -23,6 +23,16 @@
                 <div id="result"></div>
             </div>
         </div>
+        <div style="display: none;" id="other_leaves">
+            <div class="weui-mask"></div>
+            <div class="weui-dialog">
+                <div class="weui-dialog__hd"><strong class="weui-dialog__title">申請人其它請假</strong></div>
+                <div class="weui-dialog__bd"></div>
+                <div class="weui-dialog__ft">
+                    <a onclick="javascript:$('#other_leaves').hide();" href="javascript:;" class="weui-dialog__btn weui-dialog__btn_primary">確定</a>
+                </div>
+            </div>
+        </div>
     </body>
     <!-- Reject Dialog -->
     <div id="reject_dialog" style="display: none;">

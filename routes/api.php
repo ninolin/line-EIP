@@ -44,6 +44,7 @@ Route::get('applyoverwork/{id}', 'View\applyoverwork@show');
 Route::post('receive', 'Line\Receive@receive');
 Route::get('validateleave/{id}', 'View\validateleave@index');
 Route::put('validateleave/{id}', 'View\validateleave@update');
+Route::get('validateleave/show_other_leaves/{id}', 'View\validateleave@show_other_leaves');
 
 Route::get('individuallog/{id}', 'View\individuallog@index');
 Route::put('individuallog/{id}', 'View\individuallog@cancel');

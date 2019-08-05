@@ -194,6 +194,20 @@ class validateleave extends Controller
         }
     }
 
+    public function show_other_leaves($id)
+    {
+        $apply_user_no = $id;
+        $sql  = "select ela.*, elt.name as leave_name ";
+        $sql .= "from eip_leave_apply ela, eip_leave_type elt ";
+        $sql .= "where ela.apply_user_no =? and ";
+        $sql .= "ela.apply_type = 'L' and ela.apply_status IN ('Y','P') and ";
+        $sql .= "ela.start_date >= now() and ela.leave_type = elt.id";
+        $leaves = DB::select($sql, [$apply_user_no]);
+        return response()->json([
+            'status' => 'successful',
+            'data' => $leaves
+        ]);
+    }
     /**
      * 請假寫入google calendar
      *
