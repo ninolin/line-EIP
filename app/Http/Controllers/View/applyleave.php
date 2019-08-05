@@ -31,7 +31,6 @@ class applyleave extends Controller
      */
     public function create()
     {
-        
         //因為有同一種假但不同天數的假別，所以做distinct name，之後新增假時，再判斷是用那一種假別的id
         $sql  ='select distinct elt.name, et.name as title_name, et.id as title_id ';
         $sql .='from eip_leave_type elt, eip_title et ';
@@ -68,7 +67,8 @@ class applyleave extends Controller
             $end_time = explode("T",$request->get('endDate'))[1];     //迄時
             $comment = $request->input('comment');                    //備註
             if($comment == "") $comment = "-";
-
+            $diff_min = floor((strtotime($end_date." ".$end_time)-strtotime($start_date." ".$start_time))%86400/60); //相差分鐘
+            //檢查請假合理性
             $sql  = "select start_date from eip_leave_apply where ";
             $sql .= "apply_user_no = ? and start_date <= ? and end_date >= ? and apply_type = 'L' and apply_status IN ('P', 'Y')";
             $overlap = DB::select($sql, [$leave_agent_user_no, $request->get('startDate'), $request->get('startDate')]);
@@ -92,6 +92,7 @@ class applyleave extends Controller
             $leave_days = count(self::dates2array($start_date, $end_date));
             $leave_type_arr = DB::select('select * from eip_leave_type where name =? order by day ASC', [$leavename]);
             $leave_type_id = "";
+            $leave_min_time = 30;
             $leave_approved_title_id = "";
             $i = 0;
             foreach ($leave_type_arr as $v) {
@@ -99,14 +100,24 @@ class applyleave extends Controller
                 if($leave_days < $v->day) {
                     $leave_type_id = $v->id;
                     $leave_approved_title_id = $v->approved_title_id;
+                    $leave_min_time = $v->min_time;
                     break;
                 }
                 if($leave_type_id == "" && count($leave_type_arr) == $i){
                     $leave_type_id = $v->id;
                     $leave_approved_title_id = $v->approved_title_id;
+                    $leave_min_time = $v->min_time;
                     break;
                 }
             }
+
+            if((int)$diff_min <= (int)$leave_min_time) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => '失敗:最小請假時間為'.$leave_min_time."分鐘"
+                ], 500);
+            }
+
             //取得申請人的基本資料
             $sql = 'select u.NO, u.cname, ewc.* from user as u LEFT JOIN eip_work_class as ewc on u.work_class_id = ewc.id WHERE u.line_id = ?';
             $users = DB::select($sql, [$apply_user_line_id]);

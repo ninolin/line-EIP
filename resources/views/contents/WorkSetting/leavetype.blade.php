@@ -16,6 +16,7 @@
         <tr>
           <th scope="col">假別</th>
           <th scope="col">天數</th>
+          <th scope="col">最小請假分鐘</th>
           <th scope="col">簽核職等</th>
           <th scope="col" class="w-25">操作</th>
         </tr>
@@ -30,9 +31,10 @@
             <tr>
               <td> {{$type->name}} </td>
               <td> {{$type->day}} </td>
+              <td> {{$type->min_time}} 分鐘</td>
               <td> {{$type->title_name}} </td>
               <td>  
-                <button type="button" class="btn btn-outline-primary btn-sm" onclick="showLeaveModal('update', '{{$type->id}}', '{{$type->name}}', '{{$type->day}}', '{{$type->title_id}}')">修改</button>
+                <button type="button" class="btn btn-outline-primary btn-sm" onclick="showLeaveModal('update', '{{$type->id}}', '{{$type->name}}', '{{$type->day}}', '{{$type->title_id}}', '{{$type->min_time}}')">修改</button>
                 <button type="button" class="btn btn-outline-danger btn-sm" onclick="showDeleteModal('{{$type->id}}', '{{$type->name}}', '{{$type->day}}')">刪除</button>
               </td>
             </tr>
@@ -82,6 +84,17 @@
               <input type="text" class="form-control w-75 leave-day">
             </div>
             <div class="row form-group">
+              <label for="leave-day" class="col-form-label w-25">請假單位:</label>
+              <select class="form-control w-75 leave-min-time" id="sel1">
+                <option value="30">30分鐘</option>
+                <option value="60">60分鐘</option>
+                <option value="90">90分鐘</option>
+                <option value="120">120分鐘</option>
+                <option value="150">150分鐘</option>
+                <option value="180">180分鐘</option>
+              </select>
+            </div>
+            <div class="row form-group">
               <label for="title-name" class="col-form-label w-25">簽核職等:</label>
               <div class="col-form-label w-75">
                 <select id="title_set_select" class="form-control-lg"></select>
@@ -123,7 +136,7 @@
 </div>
 
 <script>
-  const showLeaveModal = async (type, leave_id, leave_name, leave_day, title_id) => {
+  const showLeaveModal = async (type, leave_id, leave_name, leave_day, title_id, min_time) => {
     const titles_res = await get_all_title();
     if(titles_res.status == "successful") {
         const all_titles = titles_res.data.map(item => {
@@ -146,6 +159,7 @@
             $("#leaveModal").find(".modal-header h5").html("修改假別");
             $("#leaveModal").find(".leave-name").val(leave_name);
             $("#leaveModal").find(".leave-day").val(leave_day);
+            $("#leaveModal").find(".leave-min-time").val(min_time);
             $("#title_set_select").val(title_id).trigger("change");
             $("#leaveModal").find(".todo").attr("onclick", "update_leave('"+leave_id+"')").html("修改");
             $('#leaveModal').modal('toggle');
@@ -168,6 +182,7 @@
           data: {
               "name": $("#leaveModal").find(".leave-name").val(),
               "day": $("#leaveModal").find(".leave-day").val(),
+              "min_time": $("#leaveModal").find(".leave-min-time").val(),
               "approved_title_id": parseInt($("#title_set_select").val())
           }, 
           method: "post"
@@ -187,6 +202,7 @@
           data: {
               "name": $("#leaveModal").find(".leave-name").val(),
               "day": $("#leaveModal").find(".leave-day").val(),
+              "min_time": $("#leaveModal").find(".leave-min-time").val(),
               "approved_title_id": parseInt($("#title_set_select").val())
           }, 
           method: "put"
