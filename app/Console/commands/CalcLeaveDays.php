@@ -68,17 +68,7 @@ class CalcLeaveDays extends Command
             }
             $this_y_leave = $this->leave_days[$diff_y-1] - (($onboard_m-1) + ($onboard_d-1)/$this->month_days[(int)$today_m])/12 * $this->leave_days[$diff_y-1];
             $leave_day = $last_y_leave + $this_y_leave;
-            
         }
-
-        $log_file_path = storage_path('test_CalcLeaveDays.log');
-        $log_info = [
-            'date'=>date('Y-m-d H:i:s'),
-            'leave_day'=>$leave_day
-        ];
-        $log_info_json = json_encode($log_info) . "\r\n";
-        File::append($log_file_path, $log_info_json);
-        
         return round($leave_day, 1);
     }
 }

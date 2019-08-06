@@ -47,15 +47,17 @@ class leavetype extends Controller
     public function store(Request $request)
     {
         //debug( $request->get('name'));
-        $name = $request->get('name');
-        $day = $request->get('day');
-        $min_time = $request->get('min_time');
-        $approved_title_id = $request->get('approved_title_id');
+        $name           = $request->get('name');
+        $day            = $request->get('day');
+        $compensatory   = $request->get('compensatory');
+        $min_time       = $request->get('min_time');
+        $approved_title_id  = $request->get('approved_title_id');
         //檢查參數格式是否正確
         $validator = Validator::make($request->all(), [
-            'name'      => 'required|string|max:32',
-            'day'       => 'required|integer',
-            'min_time'  => 'required|integer',
+            'name'          => 'required|string|max:32',
+            'day'           => 'required|integer',
+            'compensatory'  => 'required|boolean',
+            'min_time'      => 'required|integer',
             'approved_title_id' => 'required|integer'
         ]);
         if ($validator->fails()) {
@@ -73,7 +75,7 @@ class leavetype extends Controller
             ], 409);
         }
 
-        if(DB::insert("insert into eip_leave_type (name, day, min_time, approved_title_id) values (?, ?, ?, ?)", [$name, $day, $min_time, $approved_title_id]) == 1) {
+        if(DB::insert("insert into eip_leave_type (name, day, min_time, compensatory, approved_title_id) values (?, ?, ?, ?, ?)", [$name, $day, $min_time, $compensatory, $approved_title_id]) == 1) {
             return response()->json([
                 'status' => 'successful'
             ]);
@@ -116,15 +118,17 @@ class leavetype extends Controller
      */
     public function update(Request $request, $id)
     {
-        $name       = $request->get('name');
-        $day        = $request->get('day');
-        $min_time   = $request->get('min_time');
-        $approved_title_id = $request->get('approved_title_id');
+        $name           = $request->get('name');
+        $day            = $request->get('day');
+        $compensatory   = $request->get('compensatory');
+        $min_time       = $request->get('min_time');
+        $approved_title_id  = $request->get('approved_title_id');
         //檢查參數格式是否正確
         $validator = Validator::make($request->all(), [
-            'name'      => 'required|string|max:32',
-            'day'       => 'required|integer',
-            'min_time'  => 'required|integer',
+            'name'          => 'required|string|max:32',
+            'day'           => 'required|integer',
+            'compensatory'  => 'required|boolean',
+            'min_time'      => 'required|integer',
             'approved_title_id' => 'required|integer'
         ]);
         if ($validator->fails()) {
@@ -142,7 +146,7 @@ class leavetype extends Controller
             ], 409);
         }
 
-        if(DB::update("update eip_leave_type set name =?, day =?, min_time =?, approved_title_id =? where id =?", [$name, $day, $min_time, $approved_title_id, $id]) == 1) {
+        if(DB::update("update eip_leave_type set name =?, day =?, min_time =?, compensatory =?, approved_title_id =? where id =?", [$name, $day, $min_time, $compensatory, $approved_title_id, $id]) == 1) {
             return response()->json([
                 'status' => 'successful'
             ]);
