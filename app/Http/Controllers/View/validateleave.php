@@ -125,6 +125,10 @@ class validateleave extends Controller
                     ]);
                 } else {
                     if($apply_data->apply_type == 'L') {
+                        if($apply_data->leave_compensatory == 1) {
+                            //拒絕加班補休要把用那天加班來補的紀錄刪掉
+                            DB::delete("delete from eip_compensatory_relationship where leave_apply_id = ?", [$apply_id]);
+                        }
                         LineServiceProvider::sendNotifyFlexMeg($apply_data->apply_user_line_id, array_merge(["請假不通過","原因::".$reject_reason,"假別::".$apply_data->leave_name,"起日::".$apply_data->start_date,"迄日::".$apply_data->end_date,"備註::". $apply_data->comment]));
                     } else {
                         LineServiceProvider::sendNotifyFlexMeg($apply_data->apply_user_line_id, array_merge(["加班不通過","原因::".$reject_reason,"加班日::".$apply_data->over_work_date,"加班小時::".$apply_data->over_work_hours,"備註::". $apply_data->comment]));
@@ -148,6 +152,10 @@ class validateleave extends Controller
                     if($insert_event == 0){ throw new Exception('Insert to google calendar failed!');  }
                     if(DB::update("update eip_leave_apply set apply_status =?, event_id =? where id =?", ['Y', $insert_event, $apply_id]) == 1) {
                         if($apply_data->apply_type == 'L') {
+                            //如果是加班補休，要從補休中扣
+                            if($apply_data->leave_compensatory == 1) {
+                                self::use_compensatory_leave($apply_data);
+                            }
                             LineServiceProvider::sendNotifyFlexMeg($apply_data->apply_user_line_id, array_merge(["請假已通過","假別::".$apply_data->leave_name,"起日::".$apply_data->start_date,"迄日::".$apply_data->end_date,"備註::". $apply_data->comment]));
                         } else {
                             LineServiceProvider::sendNotifyFlexMeg($apply_data->apply_user_line_id, array_merge(["加班已通過","加班日::".$apply_data->over_work_date,"加班小時::".$apply_data->over_work_hours,"備註::". $apply_data->comment]));
@@ -217,7 +225,8 @@ class validateleave extends Controller
      * @param  string  $title
      * @return int
      */
-    static protected function insert_event2gcalendar($start_date, $end_date, $title) {
+    static protected function insert_event2gcalendar($start_date, $end_date, $title) 
+    {
         $gcalendar_appscript_uri = Config::get('eip.gcalendar_appscript_uri');
         log::info($gcalendar_appscript_uri);
         $json_str = '{
@@ -233,5 +242,10 @@ class validateleave extends Controller
         }else{
             return 1;
         }
+    }
+
+    static protected function use_compensatory_leave($apply_data)
+    {
+
     }
 }

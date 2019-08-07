@@ -25,7 +25,7 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         $schedule->command('calc:leavedays')->daily();
-        $schedule->command('gen:compensatoryleave')->daily();
+        //$schedule->command('gen:compensatoryleave')->daily();
     }
 
     /**

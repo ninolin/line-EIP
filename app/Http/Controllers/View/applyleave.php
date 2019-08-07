@@ -67,8 +67,8 @@ class applyleave extends Controller
             $end_time = explode("T",$request->get('endDate'))[1];     //迄時
             $comment = $request->input('comment');                    //備註
             if($comment == "") $comment = "-";
-            $diff_min = floor((strtotime($end_date." ".$end_time)-strtotime($start_date." ".$start_time))%86400/60); //相差分鐘
-            //檢查請假合理性
+            $diff_min = floor((strtotime($end_date." ".$end_time)-strtotime($start_date." ".$start_time))%86400/60); //請假分鐘
+            //檢查請假合理性-檢查代理人在該假單請假時間中是否也正在請假
             $sql  = "select start_date from eip_leave_apply where ";
             $sql .= "apply_user_no = ? and start_date <= ? and end_date >= ? and apply_type = 'L' and apply_status IN ('P', 'Y')";
             $overlap = DB::select($sql, [$leave_agent_user_no, $request->get('startDate'), $request->get('startDate')]);
@@ -78,7 +78,7 @@ class applyleave extends Controller
                     'message' => '失敗:代理人在該假單請假時間中也正在請假'
                 ], 500);
             }
-
+            //檢查請假合理性-檢查請假時間中有沒有正在擔任代理人
             $sql  = "select start_date from eip_leave_apply where agent_user_no IN (select NO from user where line_id = ?) ";
             $sql .= "and start_date <= ? and end_date >= ? and apply_type = 'L' and apply_status IN ('P', 'Y')";
             $overlap = DB::select($sql, [$apply_user_line_id, $request->get('startDate'), $request->get('startDate')]);
@@ -88,11 +88,13 @@ class applyleave extends Controller
                     'message' => '失敗:請假時間中正在擔任代理人'
                 ], 500);
             }
+            
             //取得假別的id
             $leave_days = count(self::dates2array($start_date, $end_date));
             $leave_type_arr = DB::select('select * from eip_leave_type where name =? order by day ASC', [$leavename]);
             $leave_type_id = "";
             $leave_min_time = 30;
+            $leave_compensatory = 0;
             $leave_approved_title_id = "";
             $i = 0;
             foreach ($leave_type_arr as $v) {
@@ -101,12 +103,14 @@ class applyleave extends Controller
                     $leave_type_id = $v->id;
                     $leave_approved_title_id = $v->approved_title_id;
                     $leave_min_time = $v->min_time;
+                    $leave_compensatory = $v->compensatory;
                     break;
                 }
                 if($leave_type_id == "" && count($leave_type_arr) == $i){
                     $leave_type_id = $v->id;
                     $leave_approved_title_id = $v->approved_title_id;
                     $leave_min_time = $v->min_time;
+                    $leave_compensatory = $v->compensatory;
                     break;
                 }
             }
@@ -136,6 +140,7 @@ class applyleave extends Controller
                 $apply_user_lunch_start = $v->lunch_start ? $v->lunch_start : '12:00:00';
                 $apply_user_lunch_end = $v->lunch_end ? $v->lunch_end : '13:00:00';     
             }
+            
             //取得代理人的資料
             $agent_users = DB::select('select cname, line_id from user where NO =?', [$leave_agent_user_no]);
             $agent_cname = ""; //代理人
@@ -178,6 +183,27 @@ class applyleave extends Controller
                     }
                 }
             }
+            //檢查請假合理性-檢查有沒有足夠的加班可以補休
+            if($leave_compensatory == 1) {
+                $sql  = "select sum(over_work_hours) as total_over_work_hours from eip_leave_apply where apply_user_no =? and apply_type = 'O' and DATEDIFF(now(), over_work_date) <= 180 and apply_status = 'Y'";
+                $data = DB::select($sql, [$apply_user_no]);
+                $total_over_work_hours = 0;
+                foreach ($data as $d) {
+                    $total_over_work_hours = $d->total_over_work_hours; //180天內加班總時數
+                }
+                $sql  = "select sum(leave_hours) as total_leave_hours from leave_apply_id where id IN ( ";
+                $sql .= "   select distinct leave_apply_id from eip_compensatory_relationship ";
+                $sql .= "   where over_work_apply_id IN ( ";
+                $sql .= "       select id from eip_leave_apply where apply_user_no =? and apply_type = 'O' and DATEDIFF(now(), over_work_date) <= 180 and apply_status = 'Y' ";
+                $sql .= "   ) ";
+                $sql .= ") ";
+                $total_over_work_used_leave_hours = 0;
+                foreach ($data as $d) {
+                    $total_over_work_used_leave_hours = $d->total_leave_hours; //180天內加班已補休的總時數
+                }
+                $remain_over_work_can_leave_hours = $total_over_work_hours - $total_over_work_used_leave_hours;
+                if($leave_hours > $remain_over_work_can_leave_hours) throw new Exception('請假失敗:請假時數超過加班時數'); 
+            }
             
             //寫入請假紀錄
             $sql = "insert into eip_leave_apply ";
@@ -200,6 +226,23 @@ class applyleave extends Controller
                     DB::delete("delete from eip_leave_apply where id = ?", [$last_appy_id]);
                     DB::delete("delete from eip_leave_apply_process where apply_id = ?", [$last_appy_id]);
                     throw new Exception('insert db error'); 
+                }
+            }
+            //加班補休要寫入eip_compensatory_relationship記錄補休是用那天加班來補
+            if($leave_compensatory == 1) {
+                $sql  = "select id, over_work_hours from eip_leave_apply where apply_user_no =? and apply_type = 'O' and DATEDIFF(now(), over_work_date) <= 180 and apply_status = 'Y' order by id ASC";
+                $over_work_leaves = DB::select($sql, [$apply_user_no]);
+                foreach ($over_work_leaves as $o) {
+                    $over_work_use = DB::select("select sum(leave_hours) as leave_hours from eip_leave_apply where id IN (select leave_apply_id from eip_compensatory_relationship where over_work_apply_id =?)", [$o->id]);
+                    $over_work_remain_hours = 0;
+                    foreach ($over_work_use as $ow) {
+                        $over_work_remain_hours = $o->over_work_hours - $ow->leave_hours;
+                    }
+                    if($over_work_remain_hours > 0) {
+                        DB::insert("insert into eip_compensatory_relationship (leave_apply_id, over_work_apply_id) value (?, ?)", [$last_appy_id, $o->id]);
+                        $leave_hour = $leave_hour - $over_work_remain_hours;
+                        if($leave_hour <= 0) break;
+                    }
                 }
             }
 
