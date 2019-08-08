@@ -9,7 +9,7 @@ function initializeApp(data) {
     document.getElementById('useridfield').textContent = data.context.userId;
     promise_call({
         url: "./api/validateleave/"+data.context.userId, 
-        //url: "./api/validateleave/Ub298f6326d10027ebdd996a57b731f89", 
+        //url: "./api/validateleave/U8d41dfb18097f57080858e39b929ce39", 
         method: "get"
     })
     .then(v => {
@@ -164,20 +164,33 @@ const show_other_leaves = (apply_user_no) => {
     .then(v => {
         if(v.status == "successful") {
             if(v.data.length > 0) $("#other_leaves").find(".weui-dialog__bd").html("");
-            $html = "<table style='width: 100%;'><tr><th>起</th><th>迄</th><th>假別</th><th>狀態</th></tr>";
+            // $html = "<table style='width: 100%;'><tr><th>起</th><th>迄</th><th>假別</th><th>狀態</th></tr>";
+            // v.data.map(item => {
+            //     $html += "<tr>";
+            //     $html += "<td>"+item.start_date+"</td>";
+            //     $html += "<td>"+item.end_date+"</td>";
+            //     $html += "<td>"+item.leave_name+"</td>";
+            //     if(item.apply_status == 'Y') {
+            //         $html += "<td>已通過</td>";
+            //     } else {
+            //         $html += "<td>簽核中</td>";
+            //     }
+            //     $html += "</tr>";
+            // });
+            //$html +="</table>"
+            $html = "<div class='other_leave_card'>";
             v.data.map(item => {
-                $html += "<tr>";
-                $html += "<td>"+item.start_date+"</td>";
-                $html += "<td>"+item.end_date+"</td>";
-                $html += "<td>"+item.leave_name+"</td>";
+                $html += "<div class='weui-flex'>";
+                $html += "  <div class='weui-flex__item'>"+item.leave_name+"</div>"
                 if(item.apply_status == 'Y') {
-                    $html += "<td>已通過</td>";
+                    $html += "<div class='weui-flex__item'>已通過</div>";
                 } else {
-                    $html += "<td>簽核中</td>";
+                    $html += "<div class='weui-flex__item'>簽核中</div>";
                 }
-                $html += "</tr>";
+                $html += "</div>";
+                $html += "<div class='weui-flex'><div class='weui-flex__item'>"+item.start_date+" ~ "+item.end_date+"</div></div>";
             });
-            $html +="</table>"
+            $html +="</div>"
             $("#other_leaves").find(".weui-dialog__bd").html($html);
             $("#other_leaves").show();
         } 

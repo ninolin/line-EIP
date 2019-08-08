@@ -10,6 +10,7 @@
         <link href="{{ asset('js/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
         <link href="{{ asset('css/weui.min.css') }}" rel="stylesheet">
         <link href="{{ asset('css/public.css') }}" rel="stylesheet">
+        <link href="{{ asset('css/validateLeave.css') }}" rel="stylesheet">
     </head>
     <body style="background-color: #f1f1f1;">
         <div class="weui-flex"><div class="weui-flex__item mobile_topbar">工時簽核</div></div>
