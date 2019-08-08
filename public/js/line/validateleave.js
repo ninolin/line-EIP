@@ -188,7 +188,8 @@ const show_other_leaves = (apply_user_no) => {
                     $html += "<div class='weui-flex__item'>簽核中</div>";
                 }
                 $html += "</div>";
-                $html += "<div class='weui-flex'><div class='weui-flex__item'>"+item.start_date+" ~ "+item.end_date+"</div></div>";
+                $html += "<div class='weui-flex'><div class='weui-flex__item'>起:"+item.start_date+"</div></div>";
+                $html += "<div class='weui-flex'><div class='weui-flex__item'>迄:"+item.end_date+"</div></div>";
             });
             $html +="</div>"
             $("#other_leaves").find(".weui-dialog__bd").html($html);
