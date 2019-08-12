@@ -21,14 +21,14 @@ function initializeApp(data) {
 }
 
 const apply_overwork = () => {
-    alert(document.getElementById('useridfield').textContent);
+    //alert(document.getElementById('useridfield').textContent);
     const post_data = {
         "userId": document.getElementById('useridfield').textContent,
         //"userId": "U8d41dfb18097f57080858e39b929ce39",
         "overworkDate": $("#overworkDate").val(),
         "overworkHour": $("#overworkHour").val()
     }
-    alert(JSON.stringify(post_data));
+    //alert(JSON.stringify(post_data));
     for (k in post_data) {
         if(post_data[k] == "") {
             alert("資料不正確");
