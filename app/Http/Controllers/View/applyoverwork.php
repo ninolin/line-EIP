@@ -53,9 +53,11 @@ class applyoverwork extends Controller
             //透過加班小時找到加班type_id
             $overwork_type_arr = DB::select('select * from eip_overwork_type', []);
             $overwork_type_id = "";
+            $overwork_approved_title_id = "";
             foreach ($overwork_type_arr as $v) {
                 if($overworkHour < $v->hour) {
                     $overwork_type_id = $v->id;
+                    $overwork_approved_title_id = $v->approved_title_id;
                     break;
                 }
             }
@@ -94,7 +96,7 @@ class applyoverwork extends Controller
             }
             
             //寫入簽核流程紀錄(該table沒有紀錄申請人和簽核人的line_id是因為可能會有換line帳號的情況發生)
-            $upper_users = self::find_upper($apply_user_no, [], $overwork_type_id);
+            $upper_users = self::find_upper($apply_user_no, [], $overwork_approved_title_id);
             foreach ($upper_users as $u) {
                 if(DB::insert("insert into eip_leave_apply_process (apply_id, apply_type, apply_user_no, upper_user_no) value (?, ?, ?, ?)", [$last_appy_id, 'O', $apply_user_no, $u]) != 1) {
                     DB::delete("delete from eip_leave_apply where id = ?", [$last_appy_id]);

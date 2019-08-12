@@ -2,10 +2,12 @@ var isMobile = false;
 window.onload = function (e) {
     $("#startTime").html("08:00");
     $("#endTime").html("17:00");
-    
     liff.init(function (data) {
         initializeApp(data);
+    }, function (err) {
+        alert(err);
     });
+    //initializeApp({context: {userId: "U8d41dfb18097f57080858e39b929ce39"}});
 };
 
 function initializeApp(data) {
@@ -67,7 +69,6 @@ const apply_leave = () => {
     
     const post_data = {
         "userId": document.getElementById('useridfield').textContent,
-        //"userId": "U8d41dfb18097f57080858e39b929ce39",
         "leaveType": $("#leaveType").val(),
         "leaveAgent": $("#leaveAgent").val(),
         "startDate": $("#startDate").val()+"T"+$("#startTime").html(),

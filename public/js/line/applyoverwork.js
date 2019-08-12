@@ -4,6 +4,7 @@ window.onload = function (e) {
     }, function (err) {
         alert(err);
     });
+    //initializeApp({context: {userId: "U8d41dfb18097f57080858e39b929ce39"}});
 };
 
 function initializeApp(data) {
@@ -24,7 +25,6 @@ const apply_overwork = () => {
     //alert(document.getElementById('useridfield').textContent);
     const post_data = {
         "userId": document.getElementById('useridfield').textContent,
-        //"userId": "U8d41dfb18097f57080858e39b929ce39",
         "overworkDate": $("#overworkDate").val(),
         "overworkHour": $("#overworkHour").val()
     }
