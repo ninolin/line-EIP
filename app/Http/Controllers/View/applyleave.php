@@ -294,7 +294,7 @@ class applyleave extends Controller
     }
 
     /**
-     * 回傳下一個簽核人
+     * 回傳下一個簽核人，因為有互相指定為下一個簽核人造成無窮迴圈的狀況，所以array最長為10
      *
      * @param  int      $user_no
      * @param  array    $array
@@ -305,7 +305,7 @@ class applyleave extends Controller
         $users = DB::select('select title_id, upper_user_no from user where NO =?', [$user_no]);
         if($users > 0) {
             foreach ($users as $u) {
-                if($u-> upper_user_no != 0 && $u-> title_id != $approved_title_id) {
+                if($u-> upper_user_no != 0 && $u-> title_id != $approved_title_id && count($array) < 10) {
                     array_push($array, $u-> upper_user_no);
                     return self::find_upper($u-> upper_user_no, $array, $approved_title_id);
                 } else {
