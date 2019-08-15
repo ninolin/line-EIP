@@ -5,13 +5,13 @@ namespace App\Http\Controllers\View\LeaveLog;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Input;
+use App\Console\commands\CalcLeaveDays;
+use App\Providers\LeaveProvider;
+use App\Providers\LineServiceProvider;
 use DB;
 use Log;
 use Exception;
 use Config;
-use App\Console\commands\CalcLeaveDays;
-use App\Providers\LeaveProvider;
-use App\Providers\LineServiceProvider;
 
 class leavelog extends Controller
 {
@@ -190,7 +190,7 @@ class leavelog extends Controller
      * 更新代理人
      * 3個step:
      * step1: 檢查代理人是不是在代理期間內也有請假
-     * step2: 更新table
+     * step2: 更新eip_leave_apply
      * step3: 通知申請人、新舊代理人、已簽核過的簽核人和下一個簽核人
      * 
      * @param \Illuminate\Http\Request
@@ -242,7 +242,12 @@ class leavelog extends Controller
     }
 
     /**
-     * 更新休假/加班日期
+     * 更新休假起日/休假迄日/加班日期/加班小時
+     * 4個step:
+     * step1: 判斷是要更新 休假起日/休假迄日/加班日期/加班小時
+     * step2: 重算小時
+     * step3: 更新eip_leave_apply
+     * step3: 通知申請人、代理人、已簽核過的簽核人和下一個簽核人
      * 
      * @param \Illuminate\Http\Request
      */
@@ -283,6 +288,7 @@ class leavelog extends Controller
                 }
             } else if($type == 'overwork_date') {
                 if(DB::update("update eip_leave_apply set over_work_date =? where id =?", [$new_date, $apply_id]) == 1) {
+                    self::send_notify_after_change_date($apply_id, 'overwork');
                     return response()->json([
                         'status' => 'successful'
                     ]);
@@ -291,6 +297,7 @@ class leavelog extends Controller
                 }
             } else if($type == 'overwork_hour') {
                 if(DB::update("update eip_leave_apply set over_work_hours =? where id =?", [$new_date, $apply_id]) == 1) {
+                    self::send_notify_after_change_date($apply_id, 'overwork');
                     return response()->json([
                         'status' => 'successful'
                     ]);
@@ -308,6 +315,7 @@ class leavelog extends Controller
                 throw new Exception($r->message);
             }
             if(DB::update("update eip_leave_apply set ".$column1." =?, leave_hours =? where id =?", [$new_date, $leave_hours, $apply_id]) == 1) {
+                self::send_notify_after_change_date($apply_id, 'leave');
                 return response()->json([
                     'status' => 'successful'
                 ]);
@@ -320,6 +328,44 @@ class leavelog extends Controller
                 'status' => 'error',
                 'message' => $e->getMessage()
             ]);
+        }
+    }
+
+    static protected function send_notify_after_change_date($apply_id, $type) {
+        if($type == "leave") {
+            $v = json_decode(LeaveProvider::getLeaveApply($apply_id));
+            $msg = ["假別::". $v->leave_name,"代理人::".$v->agent_cname,"起日::".$v->start_date,"迄日::". $v->end_date,"備住::". $v->comment];
+            LineServiceProvider::sendNotifyFlexMeg($v->apply_user_line_id, array_merge(["更換休假時間"], $msg));
+            LineServiceProvider::sendNotifyFlexMeg($v->agent_user_line_id, array_merge([$v->apply_user_cname."更換休假時間"], $msg));
+            $sql  = "select elap.upper_user_no, elap.is_validate, u.line_id ";
+            $sql .= "from eip_leave_apply_process elap ";
+            $sql .= "left join user u ";
+            $sql .= "on elap.upper_user_no = u.NO ";
+            $sql .= "where elap.apply_id = ?";
+            $uppers = DB::select($sql, [$apply_id]);
+            foreach ($uppers as $u) {
+                LineServiceProvider::sendNotifyFlexMeg($u->line_id, array_merge(["更換休假時間"], $msg));
+                if(is_null($u->is_validate)){
+                    break;
+                }
+            }
+        } else {
+            $v = json_decode(LeaveProvider::getLeaveApply($apply_id));
+            $msg = ["加班日::".$v->over_work_date,"加班小時::".$v->over_work_hours,"備住::". $v->comment];
+            LineServiceProvider::sendNotifyFlexMeg($v->apply_user_line_id, array_merge(["更換加班時間"], $msg));
+            LineServiceProvider::sendNotifyFlexMeg($v->agent_user_line_id, array_merge([$v->apply_user_cname."更換加班時間"], $msg));
+            $sql  = "select elap.upper_user_no, elap.is_validate, u.line_id ";
+            $sql .= "from eip_leave_apply_process elap ";
+            $sql .= "left join user u ";
+            $sql .= "on elap.upper_user_no = u.NO ";
+            $sql .= "where elap.apply_id = ?";
+            $uppers = DB::select($sql, [$apply_id]);
+            foreach ($uppers as $u) {
+                LineServiceProvider::sendNotifyFlexMeg($u->line_id, array_merge(["更換加班時間"], $msg));
+                if(is_null($u->is_validate)){
+                    break;
+                }
+            }
         }
     }
 }
