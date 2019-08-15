@@ -7,8 +7,10 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Input;
 use DB;
 use Log;
+use Exception;
+use Config;
 use App\Console\commands\CalcLeaveDays;
-use App\Providers\LeaveApplyProvider;
+use App\Providers\LeaveProvider;
 use App\Providers\LineServiceProvider;
 
 class leavelog extends Controller
@@ -55,11 +57,19 @@ class leavelog extends Controller
         $sql .= 'limit ?,10 ';
         $logs = DB::select($sql, [($page-1)*10]);
         foreach ($logs as $key => $value) {
+            $apply_time = strftime('%Y-%m-%d %H:%M', strtotime($value->apply_time));
+            $logs[$key]->apply_time = $apply_time;
             if($value->apply_type == 'L') {
-                $start_date = str_replace("T", " ", $value->start_date);
-                $end_date = str_replace("T", " ", $value->end_date);
+                $start_date = strftime('%Y-%m-%dT%H:%M', strtotime($value->start_date));
+                $end_date = strftime('%Y-%m-%dT%H:%M', strtotime($value->end_date));
+                
                 $logs[$key]->start_date = $start_date;
                 $logs[$key]->end_date = $end_date;
+                
+                //$start_date = str_replace("T", " ", $value->start_date);
+                //$end_date = str_replace("T", " ", $value->end_date);
+                //$logs[$key]->start_date = $start_date;
+                //$logs[$key]->end_date = $end_date;
             }
         }
         $total_logs = DB::select('select * from eip_leave_apply', []);
@@ -155,6 +165,11 @@ class leavelog extends Controller
         ]);
     }
 
+    /**
+     * 更新簽核人
+     * 
+     * @param \Illuminate\Http\Request
+     */
     public function change_upper_user(Request $request)
     {
         $apply_process_id = $request->get('apply_process_id');
@@ -184,7 +199,7 @@ class leavelog extends Controller
     {
         $apply_id = $request->get('apply_id');
         $user_NO = $request->get('user_NO');
-        $v = json_decode(LeaveApplyProvider::getLeaveApply($apply_id));
+        $v = json_decode(LeaveProvider::getLeaveApply($apply_id));
 
         $old_agent_user_line_id = $v->agent_user_line_id;
         $sql  = "select start_date from eip_leave_apply where ";
@@ -198,7 +213,7 @@ class leavelog extends Controller
         }
         
         if(DB::update("update eip_leave_apply set agent_user_no =? where id =?", [$user_NO, $apply_id]) == 1) {
-            $v = json_decode(LeaveApplyProvider::getLeaveApply($apply_id));
+            $v = json_decode(LeaveProvider::getLeaveApply($apply_id));
             $msg = ["假別::". $v->leave_name,"代理人::".$v->agent_cname,"起日::".$v->start_date,"迄日::". $v->end_date,"備住::". $v->comment];
             LineServiceProvider::sendNotifyFlexMeg($v->apply_user_line_id, array_merge(["更換代理人"], $msg));
             LineServiceProvider::sendNotifyFlexMeg($old_agent_user_line_id, array_merge(["代理人取消"], $msg));
@@ -223,6 +238,88 @@ class leavelog extends Controller
                 'status' => 'error',
                 'message' => 'update error'
             ], 500);
+        }
+    }
+
+    /**
+     * 更新休假/加班日期
+     * 
+     * @param \Illuminate\Http\Request
+     */
+    public function change_date(Request $request)
+    {
+        try {    
+            $apply_id = $request->get('apply_id');
+            $type = $request->get('type');
+            $new_date = $request->get('new_date');
+            $leave_hours = 0;
+            $start_date = "";
+            $end_date = "";
+            $work_class_id = "";
+            $column1 = "";
+            $sql = "";
+            if($type == 'leave_start_date') {
+                $column1 = "start_date";
+                $sql  = "select ela.apply_user_no, ela.end_date, u.work_class_id ";
+                $sql .= "from eip_leave_apply ela, user u ";
+                $sql .= "where ela.id = ? and ela.apply_user_no = u.NO";
+                $data = DB::select($sql, [$apply_id]);
+                foreach ($data as $d) {
+                    $start_date = $new_date;
+                    $end_date = $d->end_date;
+                    $work_class_id = $d->work_class_id;
+                }
+                
+            } else if($type == 'leave_end_date') {
+                $column1 = "end_date";
+                $sql  = "select ela.apply_user_no, ela.start_date, u.work_class_id ";
+                $sql .= "from eip_leave_apply ela, user u ";
+                $sql .= "where ela.id = ? and ela.apply_user_no = u.NO";
+                $data = DB::select($sql, [$apply_id]);
+                foreach ($data as $d) {
+                    $start_date = $d->start_date;
+                    $end_date = $new_date;
+                    $work_class_id = $d->work_class_id;
+                }
+            } else if($type == 'overwork_date') {
+                if(DB::update("update eip_leave_apply set over_work_date =? where id =?", [$new_date, $apply_id]) == 1) {
+                    return response()->json([
+                        'status' => 'successful'
+                    ]);
+                } else {
+                    throw new Exception('update error');
+                }
+            } else if($type == 'overwork_hour') {
+                if(DB::update("update eip_leave_apply set over_work_hours =? where id =?", [$new_date, $apply_id]) == 1) {
+                    return response()->json([
+                        'status' => 'successful'
+                    ]);
+                } else {
+                    throw new Exception('update error');
+                }
+            } else {
+                throw new Exception('type error');
+            }
+
+            $r = json_decode(json_encode(LeaveProvider::getLeaveHours($start_date, $end_date, $work_class_id)));
+            if($r->status == "successful") {
+                $leave_hours = $r->leave_hours;
+            } else {
+                throw new Exception($r->message);
+            }
+            if(DB::update("update eip_leave_apply set ".$column1." =?, leave_hours =? where id =?", [$new_date, $leave_hours, $apply_id]) == 1) {
+                return response()->json([
+                    'status' => 'successful'
+                ]);
+            } else {
+                 throw new Exception('update error');
+            }
+            
+        } catch (Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => $e->getMessage()
+            ]);
         }
     }
 }

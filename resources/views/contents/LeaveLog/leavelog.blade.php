@@ -1,5 +1,21 @@
 @extends('contents.LeaveLog.master')
 @section('content2')
+<style>
+  .date-input {
+    padding: 1px !important;
+    width: 235px !important;
+  }
+  .overwork-date {
+    width: 65% !important;
+    display: inline;
+  }
+  .overwork-hour {
+    width: 31% !important;
+    display: inline;
+    margin-top: 1px;
+    height: 30px !important;
+  }
+</style>
 <div class="container-fluid pt-lg-4">
   <form>
     <div class="row">
@@ -56,14 +72,24 @@
             </td>
             <td> 
               @if ($log->apply_type == 'L')
-                {{$log->start_date}}
+                <input type="datetime-local" id='leave_start_date_{{$log->id}}' class="form-control date-input" value="{{$log->start_date}}" onfocusout='confirm_change_date("leave_start_date", {{$log->id}}, "{{$log->start_date}}", "{{$log->cname}}")'>
               @else
-                {{$log->over_work_date}} 
+                <input type="date" id='overwork_date_{{$log->id}}' class="form-control date-input overwork-date" value="{{$log->over_work_date}}" onfocusout='confirm_change_date("overwork_date", {{$log->id}}, "{{$log->over_work_date}}", "{{$log->cname}}")'>
+                <select class="form-control overwork-hour" id='overwork_hour_{{$log->id}}' onchange='confirm_change_date("overwork_hour", {{$log->id}}, "{{$log->over_work_hours}}", "{{$log->cname}}")'>
+                  <option value="1" @if ($log->over_work_hours == '1') selected @endif>1小時</option>
+                  <option value="2" @if ($log->over_work_hours == '2') selected @endif>2小時</option>
+                  <option value="3" @if ($log->over_work_hours == '3') selected @endif>3小時</option>
+                  <option value="4" @if ($log->over_work_hours == '4') selected @endif>4小時</option>
+                  <option value="5" @if ($log->over_work_hours == '5') selected @endif>5小時</option>
+                  <option value="6" @if ($log->over_work_hours == '6') selected @endif>6小時</option>
+                  <option value="7" @if ($log->over_work_hours == '7') selected @endif>7小時</option>
+                  <option value="8" @if ($log->over_work_hours == '8') selected @endif>8小時</option>
+                </select>
               @endif
             </td>
             <td>
               @if ($log->apply_type == 'L') 
-                {{$log->end_date}}
+                <input type="datetime-local" id='leave_end_date_{{$log->id}}' class="form-control date-input" value="{{$log->end_date}}" onfocusout='confirm_change_date("leave_end_date", {{$log->id}}, "{{$log->end_date}}", "{{$log->cname}}")'>
               @else
                 -
               @endif
@@ -94,13 +120,13 @@
       <nav aria-label="Page navigation example">
       <ul class="pagination justify-content-center">
         <li class="page-item @if ($page == 1) disabled @endif ">
-          <a class="page-link" href="./leavelog?page={{ $page-1 }}">上一頁</a>
+          <a class="page-link" href="./last?page={{ $page-1 }}">上一頁</a>
         </li>
         @for ($i = 1; $i <= $total_pages; $i++)
-          <li class="page-item @if ($i == $page) active @endif"><a class="page-link" href="./leavelog?page={{ $i }}">{{$i}}</a></li>
+          <li class="page-item @if ($i == $page) active @endif"><a class="page-link" href="./last?page={{ $i }}">{{$i}}</a></li>
         @endfor
         <li class="page-item @if ($page == $total_pages) disabled @endif">
-          <a class="page-link" href="./leavelog?page={{ $page+1 }}">下一頁</a>
+          <a class="page-link" href="./last?page={{ $page+1 }}">下一頁</a>
         </li>
       </ul>
     </div>
@@ -158,7 +184,7 @@
       <div class="modal-body">
         <form>
           <div class="container-fluid">
-            <div class="row form-group msg">aaa</div>
+            <div class="row form-group msg"></div>
           </div>
         </form>
       </div>
@@ -306,6 +332,47 @@ const change_agent_user = (apply_id, old_agent_user_no) => {
         $('#changeModal').modal('toggle');
       } else {
         $("#agent_user_select_"+apply_id).val(old_agent_user_no).trigger("change");
+        $('#changeModal').modal('toggle');
+        alert(v.message);
+      }
+  })
+}
+
+const confirm_change_date = (type, apply_id, old_date, cname) => {
+  const new_date = $("#"+type+"_"+apply_id).val().replace('T',' ');
+  let html="";
+  if(type == "leave_start_date") html = "確定要將"+cname+"的休假開始時間從 ";
+  if(type == "leave_end_date") html = "確定要將"+cname+"的休假結束時間從 ";
+  if(type == "overwork_date") html = "確定要將"+cname+"的加班日期從 ";
+  if(type == "overwork_hour") html = "確定要將"+cname+"的加班小時從 ";
+
+  $('#changeModal').modal('toggle');
+  $('#changeModal').find('.msg').html(html + old_date.replace('T',' ')+" 換成 "+new_date+" 嗎?");
+  $("#changeModal").find(".todo").attr("onclick", "change_date('"+type+"', '"+apply_id+"', '"+old_date+"')");
+  $("#changeModal").find(".tocancel").attr("onclick", "cancel_change_date('"+type+"', '"+apply_id+"', '"+old_date+"')");
+}
+
+const cancel_change_date = (type, apply_id, old_date) => {
+  $("#"+type+"_"+apply_id).val(old_date);
+  $('#changeModal').modal('toggle');
+}
+
+const change_date = (type, apply_id, old_date) => {
+  const new_date = $("#"+type+"_"+apply_id).val();
+  promise_call({
+    url: "../api/leavelog/change_date", 
+    data: {
+      "apply_id": apply_id,
+      "type":     type,
+      "new_date": new_date
+    }, 
+    method: "put"
+  })
+  .then(v => {
+      if(v.status == "successful") {
+        $('#changeModal').modal('toggle');
+      } else {
+        $("#"+type+"_"+apply_id).val(old_date);
         $('#changeModal').modal('toggle');
         alert(v.message);
       }

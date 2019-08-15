@@ -52,6 +52,7 @@ Route::put('individuallog/{id}', 'View\individuallog@cancel');
 Route::get('leavelog/{id}', 'View\LeaveLog\leavelog@list_logs');
 Route::put('leavelog/change_upper_user', 'View\LeaveLog\leavelog@change_upper_user');
 Route::put('leavelog/change_agent_user', 'View\LeaveLog\leavelog@change_agent_user');
+Route::put('leavelog/change_date', 'View\LeaveLog\leavelog@change_date');
 Route::get('test', 'Line\Test@show');
 
 Route::get('workclass', 'View\WorkSetting\workclass@index');

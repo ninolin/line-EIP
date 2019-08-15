@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Input;
 use App\Providers\LineServiceProvider;
 use App\Providers\HelperServiceProvider;
+use App\Providers\LeaveProvider;
 use DB;
 use Log;
 use Exception;
@@ -123,22 +124,17 @@ class applyleave extends Controller
             }
 
             //取得申請人的基本資料
-            $sql = 'select u.NO, u.cname, ewc.* from user as u LEFT JOIN eip_work_class as ewc on u.work_class_id = ewc.id WHERE u.line_id = ?';
+            //$sql = 'select u.NO, u.cname, ewc.* from user as u LEFT JOIN eip_work_class as ewc on u.work_class_id = ewc.id WHERE u.line_id = ?';
+            $sql = 'select NO, cname, work_class_id from user WHERE line_id = ?';
             $users = DB::select($sql, [$apply_user_line_id]);
             $apply_user_NO = "";            //申請人NO
             $apply_user_cname = "";         //申請人別名
-            $apply_user_work_start = "";    //申請人的上班開始時間
-            $apply_user_work_end = "";      //申請人的上班結束時間
-            $apply_user_lunch_start = "";   //申請人的午休開始時間
-            $apply_user_lunch_end = "";     //申請人的午休結束時間
+            $apply_work_class_id = "";      //申請人班別
             if(count($users) != 1) throw new Exception('請假失敗:請先將您的line加入EIP中'); 
             foreach ($users as $v) {
                 $apply_user_no = $v->NO;
                 $apply_user_cname = $v->cname;
-                $apply_user_work_start = $v->work_start ? $v->work_start : '08:00:00'; 
-                $apply_user_work_end = $v->work_end ? $v->work_end : '17:00:00';
-                $apply_user_lunch_start = $v->lunch_start ? $v->lunch_start : '12:00:00';
-                $apply_user_lunch_end = $v->lunch_end ? $v->lunch_end : '13:00:00';     
+                $apply_work_class_id = $v->work_class_id;    
             }
             
             //取得代理人的資料
@@ -159,30 +155,15 @@ class applyleave extends Controller
                 $upper_user_no = $v->NO; 
             }
             if($upper_line_id == "") throw new Exception('請假失敗:未設定簽核人或簽核人的line未加入EIP中');
-            //計算請假小時(目前先預設工時是早8晚5,30m為1單位)
-            $dates = self::dates2array($start_date, $end_date);
+            //計算請假小時
             $leave_hours = 0;
-            if(count($dates) == 1) { 
-                //只請一天
-                if(self::is_offday_by_gcalendar($start_date) == 8) { //先確定當天是不是休息日，不是休息日的話再來算請假小時
-                    $leave_hours += self::cal_timediff($start_time, $end_time, $apply_user_lunch_start, $apply_user_lunch_end);
-                }
-            } else {    
-                //請超過一天(正常上班時間為08:00-17:00)
-                foreach ($dates as $key=>$d) {
-                    if($key == 0) {
-                        if(self::is_offday_by_gcalendar($start_date) == 8) {
-                            $leave_hours += self::cal_timediff($start_time, "17:00", $apply_user_lunch_start, $apply_user_lunch_end);
-                        }
-                    } else if($key == count($dates)-1) {
-                        if(self::is_offday_by_gcalendar($end_date) == 8) {
-                            $leave_hours += self::cal_timediff("08:00", $end_time, $apply_user_lunch_start, $apply_user_lunch_end);
-                        }
-                    } else {
-                        $leave_hours += self::is_offday_by_gcalendar($d);
-                    }
-                }
+            $r = json_decode(json_encode(LeaveProvider::getLeaveHours($request->get('startDate'), $request->get('endDate'), $apply_work_class_id)));
+            if($r->status == "successful") {
+                $leave_hours = $r->leave_hours;
+            } else {
+                throw new Exception($r->message);
             }
+
             //檢查請假合理性-檢查有沒有足夠的加班可以補休
             if($leave_compensatory == 1) {
                 $sql  = "select sum(over_work_hours) as total_over_work_hours from eip_leave_apply where apply_user_no =? and apply_type = 'O' and DATEDIFF(now(), over_work_date) <= 180 and apply_status = 'Y'";
@@ -316,25 +297,6 @@ class applyleave extends Controller
     }
 
     /**
-     * 回傳2個時間間的相差小時，中午自動休一小時
-     *
-     * @param  string  $time1
-     * @param  string  $time2
-     * @return float 
-     */
-    static protected function cal_timediff($time1, $time2, $lunch_start, $lunch_end) {
-        if(strtotime($time1) >= strtotime($lunch_end) || strtotime($time2) <= strtotime($lunch_start)) {
-            return (strtotime($time2) - strtotime($time1))/(60*60);
-        } else if(strtotime($time1) > strtotime($lunch_start) && strtotime($time1) < strtotime($lunch_end)) {
-            return (strtotime($time2) - strtotime($lunch_end))/(60*60);
-        } else if(strtotime($time2) > strtotime($lunch_start) && strtotime($time2) < strtotime($lunch_end)){
-            return (strtotime($lunch_start) - strtotime($time1))/(60*60);
-        } else {
-            return ((strtotime($time2) - strtotime($time1)) - (strtotime($lunch_end) - strtotime($lunch_start)))/(60*60);
-        }
-    }
-
-    /**
      * 回傳2個日期間的所有日期
      *
      * @param  string  $date1
@@ -348,25 +310,6 @@ class applyleave extends Controller
             array_push($return, date('Y-m-d', strtotime('+'.$i.' days', strtotime($date1))));
         }
         return $return;
-    }
-
-    /**
-     * 檢查日期的上班小時
-     *
-     * @param  string  $check_date Y-m-d
-     * @return int
-     */
-    static protected function is_offday_by_gcalendar($check_date) {
-        $gcalendar_appscript_uri = Config::get('eip.gcalendar_appscript_uri');
-        $calevents_str = HelperServiceProvider::get_req($gcalendar_appscript_uri."?checkDate=".$check_date);
-        $calevents = explode(",", $calevents_str);
-        $offhours = 8;
-        foreach ($calevents as $e) {
-            if(strpos($e,'休息日') !== false) {
-                $offhours = $offhours - 8;
-            }
-        }
-        return $offhours;
     }
 
     /**
