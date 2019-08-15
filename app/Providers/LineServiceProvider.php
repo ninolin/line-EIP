@@ -3,7 +3,7 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
-use App\Providers\LeaveApplyProvider;
+use App\Providers\LeaveProvider;
 use Log;
 use DB;
 use Config;
@@ -56,6 +56,7 @@ class LineServiceProvider extends ServiceProvider
     }
 
     private static function sendPushMsg($line_channel_access_token, $response) {
+        //log::info($response);
         $header[] = "Content-Type: application/json";
         $header[] = "Authorization: Bearer ".$line_channel_access_token;
         $ch = curl_init("https://api.line.me/v2/bot/message/push");
@@ -247,7 +248,7 @@ class LineServiceProvider extends ServiceProvider
 
     public static function sendShowApplyDetailFlexMeg($line_id, $apply_id) {
 
-        $v = json_decode(LeaveApplyProvider::getLeaveApply($apply_id));
+        $v = json_decode(LeaveProvider::getLeaveApply($apply_id));
 
         $content = "";
         $line_channel_access_token = self::findAccessToken($line_id);

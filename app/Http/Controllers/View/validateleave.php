@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Input;
 use App\Providers\LineServiceProvider;
-use App\Providers\LeaveApplyProvider;
+use App\Providers\LeaveProvider;
 use App\Providers\HelperServiceProvider;
 use DB;
 use Log;
@@ -106,7 +106,7 @@ class validateleave extends Controller
             // }
             
             //取得apply單的資料
-            $apply_data = json_decode(LeaveApplyProvider::getLeaveApply($apply_id));
+            $apply_data = json_decode(LeaveProvider::getLeaveApply($apply_id));
             if(is_null($apply_data)) { throw new Exception('The line_id is not exist in the EIP');  }
             if($reject_reason == "null") {$reject_reason = null;}
             if(DB::update("update eip_leave_apply_process set is_validate =?, reject_reason =?, validate_time = now() where id =?", [$is_validate, $reject_reason, $process_id]) != 1) {
