@@ -29,8 +29,8 @@ class leavelog extends Controller
         $sql .= "where elap.upper_user_no = u.NO and elap.apply_id = ?";
         $processes = DB::select($sql, [$id]);
         return response()->json([
-            'status' => 'successful',
-            'data' => $processes
+            'status'        => 'successful',
+            'data'          => $processes
         ]);
     }
 
@@ -81,7 +81,8 @@ class leavelog extends Controller
             'page'          => $page,
             'total_pages'   => $total_pages,
             'agents'        => $agents,
-            'tab'           => 'last'
+            'tab'           => 'last',
+            'login_user_no' => session('user_no')
         ]);
     }
 
@@ -167,18 +168,48 @@ class leavelog extends Controller
 
     /**
      * 更新簽核人
+     * 更新eip_leave_apply, 寫入eip_leave_apply_change_log
      * 
      * @param \Illuminate\Http\Request
      */
     public function change_upper_user(Request $request)
     {
-        $apply_process_id = $request->get('apply_process_id');
-        $user_NO = $request->get('user_NO');
-        if(DB::update("update eip_leave_apply_process set upper_user_no =? where id =?", [$user_NO, $apply_process_id]) == 1) {
+        try {
+            $apply_id           = $request->get('apply_id');
+            $apply_process_id   = $request->get('apply_process_id');
+            $new_upper_user_no  = $request->get('user_NO');
+            $reason             = $request->get('reason');
+            $login_user_no      = $request->get('login_user_no');
+
+            $old_upper_user_cname = "";
+            $data = DB::select("select u.cname from eip_leave_apply_process elap, user u where elap.id =? and elap.upper_user_no = u.NO", [$apply_process_id]);
+            if(count($data) == 1) { 
+                foreach ($data as $v) {
+                    $old_upper_user_cname = $v->cname;
+                }
+            }
+            $new_upper_user_cname = "";
+            $data = DB::select("select cname from user where NO =?", [$new_upper_user_no]);
+            if(count($data) == 1) { 
+                foreach ($data as $v) {
+                    $new_upper_user_cname = $v->cname;
+                }
+            }
+
+            $sql = "insert into eip_leave_apply_change_log (apply_id, apply_process_id, change_desc, change_reason, change_use_no) value (?, ?, ?, ?, ?)";
+            DB::beginTransaction(); 
+            try {
+                DB::update("update eip_leave_apply_process set upper_user_no =? where id =?", [$new_upper_user_no, $apply_process_id]);
+                DB::insert($sql, [$apply_id, $apply_process_id, "簽核人從".$old_upper_user_cname."換成".$new_upper_user_cname, $reason, $login_user_no]);
+                DB::commit();
+            } catch (Exception $e) {
+                DB::rollBack();
+                throw $e;
+            }
             return response()->json([
                 'status' => 'successful'
             ]);
-        } else {
+        } catch(Exception $e) {
             return response()->json([
                 'status' => 'error',
                 'message' => 'update error'
@@ -190,29 +221,50 @@ class leavelog extends Controller
      * 更新代理人
      * 3個step:
      * step1: 檢查代理人是不是在代理期間內也有請假
-     * step2: 更新eip_leave_apply
+     * step2: 更新eip_leave_apply, 寫入eip_leave_apply_change_log
      * step3: 通知申請人、新舊代理人、已簽核過的簽核人和下一個簽核人
      * 
      * @param \Illuminate\Http\Request
      */
     public function change_agent_user(Request $request)
     {
-        $apply_id = $request->get('apply_id');
-        $user_NO = $request->get('user_NO');
-        $v = json_decode(LeaveProvider::getLeaveApply($apply_id));
+        try {    
+            $apply_id           = $request->get('apply_id');
+            $new_agent_user_no  = $request->get('user_NO');
+            $reason             = $request->get('reason');
+            $login_user_no      = $request->get('login_user_no');
 
-        $old_agent_user_line_id = $v->agent_user_line_id;
-        $sql  = "select start_date from eip_leave_apply where ";
-        $sql .= "apply_user_no = ? and start_date <= ? and end_date >= ? and apply_type = 'L' and apply_status IN ('P', 'Y')";
-        $overlap = DB::select($sql, [$user_NO, $v->start_date, $v->start_date]);
-        if(count($overlap) > 0) { 
-            return response()->json([
-                'status' => 'error',
-                'message' => '失敗:代理人在該假單請假時間中也正在請假'
-            ], 500);
-        }
-        
-        if(DB::update("update eip_leave_apply set agent_user_no =? where id =?", [$user_NO, $apply_id]) == 1) {
+            //檢查新的代理人在該假單請假時間是否也正在請假
+            $v = json_decode(LeaveProvider::getLeaveApply($apply_id));
+            $old_agent_user_cname = $v->apply_user_cname;       //舊代理人的cname
+            $old_agent_user_line_id = $v->agent_user_line_id;   //舊代理人的line_id
+            $sql  = "select start_date from eip_leave_apply where apply_user_no = ? and start_date <= ? and end_date >= ? and apply_type = 'L' and apply_status IN ('P', 'Y')";
+            $overlap = DB::select($sql, [$new_agent_user_no, $v->start_date, $v->start_date]);
+            if(count($overlap) > 0) { 
+                return response()->json([
+                    'status' => 'error',
+                    'message' => '失敗:代理人在該假單請假時間中也正在請假'
+                ], 500);
+            }
+            $new_agent_user_cname = "";
+            $data = DB::select("select cname from user where NO =?", [$new_agent_user_no]);
+            if(count($data) == 1) { 
+                foreach ($data as $v) {
+                    $new_agent_user_cname = $v->cname;
+                }
+            }
+
+            DB::beginTransaction(); 
+            try {
+                DB::update("update eip_leave_apply set agent_user_no =? where id =?", [$new_agent_user_no, $apply_id]);
+                $sql = "insert into eip_leave_apply_change_log (apply_id, change_desc, change_reason, change_use_no) value (?, ?, ?, ?)";
+                DB::insert($sql, [$apply_id, "代理人從".$old_agent_user_cname."換成".$new_agent_user_cname, $reason, $login_user_no]);
+                DB::commit();
+            } catch (Exception $e) {
+                DB::rollBack();
+                throw $e;
+            }
+
             $v = json_decode(LeaveProvider::getLeaveApply($apply_id));
             $msg = ["假別::". $v->leave_name,"代理人::".$v->agent_cname,"起日::".$v->start_date,"迄日::". $v->end_date,"備住::". $v->comment];
             LineServiceProvider::sendNotifyFlexMeg($v->apply_user_line_id, array_merge(["更換代理人"], $msg));
@@ -225,6 +277,7 @@ class leavelog extends Controller
             $sql .= "where elap.apply_id = ?";
             $uppers = DB::select($sql, [$apply_id]);
             foreach ($uppers as $u) {
+                //通知已簽核過的簽核人和下一個簽核人
                 LineServiceProvider::sendNotifyFlexMeg($u->line_id, array_merge(["更換代理人"], $msg));
                 if(is_null($u->is_validate)){
                     break;
@@ -233,10 +286,10 @@ class leavelog extends Controller
             return response()->json([
                 'status' => 'successful'
             ]);
-        } else {
+        } catch(Exception $e) {
             return response()->json([
                 'status' => 'error',
-                'message' => 'update error'
+                'message' => $e
             ], 500);
         }
     }
@@ -254,20 +307,24 @@ class leavelog extends Controller
     public function change_date(Request $request)
     {
         try {    
-            $apply_id = $request->get('apply_id');
-            $type = $request->get('type');
-            $new_date = $request->get('new_date');
+            $apply_id       = $request->get('apply_id');
+            $type           = $request->get('type');
+            $new_date       = $request->get('new_date');
+            $reason         = $request->get('reason');
+            $login_user_no  = $request->get('login_user_no');
+
             $leave_hours = 0;
             $start_date = "";
             $end_date = "";
             $work_class_id = "";
-            $column1 = "";
+            $column = "";
             $sql = "";
-            if($type == 'leave_start_date') {
-                $column1 = "start_date";
+            $change_desc = "";
+            if($type == 'leave_start_date') { //更新休假起日
+                $change_desc = "休假起日更新為".$new_date;
+                $column = "start_date";
                 $sql  = "select ela.apply_user_no, ela.end_date, u.work_class_id ";
-                $sql .= "from eip_leave_apply ela, user u ";
-                $sql .= "where ela.id = ? and ela.apply_user_no = u.NO";
+                $sql .= "from eip_leave_apply ela, user u where ela.id = ? and ela.apply_user_no = u.NO";
                 $data = DB::select($sql, [$apply_id]);
                 foreach ($data as $d) {
                     $start_date = $new_date;
@@ -275,35 +332,48 @@ class leavelog extends Controller
                     $work_class_id = $d->work_class_id;
                 }
                 
-            } else if($type == 'leave_end_date') {
-                $column1 = "end_date";
+            } else if($type == 'leave_end_date') {  //更新休假迄日
+                $change_desc = "休假迄日更新為".$new_date;
+                $column = "end_date";
                 $sql  = "select ela.apply_user_no, ela.start_date, u.work_class_id ";
-                $sql .= "from eip_leave_apply ela, user u ";
-                $sql .= "where ela.id = ? and ela.apply_user_no = u.NO";
+                $sql .= "from eip_leave_apply ela, user u where ela.id = ? and ela.apply_user_no = u.NO";
                 $data = DB::select($sql, [$apply_id]);
                 foreach ($data as $d) {
                     $start_date = $d->start_date;
                     $end_date = $new_date;
                     $work_class_id = $d->work_class_id;
                 }
-            } else if($type == 'overwork_date') {
-                if(DB::update("update eip_leave_apply set over_work_date =? where id =?", [$new_date, $apply_id]) == 1) {
-                    self::send_notify_after_change_date($apply_id, 'overwork');
-                    return response()->json([
-                        'status' => 'successful'
-                    ]);
-                } else {
-                    throw new Exception('update error');
+            } else if($type == 'overwork_date') {   //更新加班日
+                DB::beginTransaction(); 
+                try {
+                    DB::update("update eip_leave_apply set over_work_date =? where id =?", [$new_date, $apply_id]);
+                    $sql = "insert into eip_leave_apply_change_log (apply_id, change_desc, change_reason, change_use_no) value (?, ?, ?, ?)";
+                    DB::insert($sql, [$apply_id, "加班日更新為".$new_date, $reason, $login_user_no]);
+                    DB::commit();
+                } catch (Exception $e) {
+                    DB::rollBack();
+                    throw $e;
                 }
-            } else if($type == 'overwork_hour') {
-                if(DB::update("update eip_leave_apply set over_work_hours =? where id =?", [$new_date, $apply_id]) == 1) {
-                    self::send_notify_after_change_date($apply_id, 'overwork');
-                    return response()->json([
-                        'status' => 'successful'
-                    ]);
-                } else {
-                    throw new Exception('update error');
+                self::send_notify_after_change_date($apply_id, 'overwork');
+                return response()->json([
+                    'status' => 'successful'
+                ]);
+            } else if($type == 'overwork_hour') {   //更新加班小時
+
+                DB::beginTransaction(); 
+                try {
+                    DB::update("update eip_leave_apply set over_work_hours =? where id =?", [$new_date, $apply_id]);
+                    $sql = "insert into eip_leave_apply_change_log (apply_id, change_desc, change_reason, change_use_no) value (?, ?, ?, ?)";
+                    DB::insert($sql, [$apply_id, "加班小時更新為".$new_date, $reason, $login_user_no]);
+                    DB::commit();
+                } catch (Exception $e) {
+                    DB::rollBack();
+                    throw $e;
                 }
+                self::send_notify_after_change_date($apply_id, 'overwork');
+                return response()->json([
+                    'status' => 'successful'
+                ]);
             } else {
                 throw new Exception('type error');
             }
@@ -314,15 +384,30 @@ class leavelog extends Controller
             } else {
                 throw new Exception($r->message);
             }
-            if(DB::update("update eip_leave_apply set ".$column1." =?, leave_hours =? where id =?", [$new_date, $leave_hours, $apply_id]) == 1) {
-                self::send_notify_after_change_date($apply_id, 'leave');
-                return response()->json([
-                    'status' => 'successful'
-                ]);
-            } else {
-                 throw new Exception('update error');
+
+            $apply_data = json_decode(LeaveProvider::getLeaveApply($apply_id));
+            $insert_event = $apply_data->event_id;
+            if($apply_data->apply_status == 'Y') {
+                log::info("event_id: ".$apply_data->event_id);
+                LeaveProvider::delete_event_from_gcalendar($apply_data->event_id);
+                $insert_event = LeaveProvider::insert_event2gcalendar($start_date, $end_date, $apply_data->apply_user_cname."的".$apply_data->leave_name);
             }
-            
+
+            DB::beginTransaction(); 
+            try {
+                DB::update("update eip_leave_apply set ".$column." =?, leave_hours =?, event_id =? where id =?", [$new_date, $leave_hours, $insert_event, $apply_id]);
+                $sql = "insert into eip_leave_apply_change_log (apply_id, change_desc, change_reason, change_use_no) value (?, ?, ?, ?)";
+                DB::insert($sql, [$apply_id, $change_desc, $reason, $login_user_no]);
+                DB::commit();
+            } catch (Exception $e) {
+                DB::rollBack();
+                throw $e;
+            }
+            self::send_notify_after_change_date($apply_id, 'leave');
+
+            return response()->json([
+                'status' => 'successful'
+            ]);
         } catch (Exception $e) {
             return response()->json([
                 'status' => 'error',
@@ -330,6 +415,12 @@ class leavelog extends Controller
             ]);
         }
     }
+
+    /**
+     * 通知申請人、代理人、已簽核過的簽核人和下一個簽核人
+     * 
+     * @param \Illuminate\Http\Request
+     */
 
     static protected function send_notify_after_change_date($apply_id, $type) {
         if($type == "leave") {

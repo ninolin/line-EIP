@@ -30,7 +30,8 @@ class HelperServiceProvider extends ServiceProvider
 
     public static function get_req($_url)
     {
-        $ch = curl_init($_url);
+        //log::info(trim($_url));
+        $ch = curl_init(trim($_url));
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
         curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);

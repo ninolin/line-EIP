@@ -25,8 +25,10 @@ class AuthController extends Controller
         $password = $request->input('password');
         $users = DB::select('select * from user where username = ? and password = ?', [$account, md5($password)]);
         if(sizeof($users) == 1 ) {
-            if ($this->auth->setVerified()) {
-                return $this->auth->redirect();
+            foreach ($users as $u) {
+                if ($this->auth->setVerified($u->NO, null)) {
+                    return $this->auth->redirect();
+                }
             }
         } else {
             return redirect('login')->with('login_status', '帳號或密碼錯誤');
@@ -74,8 +76,10 @@ class AuthController extends Controller
             //]
             $users = DB::select('select * from user where gmail = ?', [$profile->email]);
             if(sizeof($users) == 1 ) {
-                if ($this->auth->setVerified()) {
-                    return $this->auth->redirect();
+                foreach ($users as $u) {
+                    if ($this->auth->setVerified($u->NO, null)) {
+                        return $this->auth->redirect();
+                    }
                 }
             } else {
                 return redirect('login')->with('login_status', '該用戶不存在');

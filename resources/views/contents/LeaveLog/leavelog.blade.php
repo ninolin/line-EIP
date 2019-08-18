@@ -50,7 +50,7 @@
             <td> {{$log->cname}} </td>
             <td> 
               @if ($log->apply_type == 'L') 
-                <select class="blade_select2" id='agent_user_select_{{$log->id}}' onchange='confirm_change_agent_user({{$log->id}},{{$log->agent_user_no}},"{{$log->agent_cname}}")'>
+                <select class="blade_select2" id='agent_user_select_{{$log->id}}' onchange='confirm_change_agent_user({{$log->id}}, {{$log->agent_user_no}}, "{{$log->agent_cname}}", {{$login_user_no}})'>
                   @foreach($agents as $a)
                     @if ($a->cname == $log->agent_cname) 
                       <option value='{{$a->NO}}' selected> {{$a->cname}}</option>
@@ -72,10 +72,10 @@
             </td>
             <td> 
               @if ($log->apply_type == 'L')
-                <input type="datetime-local" id='leave_start_date_{{$log->id}}' class="form-control date-input" value="{{$log->start_date}}" onfocusout='confirm_change_date("leave_start_date", {{$log->id}}, "{{$log->start_date}}", "{{$log->cname}}")'>
+                <input type="datetime-local" id='leave_start_date_{{$log->id}}' class="form-control date-input" value="{{$log->start_date}}" onfocusout='confirm_change_date("leave_start_date", {{$log->id}}, "{{$log->start_date}}", "{{$log->cname}}", {{$login_user_no}})'>
               @else
-                <input type="date" id='overwork_date_{{$log->id}}' class="form-control date-input overwork-date" value="{{$log->over_work_date}}" onfocusout='confirm_change_date("overwork_date", {{$log->id}}, "{{$log->over_work_date}}", "{{$log->cname}}")'>
-                <select class="form-control overwork-hour" id='overwork_hour_{{$log->id}}' onchange='confirm_change_date("overwork_hour", {{$log->id}}, "{{$log->over_work_hours}}", "{{$log->cname}}")'>
+                <input type="date" id='overwork_date_{{$log->id}}' class="form-control date-input overwork-date" value="{{$log->over_work_date}}" onfocusout='confirm_change_date("overwork_date", {{$log->id}}, "{{$log->over_work_date}}", "{{$log->cname}}", {{$login_user_no}})'>
+                <select class="form-control overwork-hour" id='overwork_hour_{{$log->id}}' onchange='confirm_change_date("overwork_hour", {{$log->id}}, "{{$log->over_work_hours}}", "{{$log->cname}}", {{$login_user_no}})'>
                   <option value="1" @if ($log->over_work_hours == '1') selected @endif>1小時</option>
                   <option value="2" @if ($log->over_work_hours == '2') selected @endif>2小時</option>
                   <option value="3" @if ($log->over_work_hours == '3') selected @endif>3小時</option>
@@ -89,7 +89,7 @@
             </td>
             <td>
               @if ($log->apply_type == 'L') 
-                <input type="datetime-local" id='leave_end_date_{{$log->id}}' class="form-control date-input" value="{{$log->end_date}}" onfocusout='confirm_change_date("leave_end_date", {{$log->id}}, "{{$log->end_date}}", "{{$log->cname}}")'>
+                <input type="datetime-local" id='leave_end_date_{{$log->id}}' class="form-control date-input" value="{{$log->end_date}}" onfocusout='confirm_change_date("leave_end_date", {{$log->id}}, "{{$log->end_date}}", "{{$log->cname}}", {{$login_user_no}})'>
               @else
                 -
               @endif
@@ -108,7 +108,7 @@
               @endif
             </td>
             <td>  
-             <button type="button" class="btn btn-outline-primary btn-sm" onclick="showDetailModal({{$log->id}})">詳細</button>
+             <button type="button" class="btn btn-outline-primary btn-sm" onclick="showDetailModal({{$log->id}}, {{$login_user_no}})">詳細</button>
             </td>
           </tr>
         @endforeach
@@ -183,9 +183,7 @@
       </div>
       <div class="modal-body">
         <form>
-          <div class="container-fluid">
-            <div class="row form-group msg"></div>
-          </div>
+          <div class="container-fluid form-group msg"></div>
         </form>
       </div>
       <div class="modal-footer">
@@ -197,7 +195,7 @@
 </div>
 
 <script>
-const showDetailModal = async (apply_id) => {
+const showDetailModal = async (apply_id, login_user_no) => {
     const users_res = await get_all_user();
     let all_users = [];
     if(users_res.status == "successful") {
@@ -222,7 +220,7 @@ const showDetailModal = async (apply_id) => {
                 html += "<td>"+item.cname+"</td>";
                 html += "<td>拒絕</td>";
             } else {
-                html += "<td><select id='upper_user_select_"+item.id+"' onchange='confirm_change_upper_user("+item.id+", "+item.upper_user_no+", \""+item.cname+"\")'></select></td>";
+                html += "<td><select id='upper_user_select_"+item.id+"' onchange='confirm_change_upper_user("+item.apply_id+", "+item.id+", "+item.upper_user_no+", \""+item.cname+"\", "+login_user_no+")'></select></td>";
                 html += "<td>待簽核</td>";
             }
             if(item.reject_reason) {
@@ -263,16 +261,28 @@ const get_all_user = () => {
     })
 }
 
-const confirm_change_upper_user = (apply_process_id, old_upper_user_no, old_upper_user_cname) => {
+const confirm_change_upper_user = (apply_id, apply_process_id, old_upper_user_no, old_upper_user_cname, login_user_no) => {
   //因為用select2要先trigger change一次，所以這邊會要檢查新的簽核人是否跟舊的簽核人不同人，才會去執行換簽核人的程式
   if(old_upper_user_no != $("#upper_user_select_"+apply_process_id).val()) {
     const new_cname = $("#upper_user_select_"+apply_process_id).select2('data')[0].cname;
     $('#changeModal').modal('toggle');
-    $('#changeModal').find('.msg').html("確定要將簽核人從 "+old_upper_user_cname+" 換成 "+new_cname+" 嗎?");
+    let html = "<div class='row'>";
+      html += "<label class='col-form-label col-md-3'>訊息:</label>";
+      html += "<label class='col-form-label' style='width: 72%;'>";
+      html += "確定要將<strong class='text-success'>簽核人</strong>";
+      html += "從<strong class='text-success'>"+old_upper_user_cname+"</strong>";
+      html += "換成<strong class='text-success'>"+new_cname+"</strong>嗎";
+      html += "</label>";
+      html += "</div>";
+      html += "<div class='row'>";
+      html += "<label class='col-form-label col-md-3'>說明:</label>";
+      html += "<input type='text' class='col-md-9 form-control confirm_reason'>";
+      html += "</div>";
+    $('#changeModal').find('.msg').html(html);
     $('#changeModal').css('z-index', '1060');
     $($('.modal-backdrop')[1]).css('z-index', '1051');
 
-    $("#changeModal").find(".todo").attr("onclick", "change_upper_user('"+apply_process_id+"')");
+    $("#changeModal").find(".todo").attr("onclick", "change_upper_user('"+apply_id+"', '"+apply_process_id+"', '"+login_user_no+"')");
     $("#changeModal").find(".tocancel").attr("onclick", "cancel_change_upper_user('"+apply_process_id+"', '"+old_upper_user_no+"')");
   }
 }
@@ -282,13 +292,16 @@ const cancel_change_upper_user = (apply_process_id, old_upper_user_no) => {
   $('#changeModal').modal('toggle');
 }
 
-const change_upper_user = (apply_process_id) => {
+const change_upper_user = (apply_id, apply_process_id, login_user_no) => {
   const user_NO = $("#upper_user_select_"+apply_process_id).val();
   promise_call({
     url: "../api/leavelog/change_upper_user", 
     data: {
+      "apply_id": apply_id,
       "apply_process_id": apply_process_id,
-      "user_NO":user_NO
+      "user_NO": user_NO,
+      "reason": $(".confirm_reason").val(),
+      "login_user_no": login_user_no
     }, 
     method: "put"
   })
@@ -303,11 +316,23 @@ const change_upper_user = (apply_process_id) => {
   //console.log(apply_process_id, $("#upper_user_select_"+apply_process_id).val());
 }
 
-const confirm_change_agent_user = (apply_id, old_agent_user_no, old_agent_user_cname) => {
+const confirm_change_agent_user = (apply_id, old_agent_user_no, old_agent_user_cname, login_user_no) => {
   const new_cname = $("#agent_user_select_"+apply_id).select2('data')[0].text;
   $('#changeModal').modal('toggle');
-  $('#changeModal').find('.msg').html("確定要將簽核人從 "+old_agent_user_cname+" 換成 "+new_cname+" 嗎?");
-  $("#changeModal").find(".todo").attr("onclick", "change_agent_user('"+apply_id+"', '"+old_agent_user_no+"')");
+  let html = "<div class='row'>";
+      html += "<label class='col-form-label col-md-3'>訊息:</label>";
+      html += "<label class='col-form-label' style='width: 72%;'>";
+      html += "確定要將<strong class='text-success'>代理人</strong>";
+      html += "從<strong class='text-success'>"+old_agent_user_cname+"</strong>";
+      html += "換成<strong class='text-success'>"+new_cname+"</strong>嗎";
+      html += "</label>";
+      html += "</div>";
+      html += "<div class='row'>";
+      html += "<label class='col-form-label col-md-3'>說明:</label>";
+      html += "<input type='text' class='col-md-9 form-control confirm_reason'>";
+      html += "</div>";
+  $('#changeModal').find('.msg').html(html);
+  $("#changeModal").find(".todo").attr("onclick", "change_agent_user('"+apply_id+"', '"+old_agent_user_no+"', '"+login_user_no+"')");
   $("#changeModal").find(".tocancel").attr("onclick", "cancel_change_agent_user('"+apply_id+"', '"+old_agent_user_no+"')");
 }
 
@@ -316,13 +341,15 @@ const cancel_change_agent_user = (apply_id, old_agent_user_no) => {
   $('#changeModal').modal('toggle');
 }
 
-const change_agent_user = (apply_id, old_agent_user_no) => {
+const change_agent_user = (apply_id, old_agent_user_no, login_user_no) => {
   const user_NO = $("#agent_user_select_"+apply_id).val();
   promise_call({
     url: "../api/leavelog/change_agent_user", 
     data: {
       "apply_id": apply_id,
-      "user_NO":user_NO
+      "user_NO": user_NO,
+      "reason": $(".confirm_reason").val(),
+      "login_user_no": login_user_no
     }, 
     method: "put"
   })
@@ -338,17 +365,25 @@ const change_agent_user = (apply_id, old_agent_user_no) => {
   })
 }
 
-const confirm_change_date = (type, apply_id, old_date, cname) => {
+const confirm_change_date = (type, apply_id, old_date, cname, login_user_no) => {
   const new_date = $("#"+type+"_"+apply_id).val().replace('T',' ');
-  let html="";
-  if(type == "leave_start_date") html = "確定要將"+cname+"的休假開始時間從 ";
-  if(type == "leave_end_date") html = "確定要將"+cname+"的休假結束時間從 ";
-  if(type == "overwork_date") html = "確定要將"+cname+"的加班日期從 ";
-  if(type == "overwork_hour") html = "確定要將"+cname+"的加班小時從 ";
-
+  let html = "<div class='row'>";
+      html += "<label class='col-form-label col-md-3'>訊息:</label>";
+      html += "<label class='col-form-label' style='width: 72%;'>";
+  if(type == "leave_start_date") html += "確定要將<strong class='text-success'>"+cname+"</strong>的休假開始時間從 ";
+  if(type == "leave_end_date") html += "確定要將<strong class='text-success'>"+cname+"</strong>的休假結束時間從 ";
+  if(type == "overwork_date") html += "確定要將<strong class='text-success'>"+cname+"</strong>的加班日期從 ";
+  if(type == "overwork_hour") html += "確定要將<strong class='text-success'>"+cname+"</strong>的加班小時從 ";
+  html += "</br>"+old_date.replace('T',' ')+"換成</br>"+new_date+"嗎?";
+  html += "</label>";
+  html += "</div>";
+  html += "<div class='row'>";
+  html += "<label class='col-form-label col-md-3'>說明:</label>";
+  html += "<input type='text' class='col-md-9 form-control confirm_reason'>";
+  html += "</div>";
   $('#changeModal').modal('toggle');
-  $('#changeModal').find('.msg').html(html + old_date.replace('T',' ')+" 換成 "+new_date+" 嗎?");
-  $("#changeModal").find(".todo").attr("onclick", "change_date('"+type+"', '"+apply_id+"', '"+old_date+"')");
+  $('#changeModal').find('.msg').html(html);
+  $("#changeModal").find(".todo").attr("onclick", "change_date('"+type+"', '"+apply_id+"', '"+old_date+"', '"+login_user_no+"')");
   $("#changeModal").find(".tocancel").attr("onclick", "cancel_change_date('"+type+"', '"+apply_id+"', '"+old_date+"')");
 }
 
@@ -357,14 +392,16 @@ const cancel_change_date = (type, apply_id, old_date) => {
   $('#changeModal').modal('toggle');
 }
 
-const change_date = (type, apply_id, old_date) => {
+const change_date = (type, apply_id, old_date, login_user_no) => {
   const new_date = $("#"+type+"_"+apply_id).val();
   promise_call({
     url: "../api/leavelog/change_date", 
     data: {
       "apply_id": apply_id,
-      "type":     type,
-      "new_date": new_date
+      "type": type,
+      "new_date": new_date,
+      "reason": $(".confirm_reason").val(),
+      "login_user_no": login_user_no
     }, 
     method: "put"
   })

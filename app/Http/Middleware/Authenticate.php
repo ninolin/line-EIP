@@ -12,20 +12,23 @@ class Authenticate
 
     public function handle($request, Closure $next) {
         $timestamp = session(self::SESSION); //取得在session中的時間
-        if($timestamp and $timestamp >= time()){
-            $this->setVerified();
+        $user_no = session('user_no');
+        if($user_no and $timestamp and $timestamp >= time()){
+            $this->setVerified($user_no, null);
             return $next($request);
         } else {
             return redirect(route('login'));
         }
     }
 
-    public function setVerified($min = null) {
+    public function setVerified($user_no, $min) {
         if (!$min) {
             $min = self::EXPIRED_MINS;
         }
         session([self::SESSION => strtotime($min)]);
-        log::info(session(self::SESSION));
+        session(['user_no' => $user_no]);
+        //log::info(session(self::SESSION));
+        //log::info(session('user_no'));
         return true;
     }
     

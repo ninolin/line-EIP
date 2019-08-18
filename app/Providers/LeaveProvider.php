@@ -31,7 +31,13 @@ class LeaveProvider extends ServiceProvider
     {
         //
     }
-    //取得apply單的資料
+
+    /**
+     * 回傳apply單的資料
+     *
+     * @param  int  $apply_id
+     * @return array 
+     */
     public static function getLeaveApply($apply_id)
     {
         $sql  = 'select a.*, u2.cname as apply_user_cname, u2.line_id as apply_user_line_id, u1.cname as agent_cname, u1.line_id as agent_user_line_id, eip_leave_type.name as leave_name, eip_leave_type.compensatory as leave_compensatory ';
@@ -51,11 +57,16 @@ class LeaveProvider extends ServiceProvider
         }
     }
 
+    /**
+     * 回傳2個時間的休假小時
+     *
+     * @param  date  $start_date
+     * @param  date  $end_date
+     * @param  int  $work_class_id
+     * @return float 
+     */
     public static function getLeaveHours($start_date, $end_date, $work_class_id) {
         try {
-            log::info($start_date);
-            log::info($end_date);
-            log::info($work_class_id);
             $work_start = "";
             $work_end = "";
             $lunch_start = "";
@@ -109,6 +120,10 @@ class LeaveProvider extends ServiceProvider
      *
      * @param  time  $time1
      * @param  time  $time2
+     * @param  date  $work_start
+     * @param  date  $work_end
+     * @param  date  $lunch_start
+     * @param  date  $lunch_end
      * @return float 
      */
     static protected function cal_timediff($time1, $time2, $work_start, $work_end, $lunch_start, $lunch_end) {
@@ -131,7 +146,7 @@ class LeaveProvider extends ServiceProvider
      *
      * @param  date  $date1
      * @param  date  $date2
-     * @return array 
+     * @return array [date, date]
      */
     static protected function dates2array($date1, $date2) {
         $return= array();
@@ -143,10 +158,10 @@ class LeaveProvider extends ServiceProvider
     }
 
     /**
-     * 檢查日期的上班小時
+     * 檢查是否為上班日
      *
-     * @param  string  $check_date Y-m-d
-     * @return int
+     * @param  date  $check_date Y-m-d
+     * @return int  8:上班日,0:休息日
      */
     static protected function is_offday_by_gcalendar($check_date) {
         $gcalendar_appscript_uri = Config::get('eip.gcalendar_appscript_uri');
@@ -159,5 +174,41 @@ class LeaveProvider extends ServiceProvider
             }
         }
         return $offhours;
+    }
+
+    /**
+     * 休假寫入google calendar
+     *
+     * @param  string  $start_date
+     * @param  string  $end_date
+     * @param  string  $title
+     * @return int  1:成功,0:失敗
+     */
+    public static function insert_event2gcalendar($start_date, $end_date, $title) {
+        $gcalendar_appscript_uri = Config::get('eip.gcalendar_appscript_uri');
+        $gcalendar_appscript_uri .="?type=insert&title=".urlencode($title)."&start=".str_replace(' ', 'T', $start_date)."&end=".str_replace(' ', 'T', $end_date);
+        $calevents_str = HelperServiceProvider::get_req($gcalendar_appscript_uri);
+        if(strpos($calevents_str,'Exception') !== false){ 
+            return 0;
+        }else{
+            return $calevents_str;
+        }
+    }
+
+    /**
+     * 休假從google calendar刪除
+     *
+     * @param  string  $event_id
+     * @return int
+     */
+    public static function delete_event_from_gcalendar($event_id) {
+        $gcalendar_appscript_uri = Config::get('eip.gcalendar_appscript_uri');
+        $gcalendar_appscript_uri .="?type=delete&eventId=".$event_id;
+        $calevents_str = HelperServiceProvider::get_req($gcalendar_appscript_uri);
+        if(strpos($calevents_str,'Exception') !== false){ 
+            return 0;
+        }else{
+            return $calevents_str;
+        }
     }
 }
