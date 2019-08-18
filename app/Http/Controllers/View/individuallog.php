@@ -4,6 +4,7 @@ namespace App\Http\Controllers\View;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Providers\LeaveProvider;
 use DB;
 use Log;
 
@@ -57,7 +58,7 @@ class individuallog extends Controller
             $leaves = DB::select($sql, ['Y', $apply_id]);
             if(count($leaves) > 0) {
                 foreach($leaves as $l) {
-                    self::delete_event2gcalendar($l->event_id);
+                    LeaveProvider::delete_event_from_gcalendar($l->event_id);
                 }
             }
             if(DB::update("update eip_leave_apply set apply_status =? where id =?", ['C', $apply_id]) != 1) {
@@ -75,28 +76,6 @@ class individuallog extends Controller
                 'status' => 'error',
                 'message' => $e->getMessage()
             ]);
-        }
-    }
-
-    /**
-     * google calendar刪除
-     *
-     * @param  string  $event_id
-     * @return int
-     */
-    static protected function delete_event2gcalendar($event_id) {
-        $gcalendar_appscript_uri = Config::get('eip.gcalendar_appscript_uri');
-        log::info($gcalendar_appscript_uri);
-        $json_str = '{
-            "type": "delete", 
-            "eventId": "'.$event_id.'"
-        }';
-        log::info($json_str);
-        $calevents_str = HelperServiceProvider::post_req($gcalendar_appscript_uri, $json_str);
-        if(strpos($calevents_str,'Exception') !== false){ 
-            return 0;
-        }else{
-            return 1;
         }
     }
 }

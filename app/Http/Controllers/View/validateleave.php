@@ -149,7 +149,7 @@ class validateleave extends Controller
                 log::info($process_id);
                 if($last_approved_id == $process_id) {
                     //全部審核完了
-                    $insert_event = self::insert_event2gcalendar($apply_data->start_date, $apply_data->end_date, $apply_data->apply_user_cname."的".$apply_data->leave_name);
+                    $insert_event = LeaveProvider::insert_event2gcalendar($apply_data->start_date, $apply_data->end_date, $apply_data->apply_user_cname."的".$apply_data->leave_name);
                     log::info($insert_event);
                     //if($insert_event == 0){ throw new Exception('Insert to google calendar failed!');  }
                     if(DB::update("update eip_leave_apply set apply_status =?, event_id =? where id =?", ['Y', $insert_event, $apply_id]) == 1) {
@@ -218,38 +218,5 @@ class validateleave extends Controller
             'data' => $leaves
         ]);
     }
-    /**
-     * 請假寫入google calendar
-     *
-     * @param  string  type
-     * @param  string  $start_date
-     * @param  string  $end_date
-     * @param  string  $title
-     * @return int
-     */
-    static protected function insert_event2gcalendar($start_date, $end_date, $title) 
-    {
-        $gcalendar_appscript_uri = Config::get('eip.gcalendar_appscript_uri');
-        $date1 = new DateTime($start_date);
-        $date2 = new DateTime($end_date);
-
-        $json_str = '{
-            "type": "insert", 
-            "title": "'.$title.'", 
-            "start": "'.date_format($date1, 'Y-m-d').'T'.date_format($date1, 'H:i:s').'",
-            "end": "'.date_format($date2, 'Y-m-d').'T'.date_format($date2, 'H:i:s').'"
-        }';
-
-        $calevents_str = HelperServiceProvider::post_req($gcalendar_appscript_uri, $json_str);
-        if(strpos($calevents_str,'Exception') !== false){ 
-            return 0;
-        }else{
-            return $calevents_str;
-        }
-    }
-
-    static protected function use_compensatory_leave($apply_data)
-    {
-
-    }
+    
 }
