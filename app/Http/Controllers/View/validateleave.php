@@ -11,6 +11,7 @@ use App\Providers\HelperServiceProvider;
 use DB;
 use Log;
 use Config;
+use DateTime;
 
 class validateleave extends Controller
 {
@@ -149,7 +150,8 @@ class validateleave extends Controller
                 if($last_approved_id == $process_id) {
                     //全部審核完了
                     $insert_event = self::insert_event2gcalendar($apply_data->start_date, $apply_data->end_date, $apply_data->apply_user_cname."的".$apply_data->leave_name);
-                    if($insert_event == 0){ throw new Exception('Insert to google calendar failed!');  }
+                    log::info($insert_event);
+                    //if($insert_event == 0){ throw new Exception('Insert to google calendar failed!');  }
                     if(DB::update("update eip_leave_apply set apply_status =?, event_id =? where id =?", ['Y', $insert_event, $apply_id]) == 1) {
                         if($apply_data->apply_type == 'L') {
                             //如果是加班補休，要從補休中扣
@@ -228,19 +230,21 @@ class validateleave extends Controller
     static protected function insert_event2gcalendar($start_date, $end_date, $title) 
     {
         $gcalendar_appscript_uri = Config::get('eip.gcalendar_appscript_uri');
-        log::info($gcalendar_appscript_uri);
+        $date1 = new DateTime($start_date);
+        $date2 = new DateTime($end_date);
+
         $json_str = '{
             "type": "insert", 
             "title": "'.$title.'", 
-            "start": "'.$start_date.':00",
-            "end": "'.$end_date.':00"
+            "start": "'.date_format($date1, 'Y-m-d').'T'.date_format($date1, 'H:i:s').'",
+            "end": "'.date_format($date2, 'Y-m-d').'T'.date_format($date2, 'H:i:s').'"
         }';
-        log::info($json_str);
+
         $calevents_str = HelperServiceProvider::post_req($gcalendar_appscript_uri, $json_str);
         if(strpos($calevents_str,'Exception') !== false){ 
             return 0;
         }else{
-            return 1;
+            return $calevents_str;
         }
     }
 
