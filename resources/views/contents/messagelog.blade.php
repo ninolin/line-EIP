@@ -20,39 +20,48 @@
       <thead class="table-thead">
         <tr>
           <th scope="col" onclick="reload_page({{$page}}, 'username', '{{$order_type}}', 'col')">帳號
-            <!-- @if ($order_col == 'username' && $order_type == 'DESC') <div class="angle-down"></div> @endif
-            @if ($order_col == 'username' && $order_type == 'ASC') <div class="angle-up"></div> @endif -->
+            @if ($order_col == 'username' && $order_type == 'DESC') <div class="angle-down"></div> @endif
+            @if ($order_col == 'username' && $order_type == 'ASC') <div class="angle-up"></div> @endif
           </th>
-          <th scope="col" onclick="reload_page({{$page}}, 'email', '{{$order_type}}', 'col')">LineChannel
-            <!-- @if ($order_col == 'email' && $order_type == 'DESC') <div class="angle-down"></div> @endif
-            @if ($order_col == 'email' && $order_type == 'ASC') <div class="angle-up"></div> @endif -->
+          <!-- <th scope="col" onclick="reload_page({{$page}}, 'email', '{{$order_type}}', 'col')">LineChannel
+            @if ($order_col == 'email' && $order_type == 'DESC') <div class="angle-down"></div> @endif
+            @if ($order_col == 'email' && $order_type == 'ASC') <div class="angle-up"></div> @endif
+          </th> -->
+          <th scope="col" onclick="reload_page({{$page}}, 'line_id', '{{$order_type}}', 'col')">LineId
+            @if ($order_col == 'line_id' && $order_type == 'DESC') <div class="angle-down"></div> @endif
+            @if ($order_col == 'line_id' && $order_type == 'ASC') <div class="angle-up"></div> @endif
           </th>
-          <th scope="col" onclick="reload_page({{$page}}, 'cname', '{{$order_type}}', 'col')">LineId
-            <!-- @if ($order_col == 'cname' && $order_type == 'DESC') <div class="angle-down"></div> @endif
-            @if ($order_col == 'cname' && $order_type == 'ASC') <div class="angle-up"></div> @endif -->
+          <th scope="col" onclick="reload_page({{$page}}, 'type', '{{$order_type}}', 'col')">type
+            @if ($order_col == 'type' && $order_type == 'DESC') <div class="angle-down"></div> @endif
+            @if ($order_col == 'type' && $order_type == 'ASC') <div class="angle-up"></div> @endif
           </th>
-          <th scope="col" onclick="reload_page({{$page}}, 'upper_user_no', '{{$order_type}}', 'col')">type
-            <!-- @if ($order_col == 'upper_user_no' && $order_type == 'DESC') <div class="angle-down"></div> @endif
-            @if ($order_col == 'upper_user_no' && $order_type == 'ASC') <div class="angle-up"></div> @endif -->
+          <th scope="col" onclick="reload_page({{$page}}, 'message', '{{$order_type}}', 'col')">message
+            @if ($order_col == 'message' && $order_type == 'DESC') <div class="angle-down"></div> @endif
+            @if ($order_col == 'message' && $order_type == 'ASC') <div class="angle-up"></div> @endif
           </th>
-          <th scope="col" onclick="reload_page({{$page}}, 'line_id', '{{$order_type}}', 'col')">message
-            <!-- @if ($order_col == 'line_id' && $order_type == 'DESC') <div class="angle-down"></div> @endif
-            @if ($order_col == 'line_id' && $order_type == 'ASC') <div class="angle-up"></div> @endif -->
+          <th scope="col" onclick="reload_page({{$page}}, 'time', '{{$order_type}}', 'col')">時間
+            @if ($order_col == 'time' && $order_type == 'DESC') <div class="angle-down"></div> @endif
+            @if ($order_col == 'time' && $order_type == 'ASC') <div class="angle-up"></div> @endif
           </th>
-          <th scope="col">操作</th>
         </tr>
       </thead>
       <tbody>
-        @foreach($messages as $msg)
+        @if(count($messages) === 0) 
           <tr>
-            <td> {{$msg->username}} </td>
-            <td> {{$msg->line_channel}} </td>
-            <td> {{$msg->line_id}} </td>
-            <td> {{$msg->type}} </td>
-            <td> {{$msg->message}} </td>  
-            <td> {{date('Y-m-d H:i:s', $msg->time)}} </td>  
+            <td colspan="5" class="text-center"> 目前無資料 </td>
           </tr>
-        @endforeach
+        @else
+          @foreach($messages as $msg)
+            <tr>
+              <td> {{$msg->username}} </td>
+              <!-- <td> {{$msg->line_channel}} </td> -->
+              <td> {{$msg->line_id}} </td>
+              <td> {{$msg->type}} </td>
+              <td> {{$msg->message}} </td>  
+              <td> {{date('Y-m-d H:i:s', $msg->time)}} </td>  
+            </tr>
+          @endforeach
+        @endif
       </tbody>
     </table>
   </div>

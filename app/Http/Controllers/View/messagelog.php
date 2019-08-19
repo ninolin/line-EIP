@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Input;
 use DB;
+use Log;
 
 class messagelog extends Controller
 {
@@ -31,20 +32,20 @@ class messagelog extends Controller
         $search = Input::get('search', '');
         $order_col = Input::get('order_col', 'username');
         $order_type = Input::get('order_type', 'DESC');
-        $threedaybefore = time() - 86400*3;
+        $timelimit = time() - 86400*10;
         $sql = "select * from eip_line_message where time > ? ";
         if($search != '') {
-            $sql .= 'and username like "%'.$search.'%" ';
+            $sql .= 'and username like "%'.$search.'%" or message like "%'.$search.'%" ';
         }
-        $sql .= "order by time DESC limit ?,10";
-        $messages = DB::select($sql, [$threedaybefore, ($page-1)*10]);
+        $sql .= "order by ".$order_col." ".$order_type." limit ?,10";
+        $messages = DB::select($sql, [$timelimit, ($page-1)*10]);
 
         $page_sql = 'select * from eip_line_message where time > ? ';
         if($search != '') {
-            $page_sql .= 'and username like "%'.$search.'%" ';
+            $page_sql .= 'and username like "%'.$search.'%" or message like "%'.$search.'%" ';
         }
 
-        $total_messages = DB::select($page_sql, [$threedaybefore]);
+        $total_messages = DB::select($page_sql, [$timelimit]);
         $total_pages = ceil(count($total_messages)/10);
         return view('contents.messagelog', [
             'search' => $search,
