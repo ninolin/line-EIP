@@ -33,9 +33,7 @@ class applyleave extends Controller
     public function create()
     {
         //因為有同一種假但不同天數的假別，所以做distinct name，之後新增假時，再判斷是用那一種假別的id
-        $sql  ='select distinct elt.name, et.name as title_name, et.id as title_id ';
-        $sql .='from eip_leave_type elt, eip_title et ';
-        $sql .='where elt.approved_title_id = et.id ';
+        $sql  ='select distinct name from eip_leave_type';
         $leavetypes = DB::select($sql, []);
         //用戶只列出有加入line的而且是status是T(True)
         $users = DB::select("select * from user where status = 'T' and line_id != '' order by cname", []);
