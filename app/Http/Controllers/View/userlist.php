@@ -199,6 +199,7 @@ class userlist extends Controller
             }
 
             try {
+                DB::update("update user set onboard_date =? where NO =?", [$onboard_date, $id]);
                 DB::delete("delete from eip_annual_leave where user_no =? and year =?", [$id, date("Y")]);
                 DB::insert("insert into eip_annual_leave (user_no, year, annual_leaves, labor_annual_leaves) value (?, ?, ?, ?)", [$id, date("Y"), $annual_leaves, $labor_annual_leaves]);
                 DB::commit();
