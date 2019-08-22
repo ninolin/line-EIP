@@ -109,6 +109,7 @@
             </td>
             <td>  
              <button type="button" class="btn btn-outline-primary btn-sm" onclick="showDetailModal({{$log->id}}, {{$login_user_no}})">詳細</button>
+             <button type="button" class="btn btn-outline-primary btn-sm" onclick="showChangeLogModal({{$log->id}})">修改紀錄</button>
             </td>
           </tr>
         @endforeach
@@ -172,6 +173,42 @@
   </div>
 </div>
 
+<div class="modal fade" id="changelogModal" tabindex="-1" role="dialog"aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">修改紀錄</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form>
+          <div class="form-group container-fluid">
+            <div class="row">
+              <table class="table table-bordered table-striped">
+                <thead class="table-thead">
+                  <tr>
+                      <th>修改日期</th>
+                      <th>修改內容</th>
+                      <th>修改人</th>
+                  </tr>
+                </thead>
+                <tbody id="changelog_data">
+                  <tr><td colspan="3">無資料</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">關閉</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="modal fade" id="changeModal" tabindex="-1" role="dialog" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered modal-sm" role="document">
     <div class="modal-content">
@@ -195,6 +232,23 @@
 </div>
 
 <script>
+
+const showChangeLogModal = async (apply_id) => {
+    const res = await get_apply_changelog(apply_id);
+    if(res.status == "successful") {
+        if(res.data.length > 0) $("#changelog_data").html("");
+        res.data.map( (item, index) => {
+            let html = "<tr>";
+            html += "<td>"+item.change_time+"</td>";
+            html += "<td>"+item.change_desc+"</td>";
+            html += "<td>"+item.cname+"</td>";
+            html += "</tr>";
+            $("#changelog_data").append(html);
+        })
+        $('#changelogModal').modal('toggle');
+    }
+}
+
 const showDetailModal = async (apply_id, login_user_no) => {
     const users_res = await get_all_user();
     let all_users = [];
@@ -250,6 +304,13 @@ const showDetailModal = async (apply_id, login_user_no) => {
 const get_apply_path = (apply_id) => {
     return promise_call({
         url: "../api/leavelog/"+apply_id, 
+        method: "get"
+    })
+}
+
+const get_apply_changelog = (apply_id) => {
+    return promise_call({
+        url: "../api/leavelog/changelog/"+apply_id, 
         method: "get"
     })
 }

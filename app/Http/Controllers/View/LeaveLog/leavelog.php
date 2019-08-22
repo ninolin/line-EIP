@@ -22,10 +22,15 @@ class leavelog extends Controller
         $this->calcL = $calcL;
     }
 
+    /**
+     * 顯示某一筆休假/加班的簽核歷程
+     * 
+     * @param  string  id
+     * @return \Illuminate\Http\Response
+     */
     public function list_logs($id)
     {
-        $sql  = "select elap.*, u.cname ";
-        $sql .= "from eip_leave_apply_process elap, user u ";
+        $sql  = "select elap.*, u.cname from eip_leave_apply_process elap, user u ";
         $sql .= "where elap.upper_user_no = u.NO and elap.apply_id = ?";
         $processes = DB::select($sql, [$id]);
         return response()->json([
@@ -36,8 +41,8 @@ class leavelog extends Controller
 
     /**
      * 顯示最近工時紀錄
-     * @param  string  search
-     * @param  string  leave_year
+     * 
+     * @param  string  id
      * @return \Illuminate\Http\Response
      */
     public function show_last()
@@ -88,8 +93,7 @@ class leavelog extends Controller
 
     /**
      * 顯示員工紀錄頁面
-     * @param  string  search
-     * @param  string  leave_year
+     * 
      * @return \Illuminate\Http\Response
      */
     public function show_individual() 
@@ -196,7 +200,7 @@ class leavelog extends Controller
                 }
             }
 
-            $sql = "insert into eip_leave_apply_change_log (apply_id, apply_process_id, change_desc, change_reason, change_use_no) value (?, ?, ?, ?, ?)";
+            $sql = "insert into eip_leave_apply_change_log (apply_id, apply_process_id, change_desc, change_reason, change_user_no) value (?, ?, ?, ?, ?)";
             DB::beginTransaction(); 
             try {
                 DB::update("update eip_leave_apply_process set upper_user_no =? where id =?", [$new_upper_user_no, $apply_process_id]);
@@ -257,7 +261,7 @@ class leavelog extends Controller
             DB::beginTransaction(); 
             try {
                 DB::update("update eip_leave_apply set agent_user_no =? where id =?", [$new_agent_user_no, $apply_id]);
-                $sql = "insert into eip_leave_apply_change_log (apply_id, change_desc, change_reason, change_use_no) value (?, ?, ?, ?)";
+                $sql = "insert into eip_leave_apply_change_log (apply_id, change_desc, change_reason, change_user_no) value (?, ?, ?, ?)";
                 DB::insert($sql, [$apply_id, "代理人從".$old_agent_user_cname."換成".$new_agent_user_cname, $reason, $login_user_no]);
                 DB::commit();
             } catch (Exception $e) {
@@ -347,7 +351,7 @@ class leavelog extends Controller
                 DB::beginTransaction(); 
                 try {
                     DB::update("update eip_leave_apply set over_work_date =? where id =?", [$new_date, $apply_id]);
-                    $sql = "insert into eip_leave_apply_change_log (apply_id, change_desc, change_reason, change_use_no) value (?, ?, ?, ?)";
+                    $sql = "insert into eip_leave_apply_change_log (apply_id, change_desc, change_reason, change_user_no) value (?, ?, ?, ?)";
                     DB::insert($sql, [$apply_id, "加班日更新為".$new_date, $reason, $login_user_no]);
                     DB::commit();
                 } catch (Exception $e) {
@@ -363,7 +367,7 @@ class leavelog extends Controller
                 DB::beginTransaction(); 
                 try {
                     DB::update("update eip_leave_apply set over_work_hours =? where id =?", [$new_date, $apply_id]);
-                    $sql = "insert into eip_leave_apply_change_log (apply_id, change_desc, change_reason, change_use_no) value (?, ?, ?, ?)";
+                    $sql = "insert into eip_leave_apply_change_log (apply_id, change_desc, change_reason, change_user_no) value (?, ?, ?, ?)";
                     DB::insert($sql, [$apply_id, "加班小時更新為".$new_date, $reason, $login_user_no]);
                     DB::commit();
                 } catch (Exception $e) {
@@ -396,7 +400,7 @@ class leavelog extends Controller
             DB::beginTransaction(); 
             try {
                 DB::update("update eip_leave_apply set ".$column." =?, leave_hours =?, event_id =? where id =?", [$new_date, $leave_hours, $insert_event, $apply_id]);
-                $sql = "insert into eip_leave_apply_change_log (apply_id, change_desc, change_reason, change_use_no) value (?, ?, ?, ?)";
+                $sql = "insert into eip_leave_apply_change_log (apply_id, change_desc, change_reason, change_user_no) value (?, ?, ?, ?)";
                 DB::insert($sql, [$apply_id, $change_desc, $reason, $login_user_no]);
                 DB::commit();
             } catch (Exception $e) {
@@ -421,7 +425,6 @@ class leavelog extends Controller
      * 
      * @param \Illuminate\Http\Request
      */
-
     static protected function send_notify_after_change_date($apply_id, $type) {
         if($type == "leave") {
             $v = json_decode(LeaveProvider::getLeaveApply($apply_id));
@@ -458,5 +461,22 @@ class leavelog extends Controller
                 }
             }
         }
+    }
+
+    /**
+     * 顯示某一筆休假/加班的簽核歷程
+     * 
+     * @param  string  id
+     * @return \Illuminate\Http\Response
+     */
+    public function list_change_logs($id)
+    {
+        $sql  = "select elac.*, u.cname from eip_leave_apply_change_log elac, user u ";
+        $sql .= "where elac.change_user_no = u.NO and elac.apply_id = ?";
+        $logs = DB::select($sql, [$id]);
+        return response()->json([
+            'status'        => 'successful',
+            'data'          => $logs
+        ]);
     }
 }
