@@ -185,18 +185,24 @@ class leavelog extends Controller
             $reason             = $request->get('reason');
             $login_user_no      = $request->get('login_user_no');
 
+            $old_upper_user_no = "";
             $old_upper_user_cname = "";
-            $data = DB::select("select u.cname from eip_leave_apply_process elap, user u where elap.id =? and elap.upper_user_no = u.NO", [$apply_process_id]);
+            $old_upper_user_line_id = "";
+            $data = DB::select("select u.NO, u.cname, u.line_id from eip_leave_apply_process elap, user u where elap.id =? and elap.upper_user_no = u.NO", [$apply_process_id]);
             if(count($data) == 1) { 
                 foreach ($data as $v) {
+                    $old_upper_user_no = $v->NO;
                     $old_upper_user_cname = $v->cname;
+                    $old_upper_user_line_id = $v->line_id;
                 }
             }
             $new_upper_user_cname = "";
-            $data = DB::select("select cname from user where NO =?", [$new_upper_user_no]);
+            $new_upper_user_line_id = "";
+            $data = DB::select("select cname, line_id from user where NO =?", [$new_upper_user_no]);
             if(count($data) == 1) { 
                 foreach ($data as $v) {
                     $new_upper_user_cname = $v->cname;
+                    $new_upper_user_line_id = $v->line_id;
                 }
             }
 
@@ -209,6 +215,19 @@ class leavelog extends Controller
             } catch (Exception $e) {
                 DB::rollBack();
                 throw $e;
+            }
+            //若更改的簽核人是下一個要簽核的人，就要通知新舊簽核人，反正不用，因為輪到他簽核時才會通知
+            $sql = "select id from eip_leave_apply_process where apply_id =? and is_validate is null order by id limit 1";
+            $data = DB::select($sql, [$apply_id]);
+            if(count($data) == 1) { 
+                foreach ($data as $v) {
+                    if($v->id == $apply_process_id) {
+                        $v = json_decode(LeaveProvider::getLeaveApply($apply_id));
+                        $msg = ["申請人::". $v->apply_user_cname, "假別::". $v->leave_name, "代理人::".$v->agent_cname,"起日::".$v->start_date,"迄日::". $v->end_date,"備住::". $v->comment];
+                        LineServiceProvider::sendNotifyFlexMeg($new_upper_user_line_id, array_merge(["請審核".$v->apply_user_cname."送出的假單"], $msg));
+                        LineServiceProvider::sendNotifyFlexMeg($old_upper_user_line_id, array_merge(["簽核人取消"], $msg));
+                    }
+                }
             }
             return response()->json([
                 'status' => 'successful'
