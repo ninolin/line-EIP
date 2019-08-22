@@ -31,8 +31,9 @@ class userlist extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
-     *
+     * 顯示員工設定頁面
+     * 
+     * @author nino
      * @return \Illuminate\Http\Response
      */
     public function create()
@@ -60,8 +61,6 @@ class userlist extends Controller
         }
         $total_users = DB::select($page_sql, []);
         $total_pages = ceil(count($total_users)/10);
-        debug($page);
-        debug($users);
         return view('contents.userlist', [
             'search' => $search,
             'order_col' => $order_col,
@@ -73,64 +72,42 @@ class userlist extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
+     * 設定員工的職等、第一簽核人、班別、到職日，更新年休假
+     * 
+     * @author nino
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, $id)
     {
-        $title_id = $request->get('title_id');
-        $upper_user_no = $request->get('upper_user_no');
-        $work_class_id = $request->get('work_class_id');
-        $onboard_date = $request->get('onboard_date');
+        try {
+            $title_id = $request->get('title_id');
+            $upper_user_no = $request->get('upper_user_no');
+            $work_class_id = $request->get('work_class_id');
+            if(DB::update("update user set title_id =?, upper_user_no =?, work_class_id =? where NO =?", [$title_id, $upper_user_no, $work_class_id, $id]) == 1) {
+                return response()->json([
+                    'status' => 'successful'
+                ]);
+            } else {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'update error'
+                ]);
+            }
 
-        if(DB::update("update user set title_id =?, upper_user_no =?, work_class_id =?, onboard_date =? where NO =?", [$title_id, $upper_user_no, $work_class_id, $onboard_date, $id]) == 1) {
-            return response()->json([
-                'status' => 'successful'
-            ]);
-        } else {
+        } catch (Exception $e) {
             return response()->json([
                 'status' => 'error',
-                'message' => 'update error'
+                'message' => $e->getMessage()
             ]);
         }
     }
 
+    /**
+     * 員工綁定line_id
+     * 
+     * @author nino
+     * @return \Illuminate\Http\Response
+     */
     public function bindlineid(Request $request, $id)
     {
         $line_id = $request->get('line_id');
@@ -146,6 +123,12 @@ class userlist extends Controller
         }
     }
 
+    /**
+     * 員工解除綁定line_id
+     * 
+     * @author nino
+     * @return \Illuminate\Http\Response
+     */
     public function unbindlineid(Request $request, $id)
     {
         if(DB::update("update user set line_id ='' where NO =?", [$id]) == 1) {
@@ -160,6 +143,12 @@ class userlist extends Controller
         }
     }
 
+    /**
+     * 檢查line_id是否有被綁定
+     * 
+     * @author nino
+     * @return \Illuminate\Http\Response
+     */
     public function checklineid(Request $request, $id)
     {
         $user = DB::select("select * from user where line_id =?", [$id]);
@@ -169,59 +158,61 @@ class userlist extends Controller
         ]);
     }
 
-    public function calcleaveday(Request $request, $NO)
+    public function get_annualleave(Request $request, $id)
     {
-        $leave_day = 0;
-        $year_useleave = 0;
-        $year_totalleave = 0;
-        $users = DB::select("select * from user where NO =?", [$NO]);
-        foreach ($users as $u) {
-            $onboard_date = $u->onboard_date;
-            if(!is_null($u->year_useleave)) {
-                $year_useleave = $u->year_useleave;
-            }
-            if(!is_null($u->year_totalleave)) {
-                $year_totalleave = $u->year_totalleave;
-            }
-            if(!is_null($onboard_date)) {
-                $leave_day = $this->calcL->calc_leavedays($onboard_date, date("Y")."-01-01");
-                if($leave_day == 10000) {
-                    $leave_day = 0;
-                }
-            }
+        $annual_leaves = 0;
+        $labor_annual_leaves = 0;
+        $leaves = DB::select("select * from eip_annual_leave where user_no =? and year =?", [$id, date("Y")]);
+        foreach ($leaves as $l) {
+            $annual_leaves = $l->annual_leaves;
+            $labor_annual_leaves = $l->labor_annual_leaves;
         }
         return response()->json([
             'status' => 'successful',
-            'leave_day' => $leave_day,
-            'year_useleave' => $year_useleave,
-            'year_totalleave' => $year_totalleave
+            'annual_leaves' => $annual_leaves,
+            'labor_annual_leaves' => $labor_annual_leaves
         ]);
     }
 
-    public function updateleaveday(Request $request, $NO)
+    public function cal_laborannualleave(Request $request, $onboard_date)
     {
-        $leave_day = $request->get('leave_day');
-        if(!is_null($leave_day)) {
-            if(DB::update("update user set year_totalleave=? where NO =?", [$leave_day, $NO]) == 1) {
-                return response()->json([
-                    'status' => 'successful'
-                ]);
-            } else {
-                return response()->json([
-                    'status' => 'error',
-                    'message' => 'update error'
-                ]);
+        $labor_annual_leaves = $this->calcL->calc_leavedays($onboard_date, date("Y")."-01-01");
+        if($labor_annual_leaves == 10000) {
+            $labor_annual_leaves = 0;
+        }
+        return response()->json([
+            'status' => 'successful',
+            'labor_annual_leaves' => $labor_annual_leaves
+        ]);
+    }
+
+    public function update_annualleave(Request $request, $id)
+    {
+        try {
+            $annual_leaves = $request->get('annual_leaves');
+            $onboard_date = $request->get('onboard_date');
+            $labor_annual_leaves = $this->calcL->calc_leavedays($onboard_date, date("Y")."-01-01");
+            if($labor_annual_leaves == 10000) {
+                $labor_annual_leaves = 0;
             }
+
+            try {
+                DB::delete("delete from eip_annual_leave where user_no =? and year =?", [$id, date("Y")]);
+                DB::insert("insert into eip_annual_leave (user_no, year, annual_leaves, labor_annual_leaves) value (?, ?, ?, ?)", [$id, date("Y"), $annual_leaves, $labor_annual_leaves]);
+                DB::commit();
+            } catch (Exception $e) {
+                DB::rollBack();
+                throw $e;
+            }
+            return response()->json([
+                'status' => 'successful'
+            ]);
+        } catch (Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => $e->getMessage()
+            ]);
         }
     }
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
-    {
-        //
-    }
+
 }

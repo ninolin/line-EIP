@@ -19,8 +19,9 @@ Route::put('userlist/{id}', 'View\userlist@update');
 Route::put('userlist/bindlineid/{id}', 'View\userlist@bindlineid');
 Route::put('userlist/unbindlineid/{id}', 'View\userlist@unbindlineid');
 Route::get('userlist/checklineid/{id}', 'View\userlist@checklineid');
-Route::get('userlist/leaveday/{NO}', 'View\userlist@calcleaveday');
-Route::put('userlist/leaveday/{NO}', 'View\userlist@updateleaveday');
+Route::get('userlist/annualleave/{NO}', 'View\userlist@get_annualleave');
+Route::put('userlist/annualleave/{NO}', 'View\userlist@update_annualleave');
+Route::get('userlist/cal_laborannualleave/{onboard_date}', 'View\userlist@cal_laborannualleave');
 
 Route::get('title', 'View\WorkSetting\title@index');
 Route::post('title', 'View\WorkSetting\title@store');

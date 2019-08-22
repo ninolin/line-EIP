@@ -1,6 +1,6 @@
 
-const showSetModal = async (user_no, title_id, upper_user_no, work_class_id, onboard_date) => {
-    $("#onboard_date").val(onboard_date);
+const showSetModal = async (user_no, title_id, upper_user_no, work_class_id) => {
+    //$("#onboard_date").val(onboard_date);
     const titles_res = await get_all_title();
     const users_res = await get_all_user();
     const class_res = await get_all_class();
@@ -53,27 +53,40 @@ const showSetModal = async (user_no, title_id, upper_user_no, work_class_id, onb
     }
 }
 
-const showLeaveDayModal = (user_no) => {
+const showLeaveDayModal = (user_no, onboard_date) => {
+    $("#onboard_date").val(onboard_date);
     $("#setLeaveDayModal").find(".todo").attr("onclick", "updateLeaveDay('"+user_no+"')")
     promise_call({
-        url: "./api/userlist/leaveday/"+user_no, 
+        url: "./api/userlist/annualleave/"+user_no, 
         method: "get"
     })
     .then(v => {
         if(v.status == "successful") {
-            $("#calc_leave_day").html(v.leave_day);
-            $("#year_useleave").html(v.year_useleave);
-            $("#year_totalleave").val(v.year_totalleave);
+            $("#labor_annual_leaves").html(v.labor_annual_leaves);
+            $("#annual_leaves").val(v.annual_leaves);
         }
         $('#setLeaveDayModal').modal('toggle');
     })
 }
 
+const cal_laborannualleave = () => {
+    promise_call({
+        url: "./api/userlist/cal_laborannualleave/"+$("#onboard_date").val(), 
+        method: "get"
+    })
+    .then(v => {
+        if(v.status == "successful") {
+            $("#labor_annual_leaves").html(v.labor_annual_leaves);
+        }
+    })
+}
+
 const updateLeaveDay = (user_no) => {
     promise_call({
-        url: "./api/userlist/leaveday/"+user_no, 
+        url: "./api/userlist/annualleave/"+user_no, 
         data: {
-            "leave_day": $("#year_totalleave").val()
+            "annual_leaves": $("#annual_leaves").val(),
+            "onboard_date": $("#onboard_date").val()
         }, 
         method: "put"
     })

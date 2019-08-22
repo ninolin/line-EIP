@@ -16,6 +16,7 @@
         <tr>
           <th scope="col">假別</th>
           <th scope="col">天數</th>
+          <th scope="col">年休</th>
           <th scope="col">加班補休</th>
           <th scope="col">最小請假分鐘</th>
           <th scope="col">簽核職等</th>
@@ -32,11 +33,12 @@
             <tr>
               <td> {{$type->name}} </td>
               <td> {{$type->day}} </td>
+              <td> @if($type->annual === 0) - @else 是 @endif </td>
               <td> @if($type->compensatory === 0) - @else 是 @endif </td>
               <td> {{$type->min_time}} 分鐘</td>
               <td> {{$type->title_name}} </td>
               <td>  
-                <button type="button" class="btn btn-outline-primary btn-sm" onclick="showLeaveModal('update', '{{$type->id}}', '{{$type->name}}', '{{$type->day}}', '{{$type->title_id}}', '{{$type->min_time}}', '{{$type->compensatory}}')">修改</button>
+                <button type="button" class="btn btn-outline-primary btn-sm" onclick="showLeaveModal('update', '{{$type->id}}', '{{$type->name}}', '{{$type->day}}', '{{$type->title_id}}', '{{$type->min_time}}', '{{$type->compensatory}}', '{{$type->annual}}')">修改</button>
                 <button type="button" class="btn btn-outline-danger btn-sm" onclick="showDeleteModal('{{$type->id}}', '{{$type->name}}', '{{$type->day}}')">刪除</button>
               </td>
             </tr>
@@ -84,6 +86,12 @@
             <div class="row form-group">
               <label for="leave-day" class="col-form-label w-25">天數:</label>
               <input type="text" class="form-control w-75 leave-day">
+            </div>
+            <div class="row form-group">
+              <label for="leave-day" class="col-form-label w-25">年休:</label>
+              <div class="form-check w-75 mt-2">
+                <input type="checkbox" class="form-check-input leave-annual">
+              </div>
             </div>
             <div class="row form-group">
               <label for="leave-day" class="col-form-label w-25">加班補休:</label>
@@ -144,7 +152,7 @@
 </div>
 
 <script>
-  const showLeaveModal = async (type, leave_id, leave_name, leave_day, title_id, min_time, compensatory) => {
+  const showLeaveModal = async (type, leave_id, leave_name, leave_day, title_id, min_time, compensatory, annual) => {
     const titles_res = await get_all_title();
     if(titles_res.status == "successful") {
         const all_titles = titles_res.data.map(item => {
@@ -168,7 +176,8 @@
             $("#leaveModal").find(".leave-name").val(leave_name);
             $("#leaveModal").find(".leave-day").val(leave_day);
             $("#leaveModal").find(".leave-min-time").val(min_time);
-            $("#leaveModal").find(".leave-compensatory").prop('checked', compensatory);
+            $("#leaveModal").find(".leave-annual").prop('checked', parseInt(annual));
+            $("#leaveModal").find(".leave-compensatory").prop('checked', parseInt(compensatory));
             $("#title_set_select").val(title_id).trigger("change");
             $("#leaveModal").find(".todo").attr("onclick", "update_leave('"+leave_id+"')").html("修改");
             $('#leaveModal').modal('toggle');
@@ -191,6 +200,7 @@
           data: {
               "name": $("#leaveModal").find(".leave-name").val(),
               "day": $("#leaveModal").find(".leave-day").val(),
+              "annual": $("#leaveModal").find(".leave-annual").prop('checked'),
               "compensatory": $("#leaveModal").find(".leave-compensatory").prop('checked'),
               "min_time": $("#leaveModal").find(".leave-min-time").val(),
               "approved_title_id": parseInt($("#title_set_select").val())
@@ -212,6 +222,7 @@
           data: {
               "name": $("#leaveModal").find(".leave-name").val(),
               "day": $("#leaveModal").find(".leave-day").val(),
+              "annual": $("#leaveModal").find(".leave-annual").prop('checked'),
               "compensatory": $("#leaveModal").find(".leave-compensatory").prop('checked'),
               "min_time": $("#leaveModal").find(".leave-min-time").val(),
               "approved_title_id": parseInt($("#title_set_select").val())

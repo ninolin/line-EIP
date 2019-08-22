@@ -27,7 +27,7 @@ class leavetype extends Controller
     public function create()
     {
         $page = Input::get('page', 1);
-        $types = DB::select('select elt.*, et.name as title_name, et.id as title_id from eip_leave_type elt, eip_title et where elt.approved_title_id = et.id order by name limit ?,10 ', [($page-1)*10]);
+        $types = DB::select('select elt.*, et.name as title_name, et.id as title_id from eip_leave_type elt left join eip_title et on elt.approved_title_id = et.id order by elt.name limit ?,10 ', [($page-1)*10]);
         $total_types = DB::select('select * from eip_leave_type', []);
         $total_pages = ceil(count($total_types)/10);
         return view('contents.WorkSetting.leavetype', [
@@ -49,6 +49,7 @@ class leavetype extends Controller
         //debug( $request->get('name'));
         $name           = $request->get('name');
         $day            = $request->get('day');
+        $annual         = $request->get('annual');
         $compensatory   = $request->get('compensatory');
         $min_time       = $request->get('min_time');
         $approved_title_id  = $request->get('approved_title_id');
@@ -56,6 +57,7 @@ class leavetype extends Controller
         $validator = Validator::make($request->all(), [
             'name'          => 'required|string|max:32',
             'day'           => 'required|integer',
+            'annual'        => 'required|boolean',
             'compensatory'  => 'required|boolean',
             'min_time'      => 'required|integer',
             'approved_title_id' => 'required|integer'
@@ -75,7 +77,7 @@ class leavetype extends Controller
             ], 409);
         }
 
-        if(DB::insert("insert into eip_leave_type (name, day, min_time, compensatory, approved_title_id) values (?, ?, ?, ?, ?)", [$name, $day, $min_time, $compensatory, $approved_title_id]) == 1) {
+        if(DB::insert("insert into eip_leave_type (name, day, min_time, annual, compensatory, approved_title_id) values (?, ?, ?, ?, ?, ?)", [$name, $day, $min_time, $annual, $compensatory, $approved_title_id]) == 1) {
             return response()->json([
                 'status' => 'successful'
             ]);
@@ -85,28 +87,6 @@ class leavetype extends Controller
                 'message' => 'insert error'
             ], 500);
         }
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
     }
 
     /**
@@ -120,6 +100,7 @@ class leavetype extends Controller
     {
         $name           = $request->get('name');
         $day            = $request->get('day');
+        $annual         = $request->get('annual');
         $compensatory   = $request->get('compensatory');
         $min_time       = $request->get('min_time');
         $approved_title_id  = $request->get('approved_title_id');
@@ -127,6 +108,7 @@ class leavetype extends Controller
         $validator = Validator::make($request->all(), [
             'name'          => 'required|string|max:32',
             'day'           => 'required|integer',
+            'annual'        => 'required|boolean',
             'compensatory'  => 'required|boolean',
             'min_time'      => 'required|integer',
             'approved_title_id' => 'required|integer'
@@ -146,7 +128,7 @@ class leavetype extends Controller
             ], 409);
         }
 
-        if(DB::update("update eip_leave_type set name =?, day =?, min_time =?, compensatory =?, approved_title_id =? where id =?", [$name, $day, $min_time, $compensatory, $approved_title_id, $id]) == 1) {
+        if(DB::update("update eip_leave_type set name =?, day =?, min_time =?, annual =?, compensatory =?, approved_title_id =? where id =?", [$name, $day, $min_time, $annual, $compensatory, $approved_title_id, $id]) == 1) {
             return response()->json([
                 'status' => 'successful'
             ]);
