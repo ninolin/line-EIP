@@ -31,13 +31,13 @@
             @if ($order_col == 'onboard_date' && $order_type == 'DESC') <div class="angle-down"></div> @endif
             @if ($order_col == 'onboard_date' && $order_type == 'ASC') <div class="angle-up"></div> @endif
           </th>
-          <!-- <th scope="col" onclick="reload_page({{$page}}, 'year_totalleave', '{{$order_type}}', 'col')">已用/全部休假
-            @if ($order_col == 'year_totalleave' && $order_type == 'DESC') <div class="angle-down"></div> @endif
-            @if ($order_col == 'year_totalleave' && $order_type == 'ASC') <div class="angle-up"></div> @endif
-          </th> -->
           <th scope="col" onclick="reload_page({{$page}}, 'title_id', '{{$order_type}}', 'col')">職等
             @if ($order_col == 'title_id' && $order_type == 'DESC') <div class="angle-down"></div> @endif
             @if ($order_col == 'title_id' && $order_type == 'ASC') <div class="angle-up"></div> @endif
+          </th>
+          <th scope="col" onclick="reload_page({{$page}}, 'default_agent_user_no', '{{$order_type}}', 'col')">預設代理人
+            @if ($order_col == 'default_agent_user_no' && $order_type == 'DESC') <div class="angle-down"></div> @endif
+            @if ($order_col == 'default_agent_user_no' && $order_type == 'ASC') <div class="angle-up"></div> @endif
           </th>
           <th scope="col" onclick="reload_page({{$page}}, 'upper_user_no', '{{$order_type}}', 'col')">第一簽核人
             @if ($order_col == 'upper_user_no' && $order_type == 'DESC') <div class="angle-down"></div> @endif
@@ -60,8 +60,8 @@
             <td> {{$user->username}} </td>
             <td> {{$user->cname}} </td>
             <td> {{$user->onboard_date}} </td>
-            <!-- <td> {{isset($user->year_useleave)?$user->year_useleave:0}} / {{isset($user->year_totalleave)?$user->year_totalleave:0}}</td> -->
             <td> {{$user->title}} </td>
+            <td> {{$user->default_agent_cname}} </td>
             <td> {{$user->upper_cname}} </td>
             <td> {{$user->work_class_name}} </td>
             <td> {{$user->line_id}} </td>
@@ -71,7 +71,7 @@
               @else
                 <button type="button" class="btn btn-outline-danger btn-sm" onclick="showUnbindLineId({{$user->NO}}, '{{$user->cname}}', '{{$user->line_id}}')">解除lineId</button>
               @endif
-              <button type="button" class="btn btn-outline-primary btn-sm" onclick="showSetModal({{$user->NO}}, {{$user->title_id}}, {{$user->upper_user_no}}, {{$user->work_class_id}})">主檔設定</button>
+              <button type="button" class="btn btn-outline-primary btn-sm" onclick="showSetModal({{$user->NO}}, {{$user->title_id}}, {{$user->default_agent_user_no}}, {{$user->upper_user_no}}, {{$user->work_class_id}})">主檔設定</button>
               <button type="button" class="btn btn-outline-primary btn-sm" onclick="showLeaveDayModal('{{$user->NO}}', '{{$user->onboard_date}}')">休假設定</button>
             </td>
           </tr>
@@ -119,9 +119,15 @@
               </div>
             </div>
             <div class="row">
+              <label for="title-name" class="col-form-label w-25">預設代理人:</label>
+              <div class="col-form-label w-75">
+                <select id="default_agent_user_set_select"></select>
+              </div>
+            </div>
+            <div class="row">
               <label for="title-name" class="col-form-label w-25">第一簽核人:</label>
               <div class="col-form-label w-75">
-                <select id="upper_user_set_select" class="w-75"></select>
+                <select id="upper_user_set_select"></select>
               </div>
             </div>
             <div class="row">

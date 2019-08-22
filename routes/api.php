@@ -38,6 +38,7 @@ Route::delete('overworktype/{id}', 'View\WorkSetting\overworktype@destroy');
 
 Route::post('applyleave', 'View\applyleave@store');
 Route::get('applyleave/{id}', 'View\applyleave@show');
+Route::get('applyleave/user/{line_id}', 'View\applyleave@get_user_by_line_id');
 
 Route::post('applyoverwork', 'View\applyoverwork@store');
 Route::get('applyoverwork/{id}', 'View\applyoverwork@show');

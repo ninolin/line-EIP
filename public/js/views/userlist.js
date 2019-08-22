@@ -1,6 +1,5 @@
 
-const showSetModal = async (user_no, title_id, upper_user_no, work_class_id) => {
-    //$("#onboard_date").val(onboard_date);
+const showSetModal = async (user_no, title_id, default_agent_user_no, upper_user_no, work_class_id) => {
     const titles_res = await get_all_title();
     const users_res = await get_all_user();
     const class_res = await get_all_class();
@@ -32,6 +31,13 @@ const showSetModal = async (user_no, title_id, upper_user_no, work_class_id) => 
             width: '100%',
         })
         $("#title_set_select").val(title_id).trigger("change");
+        $("#default_agent_user_set_select").select2({
+            dropdownParent: $("#setModal"),
+            data: all_users,
+            dropdownAutoWidth : false,
+			width: '100%'
+        })
+        $("#default_agent_user_set_select").val(default_agent_user_no).trigger("change");
         $("#upper_user_set_select").select2({
             dropdownParent: $("#setModal"),
             data: all_users,
@@ -173,9 +179,9 @@ const update_set = (user_no) => {
         url: "./api/userlist/"+user_no, 
         data: {
             "title_id": $("#title_set_select").val(),
+            "default_agent_user_no": $("#default_agent_user_set_select").val(),
             "upper_user_no": $("#upper_user_set_select").val(),
-            "work_class_id": $("#work_class_set_select").val(),
-            "onboard_date": $("#onboard_date").val()
+            "work_class_id": $("#work_class_set_select").val()
         }, 
         method: "put"
     })

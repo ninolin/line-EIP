@@ -1,7 +1,6 @@
 var isMobile = false;
 window.onload = function (e) {
-    $("#startTime").html("08:00");
-    $("#endTime").html("17:00");
+    $("#toast").show();
     liff.init(function (data) {
         initializeApp(data);
     }, function (err) {
@@ -12,21 +11,37 @@ window.onload = function (e) {
 
 function initializeApp(data) {
     document.getElementById('useridfield').textContent = data.context.userId;
-    promise_call({
-        url: "./api/userlist/checklineid/"+data.context.userId, 
-        method: "get"
-    })
-    .then(v => {
-        if(v.status == "successful" && v.data.length == 0) {
+    Promise.all([
+        promise_call({url: "./api/userlist/checklineid/"+data.context.userId, method: "get"}),
+        promise_call({url: "./api/applyleave/user/"+data.context.userId, method: "get"}),
+    ]).then(v => {
+        if(v[0].status == "successful" && v[0].data.length == 0) {
+            $("#toast").hide();
             $("#no_bind_alert").show();
             return;
         } 
+        if(v[1].status != "successful" ||  v[1].data.length == 0) {
+            $("#toast").hide();
+            alert("取得員工資料錯誤");
+            return;
+        } else {
+            const user = v[1].data[0];
+            if(user.default_agent_user_no != 0) $("#leaveAgent").val(user.default_agent_user_no);
+            user.work_start = user.work_start || '08:00:00';
+            user.work_end = user.work_end || '17:00:00';
+            $("#startTime").html(user.work_start.split(':')[0]+':'+user.work_start.split(':')[1]);
+            $("#endTime").html(user.work_end.split(':')[0]+':'+user.work_end.split(':')[1]);
+            $("#toast").hide();
+        }
+        
     })
 }
 
 const setTime = (id) => {
-    let defaultValue = ['08', '00'];
-    if(id == "endTime") defaultValue = ['17', '00']
+    const hour = $("#"+id).html().split(':')[0];
+    const min = $("#"+id).html().split(':')[1];
+    let defaultValue = [hour, min];
+    if(id == "endTime") defaultValue = [hour, min];
     weui.picker(
         [
             {label: '01', value: '01'}, 
@@ -65,6 +80,7 @@ const setTime = (id) => {
         }
     );
 }
+
 const apply_leave = () => {
     
     const post_data = {

@@ -28,6 +28,21 @@ class applyleave extends Controller
     }
 
     /**
+     * 透過lineid取得user的資料
+     */
+    public function get_user_by_line_id($line_id)
+    {
+        $sql = "select u.*, ewc.work_start, ewc.work_end ";
+        $sql.= "from user u left join eip_work_class ewc on u.work_class_id = ewc.id ";
+        $sql.= "where u.status = 'T' and u.line_id =?";
+        $users = DB::select($sql, [$line_id]);
+        return response()->json([
+            'status' => 'successful',
+            'data' => $users
+        ]);
+    }
+
+    /**
      * 顯示applyleave頁面
      */
     public function create()
@@ -36,7 +51,7 @@ class applyleave extends Controller
         $sql  ='select distinct name from eip_leave_type';
         $leavetypes = DB::select($sql, []);
         //用戶只列出有加入line的而且是status是T(True)
-        $users = DB::select("select * from user where status = 'T' and line_id != '' order by cname", []);
+        $users = DB::select("select * from user where status = 'T' order by cname", []);
         return view('line.applyleave', [
             'leavetypes' => $leavetypes,
             'users' => $users,
