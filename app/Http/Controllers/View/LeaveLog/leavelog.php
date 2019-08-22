@@ -240,7 +240,7 @@ class leavelog extends Controller
 
             //檢查新的代理人在該假單請假時間是否也正在請假
             $v = json_decode(LeaveProvider::getLeaveApply($apply_id));
-            $old_agent_user_cname = $v->apply_user_cname;       //舊代理人的cname
+            $old_agent_user_cname = $v->agent_cname;            //舊代理人的cname
             $old_agent_user_line_id = $v->agent_user_line_id;   //舊代理人的line_id
             $sql  = "select start_date from eip_leave_apply where apply_user_no = ? and start_date <= ? and end_date >= ? and apply_type = 'L' and apply_status IN ('P', 'Y')";
             $overlap = DB::select($sql, [$new_agent_user_no, $v->start_date, $v->start_date]);
@@ -270,7 +270,7 @@ class leavelog extends Controller
             }
 
             $v = json_decode(LeaveProvider::getLeaveApply($apply_id));
-            $msg = ["假別::". $v->leave_name,"代理人::".$v->agent_cname,"起日::".$v->start_date,"迄日::". $v->end_date,"備住::". $v->comment];
+            $msg = ["申請人::". $v->apply_user_cname, "假別::". $v->leave_name, "代理人::".$v->agent_cname,"起日::".$v->start_date,"迄日::". $v->end_date,"備住::". $v->comment];
             LineServiceProvider::sendNotifyFlexMeg($v->apply_user_line_id, array_merge(["更換代理人"], $msg));
             LineServiceProvider::sendNotifyFlexMeg($old_agent_user_line_id, array_merge(["代理人取消"], $msg));
             LineServiceProvider::sendNotifyFlexMeg($v->agent_user_line_id, array_merge([$v->apply_user_cname."指定您為請假代理人"], $msg));
@@ -428,7 +428,7 @@ class leavelog extends Controller
     static protected function send_notify_after_change_date($apply_id, $type) {
         if($type == "leave") {
             $v = json_decode(LeaveProvider::getLeaveApply($apply_id));
-            $msg = ["假別::". $v->leave_name,"代理人::".$v->agent_cname,"起日::".$v->start_date,"迄日::". $v->end_date,"備住::". $v->comment];
+            $msg = ["申請人::". $v->apply_user_cname,"假別::". $v->leave_name,"代理人::".$v->agent_cname,"起日::".$v->start_date,"迄日::". $v->end_date,"備住::". $v->comment];
             LineServiceProvider::sendNotifyFlexMeg($v->apply_user_line_id, array_merge(["更換休假時間"], $msg));
             LineServiceProvider::sendNotifyFlexMeg($v->agent_user_line_id, array_merge([$v->apply_user_cname."更換休假時間"], $msg));
             $sql  = "select elap.upper_user_no, elap.is_validate, u.line_id ";
@@ -445,7 +445,7 @@ class leavelog extends Controller
             }
         } else {
             $v = json_decode(LeaveProvider::getLeaveApply($apply_id));
-            $msg = ["加班日::".$v->over_work_date,"加班小時::".$v->over_work_hours,"備住::". $v->comment];
+            $msg = ["申請人::". $v->apply_user_cname,"加班日::".$v->over_work_date,"加班小時::".$v->over_work_hours,"備住::". $v->comment];
             LineServiceProvider::sendNotifyFlexMeg($v->apply_user_line_id, array_merge(["更換加班時間"], $msg));
             LineServiceProvider::sendNotifyFlexMeg($v->agent_user_line_id, array_merge([$v->apply_user_cname."更換加班時間"], $msg));
             $sql  = "select elap.upper_user_no, elap.is_validate, u.line_id ";
