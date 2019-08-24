@@ -35,6 +35,15 @@ Route::middleware('auth')->get('/work/setting/leavetype', 'View\WorkSetting\leav
 Route::middleware('auth')->get('/work/setting/overworktype', 'View\WorkSetting\overworktype@create')->name('ws_overworktype');
 Route::middleware('auth')->get('/leavelog/last', 'View\LeaveLog\leavelog@show_last')->name('ll_last');
 Route::middleware('auth')->get('/leavelog/individual', 'View\LeaveLog\leavelog@show_individual')->name('ll_individual');
+Route::middleware('auth')->get('/PersonalOperate/applyleave', 'View\PersonalOperate\applyleave_web@show_view')->name('po_applyleave');
+Route::middleware('auth')->get('/PersonalOperate/applyoverwork', 'View\PersonalOperate\applyoverwork_web@show_view')->name('po_applyoverwork');
+Route::middleware('auth')->get('/PersonalOperate/validate', 'View\PersonalOperate\validateleave@create')->name('po_validate');
+Route::middleware('auth')->get('/PersonalOperate/log', 'View\PersonalOperate\individuallog@create')->name('po_log');
+
+
+// Route::middleware('auth')->get('/web/applyoverwork', 'View\applyoverwork_web@show_view')->name('applyoverworkw_web');
+// Route::middleware('auth')->get('/web/applyleave', 'View\applyleave_web@show_view')->name('applyoverworkw_web');
+
 
 Route::get('/calendar', function () {return view('contents.calendar');})->name('calendar');
 Route::get('/formmanage', function () {return view('contents.formmanage');})->name('formmanage');
