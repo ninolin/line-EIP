@@ -12,15 +12,6 @@ use Exception;
 
 class applyoverwork extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
-    {
-        //
-    }
 
     /**
      * 顯示applyoverwork頁面
@@ -44,10 +35,11 @@ class applyoverwork extends Controller
     public function store(Request $request)
     {
         try {
-            $apply_user_line_id = $request->get('userId');  //申請者的line_id
+            $apply_user_id = $request->get('userId');  //申請者的line_id
             $overworkDate = $request->get('overworkDate');  //加班日
             $overworkHour = $request->get('overworkHour');  //加班小時
             $comment = $request->get('comment');            //備註
+            $use_mode = $request->get('use_mode');    
             if($comment == "") $comment = "-";
             
             //透過加班小時找到加班type_id
@@ -62,7 +54,8 @@ class applyoverwork extends Controller
                 }
             }
             //取得申請人的NO和別名
-            $users = DB::select('select NO, cname from user where line_id =?', [$apply_user_line_id]);
+            $users = $this->_get_user_info($apply_user_id,$use_mode);
+
             $apply_user_NO = "";    //申請人NO
             $apply_user_cname = ""; //申請人別名
             if(count($users) != 1) throw new Exception('請加班失敗:請先將您的line加入EIP中'); 
@@ -71,7 +64,7 @@ class applyoverwork extends Controller
                 $apply_user_cname = $v->cname;
             }
             //取得第一簽核人的資料
-            $upper_users = DB::select('select NO, line_id from user where NO in (select upper_user_no from user where line_id =?)', [$apply_user_line_id]);
+            $upper_users = $this->_get_upper_users_info($apply_user_id,$use_mode);
             $upper_line_id = "";    //第一簽核人的line_id
             $upper_user_no = "";    //第一簽核人的user_no
             foreach ($upper_users as $v) {
@@ -108,7 +101,7 @@ class applyoverwork extends Controller
             //通知申請人、代理人、第一簽核人
             Log::info("upper_line_id:".$upper_line_id);
             $msg = ["加班日::". $overworkDate,"加班小時::".$overworkHour,"備住::". $comment];
-            LineServiceProvider::sendNotifyFlexMeg($apply_user_line_id, array_merge(["加班送出，請等待簽核"], $msg));
+            LineServiceProvider::sendNotifyFlexMeg($apply_user_id, array_merge(["加班送出，請等待簽核"], $msg));
             LineServiceProvider::sendNotifyFlexMeg($upper_line_id, array_merge(["請審核".$apply_user_cname."送出的加班申請"], $msg));
             return response()->json([
                 'status' => 'successful'
@@ -123,30 +116,36 @@ class applyoverwork extends Controller
     }
 
     /**
-     * Display the specified resource.
+     * 取得申請人的NO和別名
      *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @param  string   $apply_user_id
+     * @param  string   $use_mode
+     * @return array    
      */
-    public function show($id)
-    {
-        // $sql  = 'select a.*, u2.cname as cname, u1.cname as agent_cname, eip_leave_type.name as leave_name ';
-        // $sql .= 'from ';
-        // $sql .= '(select * from eip_leave_apply where id = ?) as a ';
-        // $sql .= 'left join user as u1 ';
-        // $sql .= 'on a.leave_agent_user_no = u1.no ';
-        // $sql .= 'left join eip_leave_type ';
-        // $sql .= 'on a.leave_type_id = eip_leave_type.id ';
-        // $sql .= 'left join user as u2 ';
-        // $sql .= 'on a.line_id = u2.line_id ';
-        // debug($sql);
-        // $leaves = DB::select($sql, [$id]);
-        // debug($leaves);
-        // return response()->json([
-        //     'status' => 'successful',
-        //     'data' => $leaves
-        // ]);
+    private function _get_user_info($apply_user_id,$use_mode){
+
+        if($use_mode == 'web'){
+            return DB::select('select NO, cname from user where NO =?', [$apply_user_id]);
+        }
+        return DB::select('select NO, cname from user where line_id =?', [$apply_user_id]);
     }
+
+
+    /**
+     * 取得第一簽核人的資料
+     *
+     * @param  string   $apply_user_id
+     * @param  string   $use_mode
+     * @return array    
+     */
+    private function _get_upper_users_info($apply_user_id,$use_mode){
+
+        if($use_mode == 'web'){
+            return  DB::select('select NO, line_id from user where NO in (select upper_user_no from user where NO =?)', [$apply_user_id]);
+        }
+        return DB::select('select NO, line_id from user where NO in (select upper_user_no from user where line_id =?)', [$apply_user_id]);
+    }
+
 
     /**
      * 回傳下一個簽核人，因為有互相指定為下一個簽核人造成無窮迴圈的狀況，所以array最長為10
