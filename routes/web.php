@@ -17,7 +17,10 @@ Route::get('/', function () {return view('login');})->name('login');
 Route::get('/applyleave', 'View\applyleave@create');
 Route::get('/applyoverwork', 'View\applyoverwork@create');
 Route::get('/validateleave', 'View\validateleave@create');
-Route::get('/individuallog', 'View\individuallog@create');
+//Route::get('/individuallog', 'View\individuallog@show_leavetype_page');
+//Route::get('/individuallog/{type_id}', 'View\individuallog@show_individual_log_page');
+Route::get('/leavetype', function () {return view('line.leavetype');});
+Route::get('/individuallog/leavetype/{type_name}/{line_id}', 'View\individuallog@get_individual_log');
 
 //Route::middleware('auth')->get('/whmanage', 'View\whmanage@index')->name('whmanage');
 //Route::get('/whmanage', 'View\whmanage@index')->name('whmanage');
