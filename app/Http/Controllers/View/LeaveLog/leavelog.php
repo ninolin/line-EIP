@@ -8,6 +8,9 @@ use Illuminate\Support\Facades\Input;
 use App\Console\commands\CalcLeaveDays;
 use App\Providers\LeaveProvider;
 use App\Providers\LineServiceProvider;
+use App\Repositories\LeaveApplyRepository;
+use App\Repositories\LeaveTypeRepository;
+use App\Repositories\UserRepository;
 use DB;
 use Log;
 use Exception;
@@ -16,10 +19,21 @@ use Config;
 class leavelog extends Controller
 {
     private $calcL;
+    protected $leaveApplyRepo;
+    protected $leaveTypeRepo;
+    protected $userRepo;
 
-    public function __construct(CalcLeaveDays $calcL)
+    public function __construct(
+        CalcLeaveDays $calcL,
+        LeaveApplyRepository $leaveApplyRepo,
+        LeaveTypeRepository $leaveTypeRepo,
+        UserRepository $userRepo
+    )
     {
         $this->calcL = $calcL;
+        $this->leaveApplyRepo = $leaveApplyRepo;
+        $this->leaveTypeRepo = $leaveTypeRepo;
+        $this->userRepo = $userRepo;
     }
 
     /**
@@ -28,7 +42,7 @@ class leavelog extends Controller
      * @param  string  id
      * @return \Illuminate\Http\Response
      */
-    public function list_logs($id)
+    public function list_process_logs($id)
     {
         $sql  = "select elap.*, u.cname from eip_leave_apply_process elap, user u ";
         $sql .= "where elap.upper_user_no = u.NO and elap.apply_id = ?";
@@ -40,101 +54,105 @@ class leavelog extends Controller
     }
 
     /**
-     * 顯示最近工時紀錄
+     * 顯示簽核中紀錄
      * 
      * @param  string  id
      * @return \Illuminate\Http\Response
      */
     public function show_last()
     {
-        $search = Input::get('search', '');
-        $page = Input::get('page', 1);
-        $sql  = 'select a.*, u2.cname as cname, u1.cname as agent_cname, eip_leave_type.name as leave_name ';
-        $sql .= 'from ';
-        $sql .= '(select * from eip_leave_apply where apply_status = "P") as a ';
-        $sql .= 'left join user as u1 ';
-        $sql .= 'on a.agent_user_no = u1.NO ';
-        $sql .= 'left join eip_leave_type ';
-        $sql .= 'on a.leave_type = eip_leave_type.id ';
-        $sql .= 'left join user as u2 ';
-        $sql .= 'on a.apply_user_no = u2.NO ';
-        $sql .= 'order by id DESC ';
-        $sql .= 'limit ?,10 ';
-        $logs = DB::select($sql, [($page-1)*10]);
-        foreach ($logs as $key => $value) {
-            $apply_time = strftime('%Y-%m-%d %H:%M', strtotime($value->apply_time));
-            $logs[$key]->apply_time = $apply_time;
-            if($value->apply_type == 'L') {
-                $start_date = strftime('%Y-%m-%dT%H:%M', strtotime($value->start_date));
-                $end_date = strftime('%Y-%m-%dT%H:%M', strtotime($value->end_date));
-                
-                $logs[$key]->start_date = $start_date;
-                $logs[$key]->end_date = $end_date;
-                
-                //$start_date = str_replace("T", " ", $value->start_date);
-                //$end_date = str_replace("T", " ", $value->end_date);
-                //$logs[$key]->start_date = $start_date;
-                //$logs[$key]->end_date = $end_date;
-            }
+        $search             = Input::get('search', '');
+        $leaves_page        = Input::get('leaves_page', 1);
+        $overworks_page     = Input::get('overworks_page', 1);
+        $leaves             = [];
+        $overworks          = [];
+        $leaves_t_pages     = 0;
+        $overworks_t_pages  = 0;
+        $users              = $this->userRepo->findAllUser();
+        $key_users_result   = $this->userRepo->findUserByKeyword($search);
+        $key_users          = [];
+
+        foreach ($key_users_result as $v) {
+            array_push($key_users, $v->NO);
         }
-        $total_logs = DB::select('select * from eip_leave_apply', []);
-        $total_pages = ceil(count($total_logs)/10);
-        $agents = DB::select("select * from user where status = 'T' order by cname", []);
+
+        $overworks_result = $this->leaveApplyRepo->findPersonalOverworkLog($key_users, ["P"], null, null, $overworks_page);
+        if($overworks_result["status"] == "successful") {
+            $overworks = $overworks_result["data"];
+            $overworks_t_pages = $overworks_result["total_pages"];
+        }
+        $leaves_result = $this->leaveApplyRepo->findPersonalLeaveLog($key_users, ["P"], null, null, null, $leaves_page);
+        if($leaves_result["status"] == "successful") {
+            $leaves = $leaves_result["data"];
+            $leaves_t_pages = $leaves_result["total_pages"];
+        } 
+
         return view('contents.LeaveLog.leavelog', [
-            'logs'          => $logs, 
-            'search'        => $search,
-            'page'          => $page,
-            'total_pages'   => $total_pages,
-            'agents'        => $agents,
-            'tab'           => 'last',
-            'login_user_no' => session('user_no')
+            'leaves'            => $leaves,
+            'leaves_page'       => $leaves_page, 
+            'leaves_t_pages'    => $leaves_t_pages, 
+            'overworks'         => $overworks, 
+            'overworks_page'    => $overworks_page, 
+            'overworks_t_pages' => $overworks_t_pages, 
+            'users'             => $users, 
+            'search'            => $search,
+            'tab'               => 'last',
+            'login_user_no'     => session('user_no')
         ]);
     }
 
     /**
-     * 顯示員工紀錄頁面
+     * 顯示員工紀錄查詢頁面
      * 
+     * @param  string  id
      * @return \Illuminate\Http\Response
      */
     public function show_individual() 
     {
-        $search     = Input::get('search', '');
-        $leave_year = Input::get('leave_year', date('Y'));
-        $logs       = [];
-        $types      = [];
-        $NO = 0;
-        $onboard_date = "";
-        $cname = "";
-        $sql = 'select NO, cname, onboard_date from user where username like "%'.$search.'%" or cname like "%'.$search.'%" or email like "%'.$search.'%" limit 1'; 
-        $users = DB::select($sql, []);
-        if(count($users) == 1 && $search != '') {
-            foreach ($users as $v) {
-                $NO = $v->NO;
+        $search             = Input::get('search', '');
+        $leave_year         = Input::get('leave_year', date('Y'));
+        $leaves_page        = Input::get('leaves_page', 1);
+        $overworks_page     = Input::get('overworks_page', 1);
+        $agents_page        = Input::get('agents_page', 1);
+        $leaves             = [];
+        $overworks          = [];
+        $agents             = [];
+        $types              = [];
+        $user_no            = 0;
+        $leaves_t_pages     = 0;
+        $overworks_t_pages  = 0;
+        $agents_t_pages     = 0;
+        $onboard_date       = "";
+        $cname              = "";
+        $users              = $this->userRepo->findAllUser();
+        $key_users          = $this->userRepo->findUserByKeyword($search, 1);
+        if(count($key_users) == 1 && $search != '') {
+            foreach ($key_users as $v) {
+                $user_no = $v->NO;
                 $onboard_date = $v->onboard_date;
                 $cname = $v->cname;
             }
-            $sql  = 'select a.*, u2.cname as cname, u1.cname as agent_cname, eip_leave_type.name as leave_name ';
-            $sql .= 'from ';
-            $sql .= '(select * from eip_leave_apply) as a ';
-            $sql .= 'left join user as u1 ';
-            $sql .= 'on a.agent_user_no = u1.NO ';
-            $sql .= 'left join eip_leave_type ';
-            $sql .= 'on a.leave_type = eip_leave_type.id ';
-            $sql .= 'left join user as u2 ';
-            $sql .= 'on a.apply_user_no = u2.NO ';
-            $sql .= 'where u2.NO = ? and a.start_date like "'.$leave_year.'%"';
-            $logs = DB::select($sql, [$NO]);
-
-            $sql = 'select name, 0 as hours from eip_leave_type group by name';
-            $types = DB::select($sql, []);
-
-            foreach ($logs as $key => $value) {
-                if($value->apply_type == 'L') {
-                    $start_date = str_replace("T", " ", $value->start_date);
-                    $end_date = str_replace("T", " ", $value->end_date);
-                    $logs[$key]->start_date = $start_date;
-                    $logs[$key]->end_date = $end_date;
-                }
+            $overworks_result = $this->leaveApplyRepo->findPersonalOverworkLog([$user_no], null, $leave_year.'-01-01 00:00:00', $leave_year.'-12-31 23:59:59', $overworks_page);
+            if($overworks_result["status"] == "successful") {
+                $overworks = $overworks_result["data"];
+                $overworks_t_pages = $overworks_result["total_pages"];
+            }
+            $leaves_result = $this->leaveApplyRepo->findPersonalLeaveLog([$user_no], null, $leave_year.'-01-01 00:00:00', $leave_year.'-12-31 23:59:59', null, $leaves_page);
+            if($leaves_result["status"] == "successful") {
+                $leaves = $leaves_result["data"];
+                $leaves_t_pages = $leaves_result["total_pages"];
+            }
+  
+            $agents_result = $this->leaveApplyRepo->findPersonalAgentLog($user_no, null, $leave_year.'-01-01 00:00:00', $leave_year.'-12-31 23:59:59', $agents_page);
+            if($agents_result["status"] == "successful") {
+                $agents = $agents_result["data"];
+                $agents_t_pages = $agents_result["total_pages"];
+            }
+            $types = $this->leaveTypeRepo->findDistinctType();
+            foreach ($types as $type) {
+                $type->hours = 0;
+            }
+            foreach ($leaves as $key => $value) {
                 if($value->apply_type == 'L' && $value->apply_status == 'Y') {
                     foreach($types as $tkey => $tvalue) {
                         if($tvalue->name == $value->leave_name) {
@@ -142,31 +160,31 @@ class leavelog extends Controller
                         }
                     }
                 }
-                
-            }
-            
-            foreach($types as $v) {
-                $v->days = round($v->hours/8, 1);
             }
 
             $leave_day = $this->calcL->calc_leavedays($onboard_date, $leave_year."-01-01");
-            if($leave_day == 10000) {
-                $leave_day = 0;
-            }
-            array_push($types, (object) array('name' => '可用休假', 'days' => $leave_day, 'hours' => $leave_day*8));
-            debug($leave_day);
+            array_push($types, (object) array('name' => '可用休假', 'hours' => $leave_day*8));
         }
-        
-        debug($types);
+
         return view('contents.LeaveLog.individuallog', [
-            'NO'            => $NO, 
-            'cname'         => $cname,
-            'onboard_date'  => $onboard_date,
-            'logs'          => $logs, 
-            'types'         => $types,
-            'leave_year'    => $leave_year,
-            'search'        => $search,
-            'tab'           => 'individual'
+            'user_no'           => $user_no, 
+            'cname'             => $cname,
+            'onboard_date'      => $onboard_date,
+            'leaves'            => $leaves,
+            'leaves_page'       => $leaves_page, 
+            'leaves_t_pages'    => $leaves_t_pages, 
+            'overworks'         => $overworks, 
+            'overworks_page'    => $overworks_page, 
+            'overworks_t_pages' => $overworks_t_pages, 
+            'agents'            => $agents, 
+            'agents_page'       => $agents_page, 
+            'agents_t_pages'    => $agents_t_pages, 
+            'users'             => $users,
+            'types'             => $types,
+            'leave_year'        => $leave_year,
+            'search'            => $search,
+            'tab'               => 'individual',
+            'login_user_no'     => session('user_no')
         ]);
     }
 
@@ -316,7 +334,74 @@ class leavelog extends Controller
             ], 500);
         }
     }
+    /**
+     * 更新休假起迄日
+     * 4個step:
+     * step1: 重算小時
+     * step2: 更新google calendar
+     * step3: 更新eip_leave_apply
+     * step4: 通知申請人、代理人、已簽核過的簽核人和下一個簽核人
+     * 
+     * @param \Illuminate\Http\Request
+     */
+    public function change_leave_date(Request $request)
+    {
+        $apply_id               = $request->get('apply_id');
+        $new_leave_start_date   = $request->get('new_leave_start_date');
+        $new_leave_end_date     = $request->get('new_leave_end_date');
+        $reason                 = $request->get('reason');
+        $login_user_no          = $request->get('login_user_no');
 
+        $apply_leave        = $this->leaveApplyRepo->findApplyLeave($apply_id);
+        $work_class_id      = $apply_leave[0]->work_class_id;
+        $event_id           = $apply_leave[0]->event_id;
+        $apply_status       = $apply_leave[0]->apply_status;
+        $leave_name         = $apply_leave[0]->leave_name;
+        $apply_user_cname   = $apply_leave[0]->cname;
+        $leave_hours        = 0;
+        $insert_event       = null;
+
+        $r = json_decode(json_encode(LeaveProvider::getLeaveHours($new_leave_start_date, $new_leave_end_date, $work_class_id)));
+        if($r->status == "successful") {
+            $leave_hours = $r->leave_hours;
+        } else {
+            throw new Exception($r->message);
+        }
+        
+        if($apply_status == 'Y') {
+            LeaveProvider::delete_event_from_gcalendar($event_id);
+            $insert_event = LeaveProvider::insert_event2gcalendar($new_leave_start_date, $new_leave_end_date, $apply_user_cname."的".$leave_name);
+            
+        }
+        $update = $this->leaveApplyRepo->update_leave_date($apply_id, $new_leave_start_date, $new_leave_end_date, $reason, $login_user_no, $leave_hours, $insert_event);
+        log::info($update);
+        if($update["status"] == "successful") {
+            self::send_notify_after_change_date($apply_id, 'leave');
+        } else {
+            throw new Exception($update["message"]);
+        }
+        return response()->json([
+            'status' => 'successful'
+        ]);
+    }
+
+    public function change_overwork_date(Request $request)
+    {
+        $apply_id           = $request->get('apply_id');
+        $new_overwork_date  = $request->get('new_overwork_date');
+        $new_overwork_hours = $request->get('new_overwork_hours');
+        $reason             = $request->get('reason');
+        $login_user_no      = $request->get('login_user_no');
+        $update = $this->leaveApplyRepo->update_overwork_date($apply_id, $new_overwork_date, $new_overwork_hours, $reason, $login_user_no);
+        if($update["status"] == "successful") {
+            self::send_notify_after_change_date($apply_id, 'overwork');
+        } else {
+            throw new Exception($update["message"]);
+        }
+        return response()->json([
+            'status' => 'successful'
+        ]);
+    }
     /**
      * 更新休假起日/休假迄日/加班日期/加班小時
      * 4個step:
@@ -483,7 +568,7 @@ class leavelog extends Controller
     }
 
     /**
-     * 顯示某一筆休假/加班的簽核歷程
+     * 顯示某一筆休假/加班的修改紀錄
      * 
      * @param  string  id
      * @return \Illuminate\Http\Response

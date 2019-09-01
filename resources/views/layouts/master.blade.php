@@ -15,6 +15,8 @@
         @include('layouts.header')
         @yield('content')
         <script src="{{ asset('js/jquery/jquery.min.js') }}"></script>
+        
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js" integrity="sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4" crossorigin="anonymous"></script>
         <script src="{{ asset('js/bootstrap/js/bootstrap.min.js') }}"></script>
         <script src="{{ asset('js/select2/select2.min.js') }}"></script>
         <script src="{{ asset('js/restcall.js') }}"></script>
