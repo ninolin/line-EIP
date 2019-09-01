@@ -39,7 +39,7 @@ class individuallog extends Controller
     }
 
     /**
-     * 顯示個人請假紀錄畫面
+     * 顯示假別API
      * @author nino
      * @return \Illuminate\Http\Response
      */
@@ -59,6 +59,14 @@ class individuallog extends Controller
         }
     }
 
+    /**
+     * LINE上依假別顯示個人今年的請假紀錄
+     * @param string $type_name
+     * @param string $line_id
+     * 
+     * @author nino
+     * @return \Illuminate\Http\Response
+     */
     public function get_individual_log($type_name, $line_id)
     {
         try {
@@ -75,7 +83,10 @@ class individuallog extends Controller
                     array_push($types_id, $t->id);
                 }
                 //取得今年加班全部的紀錄
-                $leaves = $this->leaveApplyRepo->findPersonalOverworkLog($user_no, null, date("Y").'-01-01 00:00:00', date("Y").'-12-31 23:59:59');
+                $leaves_result = $this->leaveApplyRepo->findPersonalOverworkLog([$user_no], null, date("Y").'-01-01 00:00:00', date("Y").'-12-31 23:59:59');
+                if($leaves_result["status"] == "successful") {
+                    $leaves = $leaves_result["data"];
+                }
             } else {
                 $types = $this->leaveTypeRepo->findTypeByName($type_name);
                 foreach ($types as $t) {
@@ -84,10 +95,12 @@ class individuallog extends Controller
                     array_push($types_id, $t->id);
                 }
                 //取得今年某假別全部的紀錄
-                $leaves = $this->leaveApplyRepo->findPersonalLeaveLog($user_no, null, date("Y").'-01-01 00:00:00', date("Y").'-12-31 23:59:59', $types_id);
+                $leaves_result = $this->leaveApplyRepo->findPersonalLeaveLog([$user_no], null, date("Y").'-01-01 00:00:00', date("Y").'-12-31 23:59:59', $types_id);
+                if($leaves_result["status"] == "successful") {
+                    $leaves = $leaves_result["data"];
+                }
             }
             
-
             $success_hours = 0;
             $process_hours = 0;
             foreach ($leaves as $l) {
@@ -116,31 +129,32 @@ class individuallog extends Controller
             ]);
         }
     }
+
     /**
      * LINE上顯示個人工時資料
      * @author nino
      * @return \Illuminate\Http\Response
      */
-    public function index($line_id)
-    {
-        try {
-            $user = $this->userService->get_user_info($line_id, 'line');
-            if($user['status'] == 'error') throw new Exception($user['message']);
-            $user_no = $user['data']->NO;
+    // public function index($line_id)
+    // {
+    //     try {
+    //         $user = $this->userService->get_user_info($line_id, 'line');
+    //         if($user['status'] == 'error') throw new Exception($user['message']);
+    //         $user_no = $user['data']->NO;
 
-            $leaves = $this->leaveApplyRepo->findPersonalLeaveLog($user_no);
+    //         $leaves = $this->leaveApplyRepo->findPersonalLeaveLog($user_no);
 
-            return response()->json([
-                'status' => 'successful',
-                'data' => $leaves
-            ]);
-        } catch (Exception $e) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'update error'
-            ]);
-        }
-    }
+    //         return response()->json([
+    //             'status' => 'successful',
+    //             'data' => $leaves
+    //         ]);
+    //     } catch (Exception $e) {
+    //         return response()->json([
+    //             'status' => 'error',
+    //             'message' => 'update error'
+    //         ]);
+    //     }
+    // }
 
     /**
      * 取消請假/加班
