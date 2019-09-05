@@ -88,7 +88,8 @@ const apply_leave = () => {
         "leaveType": $("#leaveType").val(),
         "leaveAgent": $("#leaveAgent").val(),
         "startDate": $("#startDate").val()+"T"+$("#startTime").html(),
-        "endDate": $("#endDate").val()+"T"+$("#endTime").html()
+        "endDate": $("#endDate").val()+"T"+$("#endTime").html(),
+        "use_mode": 'line'
     }
     const start_time = new Date(post_data.startDate);
     const end_time = new Date(post_data.endDate);

@@ -32,90 +32,33 @@
     </form>
 </div>
 <div id="useridfield" style="display:none">{{$user_id}}</div>
-<!-- <div class="weui-cell">
-                        <div class="weui-cell__hd"><label for="" class="weui-label">加班日</label></div>
-                        <div class="weui-cell__bd">
-                            <input class="weui-input" id="overworkDate"  type="date" value="{{$nowdate}}"/>
-                        </div>
-                    </div>
-
-
-                    <div class="weui-cell">
-                        <div class="weui-cell__hd"><label for="" class="weui-label">加班小時</label></div>
-                        <div class="weui-cell__bd">
-                            <select class="weui-select" name="select2" id="overworkHour">
-                                <option>1</option>
-                                <option>2</option>
-                                <option>3</option>
-                                <option>4</option>
-                                <option>5</option>
-                                <option>6</option>
-                                <option>7</option>
-                                <option>8</option>
-                                <option>9</option>
-                                <option>10</option>
-                                <option>11</option>
-                                <option>12</option>
-                            </select>
-                        </div>
-                    </div>
-
-    <div class="weui-flex">
-        <div class="weui-flex__item mobile_topbar">加班申請</div>
-    </div>
-    <div class="text-center">
-        <div class="main-section">
-            <div id="useridfield" style="display:none">{{$user_id}}</div>
-                <div class="weui-cells weui-cells_form">
-                    <div class="weui-cell">
-                        <div class="weui-cell__hd"><label for="" class="weui-label">加班日</label></div>
-                        <div class="weui-cell__bd">
-                            <input class="weui-input" id="overworkDate"  type="date" value="{{$nowdate}}"/>
-                        </div>
-                    </div>
-                    <div class="weui-cell">
-                        <div class="weui-cell__hd"><label for="" class="weui-label">加班小時</label></div>
-                        <div class="weui-cell__bd">
-                            <select class="weui-select" name="select2" id="overworkHour">
-                                <option>1</option>
-                                <option>2</option>
-                                <option>3</option>
-                                <option>4</option>
-                                <option>5</option>
-                                <option>6</option>
-                                <option>7</option>
-                                <option>8</option>
-                                <option>9</option>
-                                <option>10</option>
-                                <option>11</option>
-                                <option>12</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="weui-cells weui-cells_form">
-                        <div class="weui-cell">
-                            <div class="weui-cell__bd">
-                                <textarea class="weui-textarea" placeholder="加班事由" rows="3" id="comment"></textarea>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="weui-btn-area">
-                        <a href="javascript:;" class="weui-btn weui-btn_primary mobile_btn" onclick="apply_overwork()">加班申請</a>
-                    </div>
-                </div>
-        </div>
-    </div>
-
-    <div id="toast" style="display: none;">
-        <div class="weui-mask_transparent"></div>
-        <div class="weui-mask"></div>
-        <div class="weui-toast">
-            <i class="weui-loading weui-icon_toast"></i>
-            <p class="weui-toast__content">送出中...</p>
-        </div>
-    </div> -->
-    <script src="{{ asset('js/jquery/jquery.min.js') }}"></script>
-    <script src="{{ asset('js/bootstrap/js/bootstrap.min.js') }}"></script>
-    <script src="{{ asset('js/PersonalOperate/applyoverwork.js') }}"></script>
-    <script src="https://d.line-scdn.net/liff/1.0/sdk.js"></script>
+<script>
+    const apply_overwork = () => {
+        const post_data = {
+            "userId": document.getElementById('useridfield').textContent,
+            "overworkDate": $("#overworkDate").val(),
+            "overworkHour": $("#overworkHour").val(),
+            "use_mode"    : 'web',
+        }
+        for (k in post_data) {
+            if(post_data[k] == "") {
+                alert("資料不正確");
+                return;
+            }
+        }
+        post_data.comment = $("#comment").val();
+        promise_call({
+            url: "/api/applyoverwork", 
+            data: post_data, 
+            method: "post"
+        })
+        .then(v => {
+            if(v.status == "successful") {
+                alert("申請成功");
+            } else {
+                alert(v.message);
+            }
+        })
+    }
+</script>
 @endsection

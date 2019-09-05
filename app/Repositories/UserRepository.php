@@ -43,7 +43,12 @@ class UserRepository {
     public function findUserByLineId($line_id) 
     {
         try {
-            return DB::select('select NO, cname, onboard_date from user where line_id =?', [$line_id]);
+            $sql = "select u.NO, u.cname, u.onboard_date, u.work_class_id, u.line_id, ewc.work_start, ewc.work_end ";
+            $sql.= "from user u ";
+            $sql.= "left join eip_work_class ewc ";
+            $sql.= "on u.work_class_id = ewc.id ";
+            $sql.= "where u.status = 'T' and u.line_id =? ";
+            return DB::select($sql, [$line_id]);
         } catch (Exception $e) {
             throw $e;
         }
@@ -52,7 +57,12 @@ class UserRepository {
     public function findUserByUserNo($user_no) 
     {
         try {
-            return DB::select('select NO, cname, onboard_date from user where NO =?', [$user_no]);
+            $sql = "select u.NO, u.cname, u.onboard_date, u.work_class_id, u.line_id, ewc.work_start, ewc.work_end ";
+            $sql.= "from user u ";
+            $sql.= "left join eip_work_class ewc ";
+            $sql.= "on u.work_class_id = ewc.id ";
+            $sql.= "where u.status = 'T' and u.NO =? ";
+            return DB::select($sql, [$user_no]);
         } catch (Exception $e) {
             throw $e;
         }

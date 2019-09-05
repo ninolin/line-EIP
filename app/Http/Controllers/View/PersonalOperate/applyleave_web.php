@@ -5,10 +5,25 @@ namespace App\Http\Controllers\View\PersonalOperate;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\View\applyleave;
+use App\Repositories\LeaveTypeRepository;
+use App\Repositories\UserRepository;
 use DB;
+use Log;
 
 class applyleave_web extends applyleave
 {
+    protected $leaveTypeRepo;
+    protected $userRepo;
+
+    public function __construct(
+        LeaveTypeRepository $leaveTypeRepo,
+        UserRepository $userRepo
+    )
+    {
+        $this->leaveTypeRepo = $leaveTypeRepo;
+        $this->userRepo = $userRepo;
+    }
+
     /**
      * Display the specified resource.
      *
@@ -17,26 +32,34 @@ class applyleave_web extends applyleave
     public function show_view()
     {
         //因為有同一種假但不同天數的假別，所以做distinct name，之後新增假時，再判斷是用那一種假別的id
-        $sql  ='select distinct name from eip_leave_type';
-        $leavetypes = DB::select($sql, []);
-        //用戶只列出是status是T(True)
-        $users = DB::select("select * from user where status = 'T' order by cname", []);
-       
-        $user_no = session()->all()['user_no'] || null;
-
+        $leavetypes     = $this->leaveTypeRepo->findDistinctType();
+        $users          = $this->userRepo->findAllUser();
+        $user_no        = \Session::get('user_no') ?? null;
+        $user_profile   = $this->userRepo->findUserByUserNo($user_no);
+        $hours_select   = [ '00', '01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11',  
+                            '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23'];
         if($user_no == null){
             echo 'user no not found';
             exit;
-        }
+        }  
 
-        $user_info = $this->get_user_by_line_id($user_no,'web');        
+        $startHour = date_format(date_create($user_profile[0]->work_start),"H");
+        $startMin = date_format(date_create($user_profile[0]->work_start),"i");
+        $endHour = date_format(date_create($user_profile[0]->work_end),"H");
+        $endMin = date_format(date_create($user_profile[0]->work_end),"i");
 
         return view('contents.PersonalOperate.applyleave', [
-            'leavetypes' => $leavetypes,
-            'users'      => $users,
-            'nowdate'    => date("Y-m-d"),
-            'user_id'    => $user_no,
-            'user_info'  => $user_info,
+            'leavetypes'    => $leavetypes,
+            'users'         => $users,
+            'user_profile'  => $user_profile,
+            'nowdate'       => date("Y-m-d"),
+            'user_id'       => $user_no,
+            'tab'           => 'applyleave',
+            'hours_select'  => $hours_select,
+            'startHour'     => $startHour,
+            'startMin'      => $startMin,
+            'endHour'       => $endHour,
+            'endMin'        => $endMin
         ]);
     }
 }

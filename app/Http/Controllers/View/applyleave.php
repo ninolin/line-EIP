@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Input;
 use App\Providers\LineServiceProvider;
 use App\Providers\HelperServiceProvider;
 use App\Providers\LeaveProvider;
+use App\Services\UserService;
 use DB;
 use Log;
 use Exception;
@@ -17,29 +18,42 @@ date_default_timezone_set('Asia/Taipei');
 
 class applyleave extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
+
+    protected $userService;
+
+    public function __construct(
+        UserService $userService
+    )
     {
-        //
+        $this->userService = $userService;
     }
 
     /**
      * 透過lineid取得user的資料
      */
-    public function get_user_by_line_id($line_id)
+    public function get_user_by_line_id($user_id,$use_mode=null)
     {
         $sql = "select u.*, ewc.work_start, ewc.work_end ";
         $sql.= "from user u left join eip_work_class ewc on u.work_class_id = ewc.id ";
-        $sql.= "where u.status = 'T' and u.line_id =?";
-        $users = DB::select($sql, [$line_id]);
-        return response()->json([
-            'status' => 'successful',
-            'data' => $users
-        ]);
+
+        if($use_mode == 'web'){
+            $sql.= "where u.status = 'T' and u.NO =?";
+
+            $users = DB::select($sql, [$user_id]);
+            return [
+                'status' => 'successful',
+                'data' => $users
+            ];
+        }else{
+            $sql.= "where u.status = 'T' and u.line_id =?";
+            $users = DB::select($sql, [$user_id]);
+            return response()->json([
+                'status' => 'successful',
+                'data' => $users
+            ]);
+        }
+    
+        
     }
 
     /**
@@ -80,6 +94,8 @@ class applyleave extends Controller
             $end_date = explode("T",$request->get('endDate'))[0];     //迄日
             $end_time = explode("T",$request->get('endDate'))[1];     //迄時
             $comment = $request->input('comment');                    //備註
+            $use_mode = $request->input('use_mode');                  
+            
             if($comment == "") $comment = "-";
             $diff_min = floor((strtotime($end_date." ".$end_time)-strtotime($start_date." ".$start_time))%86400/60); //請假分鐘
             //檢查請假合理性-檢查代理人在該假單請假時間中是否也正在請假
@@ -140,18 +156,13 @@ class applyleave extends Controller
             }
 
             //取得申請人的基本資料
-            //$sql = 'select u.NO, u.cname, ewc.* from user as u LEFT JOIN eip_work_class as ewc on u.work_class_id = ewc.id WHERE u.line_id = ?';
-            $sql = 'select NO, cname, work_class_id from user WHERE line_id = ?';
-            $users = DB::select($sql, [$apply_user_line_id]);
-            $apply_user_NO = "";            //申請人NO
-            $apply_user_cname = "";         //申請人別名
-            $apply_work_class_id = "";      //申請人班別
-            if(count($users) != 1) throw new Exception('請假失敗:請先將您的line加入EIP中'); 
-            foreach ($users as $v) {
-                $apply_user_no = $v->NO;
-                $apply_user_cname = $v->cname;
-                $apply_work_class_id = $v->work_class_id;    
-            }
+            $user = $this->userService->get_user_info($apply_user_line_id, $use_mode);
+            if($user['status'] == 'error') throw new Exception($user['message']);
+            $user_no = $user['data']->NO;
+            $apply_user_no = $user['data']->NO;
+            $apply_user_cname = $user['data']->cname;
+            $apply_work_class_id = $user['data']->work_class_id; 
+            $apply_user_line_id = $user['data']->line_id; 
 
             //取得代理人的資料
             $agent_users = DB::select('select cname, line_id from user where NO =?', [$leave_agent_user_no]);
@@ -163,7 +174,7 @@ class applyleave extends Controller
             }
             if($agent_line_id == "") throw new Exception('請假失敗:代理人的line未加入EIP中'); 
             //取得第一簽核人的資料
-            $upper_users = DB::select('select NO, line_id from user where NO in (select upper_user_no from user where line_id =?)', [$apply_user_line_id]);
+            $upper_users = DB::select('select NO, line_id from user where NO in (select upper_user_no from user where NO =?)', [$apply_user_no]);
             $upper_line_id = "";    //第一簽核人的line_id
             $upper_user_no = "";    //第一簽核人的user_no
             foreach ($upper_users as $v) {
@@ -292,13 +303,18 @@ class applyleave extends Controller
      */
     public function show($id)
     {
-        $sql  = 'select a.*, u2.cname as cname, u1.cname as agent_cname, eip_leave_type.name as leave_name ';
+        $sql  = 'select a.*, ';
+        $sql .= 'DATE_FORMAT(a.start_date, "%Y-%m-%d %H:%m") as start_date_f1,
+        DATE_FORMAT(a.end_date, "%Y-%m-%d %H:%m") as end_date_f1,
+        DATE_FORMAT(a.start_date, "%Y-%m-%dT%H:%m") as start_date_f2,
+        DATE_FORMAT(a.end_date, "%Y-%m-%dT%H:%m") as end_date_f2,
+        u2.cname as cname, u2.work_class_id, u1.cname as agent_cname, eip_leave_type.name as leave_name ';
         $sql .= 'from ';
         $sql .= '(select * from eip_leave_apply where id = ?) as a ';
         $sql .= 'left join user as u1 ';
         $sql .= 'on a.agent_user_no = u1.no ';
         $sql .= 'left join eip_leave_type ';
-        $sql .= 'on a.type_id = eip_leave_type.id ';
+        $sql .= 'on a.leave_type = eip_leave_type.id ';
         $sql .= 'left join user as u2 ';
         $sql .= 'on a.apply_user_no = u2.NO ';
         debug($sql);
