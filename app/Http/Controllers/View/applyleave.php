@@ -86,16 +86,20 @@ class applyleave extends Controller
     public function store(Request $request)
     {
         try {
-            $apply_user_line_id = $request->get('userId');            //申請者的line_id
-            $leave_agent_user_no = $request->get('leaveAgent');       //代理人的user_NO
-            $leavename = $request->get('leaveType');                  //假別名稱
-            $start_date = explode("T",$request->get('startDate'))[0]; //起日
-            $start_time = explode("T",$request->get('startDate'))[1]; //起時
-            $end_date = explode("T",$request->get('endDate'))[0];     //迄日
-            $end_time = explode("T",$request->get('endDate'))[1];     //迄時
-            $comment = $request->input('comment');                    //備註
-            $use_mode = $request->input('use_mode');                  
-            
+            $apply_user_line_id = $request->get('userId');                      //申請者的line_id
+            $leave_agent_user_no= $request->get('leaveAgent');                  //代理人的user_NO
+            $leavename          = $request->get('leaveType');                   //假別名稱
+            $start_date         = explode("T",$request->get('startDate'))[0];   //起日
+            $start_time         = explode("T",$request->get('startDate'))[1];   //起時
+            $end_date           = explode("T",$request->get('endDate'))[0];     //迄日
+            $end_time           = explode("T",$request->get('endDate'))[1];     //迄時
+            $comment            = $request->input('comment');                   //備註
+            $use_mode           = $request->input('use_mode');         
+
+            $start_m = date_format(date_create($start_date),"m");
+            $now_m = date("m");
+            if($start_m != $now_m) throw new Exception('只能申請這個月的休假'); 
+
             if($comment == "") $comment = "-";
             $diff_min = floor((strtotime($end_date." ".$end_time)-strtotime($start_date." ".$start_time))%86400/60); //請假分鐘
             //檢查請假合理性-檢查代理人在該假單請假時間中是否也正在請假

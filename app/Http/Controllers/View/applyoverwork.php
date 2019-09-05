@@ -35,13 +35,17 @@ class applyoverwork extends Controller
     public function store(Request $request)
     {
         try {
-            $apply_user_id = $request->get('userId');  //申請者的line_id
-            $overworkDate = $request->get('overworkDate');  //加班日
-            $overworkHour = $request->get('overworkHour');  //加班小時
-            $comment = $request->get('comment');            //備註
-            $use_mode = $request->get('use_mode');    
+            $apply_user_id  = $request->get('userId');          //申請者的line_id
+            $overworkDate   = $request->get('overworkDate');    //加班日
+            $overworkHour   = $request->get('overworkHour');    //加班小時
+            $comment        = $request->get('comment');         //備註
+            $use_mode       = $request->get('use_mode');    
             if($comment == "") $comment = "-";
             
+            $overwork_m = date_format(date_create($overworkDate),"m");
+            $now_m = date("m");
+            if($overwork_m != $now_m) throw new Exception('只能申請這個月的加班'); 
+
             //透過加班小時找到加班type_id
             $overwork_type_arr = DB::select('select * from eip_overwork_type', []);
             $overwork_type_id = "";
