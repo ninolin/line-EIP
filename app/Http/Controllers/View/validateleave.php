@@ -90,25 +90,15 @@ class validateleave extends Controller
     public function update(Request $request, $id)
     {
         try {
-            $apply_id = $id;                                //申請單id
-            $line_id = $request->get('userId');             //審核人line_id
-            $is_validate = $request->get('is_validate');    //審核結果(0=拒絕,1=同意)
-            $apply_type = $request->get('apply_type');      //申請單類型(L,O)
-            $reject_reason = $request->get('reject_reason');//拒絕理由
-            $process_id = $request->get('process_id');      //eip_leave_apply_process的id
-            // $users = DB::select('select NO, title_id, upper_user_no from user where line_id = ?', [$line_id]);
-            // $NO = "";                   //審核人NO
-            // $title_id = "";             //審核人title_id
-            // $upper_user_no = "";        //審核人的下一個審核人的user_no
-            // foreach ($users as $v) {
-            //     $NO = $v->NO;
-            //     $title_id = $v->title_id;
-            //     $upper_user_no = $v->upper_user_no;
-            // }
+            $apply_id       = $id;                              //申請單id
+            //$line_id        = $request->get('userId');          //審核人line_id
+            $is_validate    = $request->get('is_validate');     //審核結果(0=拒絕,1=同意)
+            $apply_type     = $request->get('apply_type');      //申請單類型(L,O)
+            $reject_reason  = $request->get('reject_reason');   //拒絕理由
+            $process_id     = $request->get('process_id');      //eip_leave_apply_process的id
             
             //取得apply單的資料
             $apply_data = json_decode(LeaveProvider::getLeaveApply($apply_id));
-            if(is_null($apply_data)) { throw new Exception('The line_id is not exist in the EIP');  }
             if($reject_reason == "null") {$reject_reason = null;}
             if(DB::update("update eip_leave_apply_process set is_validate =?, reject_reason =?, validate_time = now() where id =?", [$is_validate, $reject_reason, $process_id]) != 1) {
                 return response()->json([

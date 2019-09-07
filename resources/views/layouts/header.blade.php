@@ -7,13 +7,10 @@
                 <a class="angle-down nav-link">工時管理</a>
                 <ul>
                     <div>
-                        <li><a class="@if (Request::is('po_applyoverwork')) active @endif" href="{{ route('po_applyoverwork') }}">個人工時</a></li>
+                        <li><a class="@if (Request::is('po_applyleave')) active @endif" href="{{ route('po_applyleave') }}">個人工時</a></li>
                         <li><a class="@if (Request::is('calendar')) active @endif" href="{{ route('calendar') }}">工時日曆</a></li>
                         <li><a class="@if (Request::is('userlist')) active @endif" href="{{ route('userlist') }}">員工設定</a></li>
                         <li><a class="@if (Request::is('work/setting/title')) active @endif" href="{{ route('ws_title') }}">工時主檔</a></li>
-                        <!-- <li><a class="@if (Request::is('titlelist')) active @endif" href="{{ route('titlelist') }}">職等設定</a></li>
-                        <li><a class="@if (Request::is('leavetypelist')) active @endif" href="{{ route('leavetypelist') }}">假別設定</a></li>
-                        <li><a class="@if (Request::is('overworktypelist')) active @endif" href="{{ route('overworktypelist') }}">加班設定</a></li> -->
                         <li><a class="@if (Request::is('leavelog/last')) active @endif" href="{{ route('ll_last') }}">工時記錄</a></li>
                         <li><a class="@if (Request::is('messagelog')) active @endif" href="{{ route('messagelog') }}">訊息記錄</a></li>
                     </div>
