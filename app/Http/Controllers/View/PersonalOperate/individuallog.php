@@ -48,6 +48,7 @@ class individuallog extends Controller
         $leaves_page        = Input::get('leaves_page', 1);
         $overworks_page     = Input::get('overworks_page', 1);
         $agents_page        = Input::get('agents_page', 1);
+        $show_tab           = Input::get('show_tab', 'leave');
         $leaves             = [];
         $overworks          = [];
         $agents             = [];
@@ -102,6 +103,7 @@ class individuallog extends Controller
 
         return view('contents.PersonalOperate.individuallog', [
             'user_no'           => $user_no, 
+            'show_tab'          => $show_tab,
             'cname'             => $cname,
             'onboard_date'      => $onboard_date,
             'leaves'            => $leaves,

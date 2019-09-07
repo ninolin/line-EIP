@@ -41,26 +41,26 @@
   </div>
   <nav @if ($user_no == 0) style="display:none" @endif>
     <div class="nav nav-tabs" id="nav-tab" role="tablist">
-      <a class="nav-item nav-link active" id="nav-leave-tab" data-toggle="tab" href="#nav-leave" role="tab" aria-controls="nav-leave" aria-selected="true">休假</a>
-      <a class="nav-item nav-link" id="nav-overwork-tab" data-toggle="tab" href="#nav-overwork" role="tab" aria-controls="nav-overwork" aria-selected="false">加班</a>
-      <a class="nav-item nav-link" id="nav-agent-tab" data-toggle="tab" href="#nav-agent" role="tab" aria-controls="nav-agent" aria-selected="false">代理人</a>
+      <a class="nav-item nav-link @if ($show_tab === 'leave') active @endif" id="nav-leave-tab" data-toggle="tab" href="#nav-leave" role="tab" aria-controls="nav-leave" aria-selected="true">休假</a>
+      <a class="nav-item nav-link @if ($show_tab === 'overwork') active @endif" id="nav-overwork-tab" data-toggle="tab" href="#nav-overwork" role="tab" aria-controls="nav-overwork" aria-selected="false">加班</a>
+      <a class="nav-item nav-link @if ($show_tab === 'agent') active @endif" id="nav-agent-tab" data-toggle="tab" href="#nav-agent" role="tab" aria-controls="nav-agent" aria-selected="false">代理人</a>
     </div>
   </nav>
   <div class="tab-content" id="nav-tabContent" @if ($user_no == 0) style="display:none" @endif>
-    <div class="tab-pane fade show active" id="nav-leave" role="tabpanel" aria-labelledby="nav-leave-tab">
+    <div class="tab-pane fade @if ($show_tab === 'leave') show active @endif" id="nav-leave" role="tabpanel" aria-labelledby="nav-leave-tab">
       <div class="row p-lg-3">
         <table class="table table-bordered table-striped">
           <thead class="table-thead">
               <tr>
-                <th scope="col">申請人</th>
-                <th scope="col">代理人</th>
-                <th scope="col">假別</th>
-                <th scope="col">起</th>
-                <th scope="col">迄</th>
+                <th scope="col" style="width: 150px;">申請人</th>
+                <th scope="col" style="width: 150px;">代理人</th>
+                <th scope="col" style="width: 170px;">假別</th>
+                <th scope="col" style="width: 170px;">起</th>
+                <th scope="col" style="width: 170px;">迄</th>
                 <th scope="col">備註</th>
-                <th scope="col" style="width: 160px;">申請日</th>
+                <th scope="col" style="width: 170px;">申請日</th>
                 <th scope="col" style="width: 75px;">狀態</th>
-                <th scope="col"></th>
+                <th scope="col" style="width: 75px;"></th>
               </tr>
           </thead>
           <tbody>
@@ -105,30 +105,30 @@
           <nav aria-label="Page navigation example">
           <ul class="pagination justify-content-center">
             <li class="page-item @if ($leaves_page == 1) disabled @endif ">
-              <a class="page-link" href="./individual?leave_year={{$leave_year}}&leaves_page={{ $leaves_page-1 }}&overworks_page={{ $overworks_page }}&agents_page={{ $agents_page }}">上一頁</a>
+              <a class="page-link" href="./individual?leave_year={{$leave_year}}&show_tab=leave&leaves_page={{ $leaves_page-1 }}&overworks_page={{ $overworks_page }}&agents_page={{ $agents_page }}">上一頁</a>
             </li>
             @for ($i = 1; $i <= $leaves_t_pages; $i++)
-              <li class="page-item @if ($i == $leaves_page) active @endif"><a class="page-link" href="./individual?leave_year={{$leave_year}}&leaves_page={{ $i }}&overworks_page={{ $overworks_page }}&agents_page={{ $agents_page }}">{{$i}}</a></li>
+              <li class="page-item @if ($i == $leaves_page) active @endif"><a class="page-link" href="./individual?leave_year={{$leave_year}}&show_tab=leave&leaves_page={{ $i }}&overworks_page={{ $overworks_page }}&agents_page={{ $agents_page }}">{{$i}}</a></li>
             @endfor
             <li class="page-item @if ($leaves_page == $leaves_t_pages) disabled @endif">
-              <a class="page-link" href="./individual?leave_year={{$leave_year}}&leaves_page={{ $leaves_page+1 }}&overworks_page={{ $overworks_page }}&agents_page={{ $agents_page }}">下一頁</a>
+              <a class="page-link" href="./individual?leave_year={{$leave_year}}&show_tab=leave&leaves_page={{ $leaves_page+1 }}&overworks_page={{ $overworks_page }}&agents_page={{ $agents_page }}">下一頁</a>
             </li>
           </ul>
         </div>
       </div>
     </div>
-    <div class="tab-pane fade" id="nav-overwork" role="tabpanel" aria-labelledby="nav-overwork-tab">
+    <div class="tab-pane fade @if ($show_tab === 'overwork') show active @endif" id="nav-overwork" role="tabpanel" aria-labelledby="nav-overwork-tab">
       <div class="row p-lg-3">
         <table class="table table-bordered table-striped">
             <thead class="table-thead">
               <tr>
-                <th scope="col">申請人</th>
-                <th scope="col">加班日期</th>
-                <th scope="col">加班小時</th>
+                <th scope="col" style="width: 150px;">申請人</th>
+                <th scope="col" style="width: 170px;">加班日期</th>
+                <th scope="col" style="width: 100px;">加班小時</th>
                 <th scope="col">備註</th>
-                <th scope="col">申請日</th>
-                <th scope="col">狀態</th>
-                <th scope="col"></th>
+                <th scope="col" style="width: 170px;">申請日</th>
+                <th scope="col" style="width: 75px;">狀態</th>
+                <th scope="col" style="width: 75px;"></th>
               </tr>
             </thead>
             <tbody>
@@ -138,7 +138,7 @@
                   <td> {{$overwork->over_work_date}} </td>
                   <td> {{$overwork->over_work_hours}}小時 </td>
                   <td> {{$overwork->comment}} </td>
-                  <td> {{$overwork->apply_time}} </td>
+                  <td> {{strftime('%Y-%m-%d %H:%M', strtotime($overwork->apply_time))}} </td>
                   <td> 
                     @if ($overwork->apply_status == 'Y')
                         已通過
@@ -171,32 +171,32 @@
           <nav aria-label="Page navigation example">
           <ul class="pagination justify-content-center">
             <li class="page-item @if ($overworks_page == 1) disabled @endif ">
-              <a class="page-link" href="./individual?leave_year={{$leave_year}}&leaves_page={{ $leaves_page }}&overworks_page={{ $overworks_page-1 }}&agents_page={{ $agents_page }}">上一頁</a>
+              <a class="page-link" href="./individual?leave_year={{$leave_year}}&show_tab=overwork&leaves_page={{ $leaves_page }}&overworks_page={{ $overworks_page-1 }}&agents_page={{ $agents_page }}">上一頁</a>
             </li>
             @for ($i = 1; $i <= $overworks_t_pages; $i++)
-              <li class="page-item @if ($i == $overworks_page) active @endif"><a class="page-link" href="./individual?leave_year={{$leave_year}}&leaves_page={{ $leaves_page }}&overworks_page={{ $i }}&agents_page={{ $agents_page }}">{{$i}}</a></li>
+              <li class="page-item @if ($i == $overworks_page) active @endif"><a class="page-link" href="./individual?leave_year={{$leave_year}}&show_tab=overwork&leaves_page={{ $leaves_page }}&overworks_page={{ $i }}&agents_page={{ $agents_page }}">{{$i}}</a></li>
             @endfor
             <li class="page-item @if ($overworks_page == $overworks_t_pages) disabled @endif">
-              <a class="page-link" href="./individual?leave_year={{$leave_year}}&leaves_page={{ $leaves_page }}&overworks_page={{ $overworks_page+1 }}&agents_page={{ $agents_page }}">下一頁</a>
+              <a class="page-link" href="./individual?leave_year={{$leave_year}}&show_tab=overwork&leaves_page={{ $leaves_page }}&overworks_page={{ $overworks_page+1 }}&agents_page={{ $agents_page }}">下一頁</a>
             </li>
           </ul>
         </div>
       </div>
     </div>
-    <div class="tab-pane fade" id="nav-agent" role="tabpanel" aria-labelledby="nav-agent-tab">
+    <div class="tab-pane fade @if ($show_tab === 'agent') show active @endif" id="nav-agent" role="tabpanel" aria-labelledby="nav-agent-tab">
       <div class="row p-lg-3">
         <table class="table table-bordered table-striped">
           <thead class="table-thead">
               <tr>
-                <th scope="col">申請人</th>
-                <th scope="col">代理人</th>
-                <th scope="col">假別</th>
-                <th scope="col">起</th>
-                <th scope="col">迄</th>
+                <th scope="col" style="width: 150px;">申請人</th>
+                <th scope="col" style="width: 150px;">代理人</th>
+                <th scope="col" style="width: 170px;">假別</th>
+                <th scope="col" style="width: 170px;">起</th>
+                <th scope="col" style="width: 170px;">迄</th>
                 <th scope="col">備註</th>
-                <th scope="col">申請日</th>
-                <th scope="col">狀態</th>
-                <th scope="col"></th>
+                <th scope="col" style="width: 170px;">申請日</th>
+                <th scope="col" style="width: 75px;">狀態</th>
+                <th scope="col" style="width: 75px;"></th>
               </tr>
           </thead>
           <tbody>
@@ -213,20 +213,20 @@
                   </td>
                   <td> 
                     @if ($agent->apply_type == 'L')
-                      {{$agent->start_date}}
+                      {{strftime('%Y-%m-%d %H:%M', strtotime($agent->start_date))}}
                     @else
                       {{$agent->over_work_date}} 
                     @endif
                   </td>
                   <td>
                     @if ($agent->apply_type == 'L') 
-                      {{$agent->end_date}}
+                      {{strftime('%Y-%m-%d %H:%M', strtotime($agent->end_date))}}
                     @else
                       -
                     @endif
                   </td>
                   <td> {{$agent->comment}} </td>
-                  <td> {{$agent->apply_time}} </td>
+                  <td> {{strftime('%Y-%m-%d %H:%M', strtotime($agent->apply_time))}} </td>
                   <td> 
                     @if ($agent->apply_status == 'Y')
                         已通過
@@ -259,13 +259,13 @@
           <nav aria-label="Page navigation example">
           <ul class="pagination justify-content-center">
             <li class="page-item @if ($agents_page == 1) disabled @endif ">
-              <a class="page-link" href="./individual?leave_year={{$leave_year}}&leaves_page={{ $leaves_page }}&overworks_page={{ $overworks_page }}&agents_page={{ $agents_page-1 }}">上一頁</a>
+              <a class="page-link" href="./individual?leave_year={{$leave_year}}&show_tab=agent&leaves_page={{ $leaves_page }}&overworks_page={{ $overworks_page }}&agents_page={{ $agents_page-1 }}">上一頁</a>
             </li>
             @for ($i = 1; $i <= $agents_t_pages; $i++)
-              <li class="page-item @if ($i == $agents_page) active @endif"><a class="page-link" href="./individual?leave_year={{$leave_year}}&leaves_page={{ $leaves_page }}&overworks_page={{ $overworks_page }}&agents_page={{ $i }}">{{$i}}</a></li>
+              <li class="page-item @if ($i == $agents_page) active @endif"><a class="page-link" href="./individual?leave_year={{$leave_year}}&show_tab=agent&leaves_page={{ $leaves_page }}&overworks_page={{ $overworks_page }}&agents_page={{ $i }}">{{$i}}</a></li>
             @endfor
             <li class="page-item @if ($agents_page == $agents_t_pages) disabled @endif">
-              <a class="page-link" href="./individual?leave_year={{$leave_year}}&leaves_page={{ $leaves_page }}&overworks_page={{ $overworks_page }}&agents_page={{ $agents_page+1 }}">下一頁</a>
+              <a class="page-link" href="./individual?leave_year={{$leave_year}}&show_tab=agent&leaves_page={{ $leaves_page }}&overworks_page={{ $overworks_page }}&agents_page={{ $agents_page+1 }}">下一頁</a>
             </li>
           </ul>
         </div>

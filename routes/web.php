@@ -41,7 +41,7 @@ Route::middleware('auth')->get('/leavelog/individual', 'View\LeaveLog\leavelog@s
 Route::middleware('auth')->get('/PersonalOperate/applyleave', 'View\PersonalOperate\applyleave_web@show_view')->name('po_applyleave');
 Route::middleware('auth')->get('/PersonalOperate/applyoverwork', 'View\PersonalOperate\applyoverwork_web@show_view')->name('po_applyoverwork');
 Route::middleware('auth')->get('/PersonalOperate/validate', 'View\PersonalOperate\validate@show_view')->name('po_validate');
-Route::middleware('auth')->get('/PersonalOperate/log', 'View\PersonalOperate\individuallog@show_individual')->name('po_individual');
+Route::middleware('auth')->get('/PersonalOperate/individual', 'View\PersonalOperate\individuallog@show_individual')->name('po_individual');
 
 
 // Route::middleware('auth')->get('/web/applyoverwork', 'View\applyoverwork_web@show_view')->name('applyoverworkw_web');

@@ -180,7 +180,7 @@ class LeaveApplyRepository {
                 $sql .= ' and over_work_date <= ? ';
                 $count_sql .= ' and over_work_date <= ? ';
                 array_push($query_data, $end_date);
-                array_push($count_data, $start_date);
+                array_push($count_data, $end_date);
             }
 
             $sql .=' order by id desc';
