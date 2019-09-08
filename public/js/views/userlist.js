@@ -1,5 +1,5 @@
 
-const showSetModal = async (user_no, title_id, default_agent_user_no, upper_user_no, work_class_id) => {
+const showSetModal = async (user_no, title_id, default_agent_user_no, upper_user_no, work_class_id, eip_level) => {
     const titles_res = await get_all_title();
     const users_res = await get_all_user();
     const class_res = await get_all_class();
@@ -52,6 +52,7 @@ const showSetModal = async (user_no, title_id, default_agent_user_no, upper_user
 			width: '100%'
         })
         $("#work_class_set_select").val(work_class_id).trigger("change");
+        $("#eip_level_set_select").val(eip_level)
         $("#setModal").find(".todo").attr("onclick", "update_set('"+user_no+"')").html("修改");
         $('#setModal').modal('toggle');
     } else {
@@ -181,7 +182,8 @@ const update_set = (user_no) => {
             "title_id": $("#title_set_select").val(),
             "default_agent_user_no": $("#default_agent_user_set_select").val(),
             "upper_user_no": $("#upper_user_set_select").val(),
-            "work_class_id": $("#work_class_set_select").val()
+            "work_class_id": $("#work_class_set_select").val(),
+            "eip_level": $("#eip_level_set_select").val()
         }, 
         method: "put"
     })

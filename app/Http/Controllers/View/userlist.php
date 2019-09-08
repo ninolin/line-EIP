@@ -5,16 +5,22 @@ namespace App\Http\Controllers\View;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Input;
+use App\Repositories\UserRepository;
 use DB;
 use App\Console\commands\CalcLeaveDays;
 
 class userlist extends Controller
 {
     private $calcL;
+    protected $userRepo;
 
-    public function __construct(CalcLeaveDays $calcL)
+    public function __construct(
+        CalcLeaveDays $calcL, 
+        UserRepository $userRepo
+    )
     {
         $this->calcL = $calcL;
+        $this->userRepo = $userRepo;
     }
     /**
      * Display a listing of the resource.
@@ -39,29 +45,18 @@ class userlist extends Controller
     public function create()
     {
         $page = Input::get('page', 1);
-        $search = Input::get('search', '');
-        $order_col = Input::get('order_col', 'username');
+        $search = Input::get('search', null);
+        $order_col = Input::get('order_col', 'cname');
         $order_type = Input::get('order_type', 'DESC');
+        $total_pages = 0;
+        $users = [];
 
-        $sql =  'select u.*, et.name as title, u3.cname as default_agent_cname, u2.cname as upper_cname, ewc.name as work_class_name ';
-        $sql .= 'from user u ';
-        $sql .= 'left join eip_title et on u.title_id = et.id ';
-        $sql .= 'left join user u2 on u.upper_user_no = u2.NO ';
-        $sql .= 'left join user u3 on u.default_agent_user_no = u3.NO ';
-        $sql .= 'left join eip_work_class ewc on u.work_class_id = ewc.id ';
-        $sql .= 'where u.status = "T" ';
-        if($search != '') {
-            $sql .= 'and (u.username like "%'.$search.'%" or u.cname like "%'.$search.'%" or u.email like "%'.$search.'%") ';
+        $user_result = $this->userRepo->findAllUserDetail($search, $order_col, $order_type, $page);
+        if($user_result["status"] == "successful") {
+            $users = $user_result["data"];
+            $total_pages = $user_result["total_pages"];
         }
-        $sql .= ' order by u.'.$order_col.' '.$order_type.' limit ?,10 ';
-        $users = DB::select($sql, [($page-1)*10]);
-        
-        $page_sql = 'select * from user where status = "T"';
-        if($search != '') {
-            $page_sql .= 'and (username like "%'.$search.'%" or cname like "%'.$search.'%" or email like "%'.$search.'%") ';
-        }
-        $total_users = DB::select($page_sql, []);
-        $total_pages = ceil(count($total_users)/10);
+
         return view('contents.userlist', [
             'search' => $search,
             'order_col' => $order_col,
@@ -81,11 +76,21 @@ class userlist extends Controller
     public function update(Request $request, $id)
     {
         try {
-            $title_id = $request->get('title_id');
-            $default_agent_user_no = $request->get('default_agent_user_no');
-            $upper_user_no = $request->get('upper_user_no');
-            $work_class_id = $request->get('work_class_id');
-            if(DB::update("update user set title_id =?, default_agent_user_no =?, upper_user_no =?, work_class_id =? where NO =?", [$title_id, $default_agent_user_no, $upper_user_no, $work_class_id, $id]) == 1) {
+            $title_id               = $request->get('title_id');
+            $default_agent_user_no  = $request->get('default_agent_user_no');
+            $upper_user_no          = $request->get('upper_user_no');
+            $work_class_id          = $request->get('work_class_id');
+            $eip_level              = $request->get('eip_level');
+            $sql = "update 
+                        user 
+                    set 
+                        title_id =?, 
+                        default_agent_user_no =?, 
+                        upper_user_no =?, 
+                        work_class_id =?,
+                        eip_level =? 
+                    where NO =?";
+            if(DB::update($sql, [$title_id, $default_agent_user_no, $upper_user_no, $work_class_id, $eip_level, $id]) == 1) {
                 return response()->json([
                     'status' => 'successful'
                 ]);

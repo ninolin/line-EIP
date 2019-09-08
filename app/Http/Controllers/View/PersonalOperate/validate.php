@@ -44,8 +44,8 @@ class validate extends Controller
         $unvalidate_apply_page      = Input::get('unvalidate_apply_page', 1);
         $validate_apply_t_pages     = 0;
         $unvalidate_apply_t_pages   = 0;
+        $user_no                    = \Session::get('user_no') ?? null;
 
-        $user_no = \Session::get('user_no') ?? null;
         $validate_result = $this->leaveProcessRepo->findApplyProcess($user_no, true, $validate_apply_page);
         if($validate_result["status"] == "successful") {
             $validate_apply = $validate_result["data"];
