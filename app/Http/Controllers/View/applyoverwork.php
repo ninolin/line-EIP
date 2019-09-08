@@ -42,9 +42,9 @@ class applyoverwork extends Controller
             $use_mode       = $request->get('use_mode');    
             if($comment == "") $comment = "-";
             
-            $overwork_m = date_format(date_create($overworkDate),"m");
-            $now_m = date("m");
-            if($overwork_m != $now_m) throw new Exception('只能申請這個月的加班'); 
+            $start_m = date_format(date_create($start_date),"Ym");
+            $now_m = date("Ym");
+            if($start_m < $now_m) throw new Exception('只能申請這個月的休假'); 
 
             //透過加班小時找到加班type_id
             $overwork_type_arr = DB::select('select * from eip_overwork_type', []);

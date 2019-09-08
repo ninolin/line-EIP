@@ -100,9 +100,9 @@ class applyleave extends Controller
             $comment            = $request->input('comment');                   //備註
             $use_mode           = $request->input('use_mode');         
 
-            $start_m = date_format(date_create($start_date),"m");
-            $now_m = date("m");
-            if($start_m != $now_m) throw new Exception('只能申請這個月的休假'); 
+            $start_m = date_format(date_create($start_date),"Ym");
+            $now_m = date("Ym");
+            if($start_m < $now_m) throw new Exception('只能申請這個月的休假'); 
 
             if($comment == "") $comment = "-";
             $diff_min = floor((strtotime($end_date." ".$end_time)-strtotime($start_date." ".$start_time))%86400/60); //請假分鐘
@@ -180,7 +180,7 @@ class applyleave extends Controller
                 $agent_cname = $v->cname;
                 $agent_line_id = $v->line_id;
             }
-            if($agent_line_id == "") throw new Exception('請假失敗:代理人的line未加入EIP中'); 
+            //if($agent_line_id == "") throw new Exception('請假失敗:代理人的line未加入EIP中'); 
             //取得第一簽核人的資料
             $upper_users = DB::select('select NO, line_id from user where NO in (select upper_user_no from user where NO =?)', [$apply_user_no]);
             $upper_line_id = "";    //第一簽核人的line_id
@@ -189,7 +189,7 @@ class applyleave extends Controller
                 $upper_line_id = $v->line_id; 
                 $upper_user_no = $v->NO; 
             }
-            if($upper_line_id == "") throw new Exception('請假失敗:未設定簽核人或簽核人的line未加入EIP中');
+            //if($upper_line_id == "") throw new Exception('請假失敗:未設定簽核人或簽核人的line未加入EIP中');
             //計算請假小時
             $leave_hours = 0;
             $r = json_decode(json_encode(LeaveProvider::getLeaveHours($request->get('startDate'), $request->get('endDate'), $apply_work_class_id)));
