@@ -105,7 +105,7 @@ class LeaveApplyRepository {
                 $count_data = array_merge($count_data, $leave_type);
             }
 
-            $sql .=' order by id desc';
+            $sql .=' order by start_date';
 
             if (!is_null($page)) {
                 $sql .= ' limit '.(($page-1)*10).',10 ';
@@ -142,10 +142,6 @@ class LeaveApplyRepository {
             $query_data = [];
             $sql  = 'select 
                         a.*, 
-                        DATE_FORMAT(a.start_date, "%Y-%m-%d %H:%m") as start_date_f1,
-                        DATE_FORMAT(a.end_date, "%Y-%m-%d %H:%m") as end_date_f1,
-                        DATE_FORMAT(a.start_date, "%Y-%m-%dT%H:%m") as start_date_f2,
-                        DATE_FORMAT(a.end_date, "%Y-%m-%dT%H:%m") as end_date_f2,
                         u2.cname as cname, 
                         u1.cname as agent_cname, 
                         e.name as leave_name 
@@ -183,7 +179,7 @@ class LeaveApplyRepository {
                 array_push($count_data, $end_date);
             }
 
-            $sql .=' order by id desc';
+            $sql .=' order by over_work_date';
 
             if (!is_null($page)) {
                 $sql .= ' limit '.(($page-1)*10).',10 ';
