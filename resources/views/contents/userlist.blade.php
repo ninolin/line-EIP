@@ -19,19 +19,23 @@
     <table class="table table-bordered table-striped">
       <thead class="table-thead">
         <tr>
-          <th scope="col" onclick="reload_page({{$page}}, 'username', '{{$order_type}}', 'col')">帳號
+          <!-- <th scope="col" onclick="reload_page({{$page}}, 'username', '{{$order_type}}', 'col')">帳號
             @if ($order_col == 'username' && $order_type == 'DESC') <div class="angle-down"></div> @endif
             @if ($order_col == 'username' && $order_type == 'ASC') <div class="angle-up"></div> @endif
-          </th>
+          </th> -->
           <th scope="col" onclick="reload_page({{$page}}, 'cname', '{{$order_type}}', 'col')">名稱
             @if ($order_col == 'cname' && $order_type == 'DESC') <div class="angle-down"></div> @endif
             @if ($order_col == 'cname' && $order_type == 'ASC') <div class="angle-up"></div> @endif
           </th>
-          <th scope="col" onclick="reload_page({{$page}}, 'onboard_date', '{{$order_type}}', 'col')">到職日
+          <th scope="col" onclick="reload_page({{$page}}, 'eip_level', '{{$order_type}}', 'col')">權限
+            @if ($order_col == 'eip_level' && $order_type == 'DESC') <div class="angle-down"></div> @endif
+            @if ($order_col == 'eip_level' && $order_type == 'ASC') <div class="angle-up"></div> @endif
+          </th>
+          <th scope="col" onclick="reload_page({{$page}}, 'onboard_date', '{{$order_type}}', 'col')" style="width: 115px;">到職日
             @if ($order_col == 'onboard_date' && $order_type == 'DESC') <div class="angle-down"></div> @endif
             @if ($order_col == 'onboard_date' && $order_type == 'ASC') <div class="angle-up"></div> @endif
           </th>
-          <th scope="col" onclick="reload_page({{$page}}, 'title_id', '{{$order_type}}', 'col')">職等
+          <th scope="col" onclick="reload_page({{$page}}, 'title_id', '{{$order_type}}', 'col')" style="width: 70px;">職等
             @if ($order_col == 'title_id' && $order_type == 'DESC') <div class="angle-down"></div> @endif
             @if ($order_col == 'title_id' && $order_type == 'ASC') <div class="angle-up"></div> @endif
           </th>
@@ -47,18 +51,24 @@
             @if ($order_col == 'upper_user_no' && $order_type == 'DESC') <div class="angle-down"></div> @endif
             @if ($order_col == 'upper_user_no' && $order_type == 'ASC') <div class="angle-up"></div> @endif
           </th>
-          <th scope="col" onclick="reload_page({{$page}}, 'line_id', '{{$order_type}}', 'col')">lineId
+          <th scope="col" onclick="reload_page({{$page}}, 'line_id', '{{$order_type}}', 'col')" style="width: 300px;" >lineId
             @if ($order_col == 'line_id' && $order_type == 'DESC') <div class="angle-down"></div> @endif
             @if ($order_col == 'line_id' && $order_type == 'ASC') <div class="angle-up"></div> @endif
           </th>
-          <th scope="col">操作</th>
+          <th scope="col" style="width: 75px;">操作</th>
         </tr>
       </thead>
       <tbody>
         @foreach($users as $user)
           <tr>
-            <td> {{$user->username}} </td>
             <td> {{$user->cname}} </td>
+            <td> 
+              @if ($user->eip_level == 'admin')
+                管理用戶
+              @else 
+                一般用戶
+              @endif
+            </td>
             <td> {{$user->onboard_date}} </td>
             <td> {{$user->title}} </td>
             <td> {{$user->default_agent_cname}} </td>
@@ -66,13 +76,21 @@
             <td> {{$user->work_class_name}} </td>
             <td> {{$user->line_id}} </td>
             <td>
-              @if ($user->line_id == '') 
-                <button type="button" class="btn btn-outline-success btn-sm" onclick="showBindLineId({{$user->NO}}, '{{$user->cname}}')">綁定lineId</button>
-              @else
-                <button type="button" class="btn btn-outline-danger btn-sm" onclick="showUnbindLineId({{$user->NO}}, '{{$user->cname}}', '{{$user->line_id}}')">解除lineId</button>
-              @endif
-              <button type="button" class="btn btn-outline-primary btn-sm" onclick="showSetModal({{$user->NO}}, {{$user->title_id}}, {{$user->default_agent_user_no}}, {{$user->upper_user_no}}, {{$user->work_class_id}})">主檔設定</button>
-              <button type="button" class="btn btn-outline-primary btn-sm" onclick="showLeaveDayModal('{{$user->NO}}', '{{$user->onboard_date}}')">休假設定</button>
+              <div class="btn-group">
+                <button type="button" class="btn btn-primary dropdown-toggle btn-sm" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  操作
+                </button>
+                <div class="dropdown-menu dropdown-menu-right">
+                  <a class="dropdown-item" href="#" onclick="showSetModal({{$user->NO}}, {{$user->title_id}}, {{$user->default_agent_user_no}}, {{$user->upper_user_no}}, {{$user->work_class_id}}, '{{$user->eip_level}}')">主檔設定</a>
+                  <a class="dropdown-item" href="#" onclick="showLeaveDayModal('{{$user->NO}}', '{{$user->onboard_date}}')">休假設定</a>
+                  <div class="dropdown-divider"></div>
+                  @if ($user->line_id == '') 
+                    <a class="dropdown-item text-success" href="#" onclick="showBindLineId({{$user->NO}}, '{{$user->cname}}')">綁定lineId</a>
+                  @else
+                    <a class="dropdown-item text-danger" href="#" onclick="showUnbindLineId({{$user->NO}}, '{{$user->cname}}', '{{$user->line_id}}')">解除lineId</a>
+                  @endif
+                  </div>
+              </div>
             </td>
           </tr>
         @endforeach
@@ -133,7 +151,16 @@
             <div class="row">
               <label for="title-name" class="col-form-label w-25">班別:</label>
               <div class="col-form-label w-75">
-                <select id="work_class_set_select" class="w-75"></select>
+                <select id="work_class_set_select"></select>
+              </div>
+            </div>
+            <div class="row">
+              <label for="title-name" class="col-form-label w-25">權限</label>
+              <div class="col-form-label w-75">
+                <select id="eip_level_set_select" class="form-control">
+                  <option value="user">一般用戶</option>
+                  <option value="admin">管理用戶</option>
+                </select>
               </div>
             </div>
           </div>
