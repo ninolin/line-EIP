@@ -41,66 +41,70 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach($unvalidate_apply as $leave)
-                  <tr>
-                    <td> {{$leave->cname}} </td>
-                    <td> 
-                      @if ($leave->apply_type === 'L')
-                        {{$leave->agent_cname}} 
-                      @else
-                        -
-                      @endif
-                    </td>
-                    <td> 
-                      @if ($leave->apply_type === 'L')
-                        {{$leave->leave_name}} ({{$leave->leave_hours}}小時)
-                      @else
-                        加班 ({{$leave->over_work_hours}}小時)
-                      @endif
-                    </td>
-                    <td> 
-                      @if ($leave->apply_type === 'L')
-                        {{strftime('%Y-%m-%d %H:%M', strtotime($leave->start_date))}}
-                      @else
-                        {{strftime('%Y-%m-%d', strtotime($leave->over_work_date))}}
-                      @endif
-                    </td>
-                    <td> 
-                      @if ($leave->apply_type === 'L')
-                        {{strftime('%Y-%m-%d %H:%M', strtotime($leave->end_date))}} 
-                      @else
-                        -
-                      @endif
-                    </td>
-                    <td> {{$leave->comment}} </td>
-                    <td> {{strftime('%Y-%m-%d %H:%M', strtotime($leave->apply_time))}} </td>
-                    <td> 
-                      @if ($leave->apply_status == 'Y')
-                          已通過
-                      @elseif ($leave->apply_status == 'N')
-                          已拒絕
-                      @elseif ($leave->apply_status == 'C')
-                          已取消
-                      @else
-                          簽核中
-                      @endif
-                    </td>
-                    <td>  
-                      <div class="btn-group">
-                        <button type="button" class="btn btn-primary dropdown-toggle btn-sm" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                          操作
-                        </button>
-                        <div class="dropdown-menu dropdown-menu-right">
-                          <a class="dropdown-item" href="#" onclick="showDetailModal({{$leave->id}})">簽核紀錄</a>
-                          <a class="dropdown-item" href="#" onclick="showChangeLogModal({{$leave->id}})">更新紀錄</a>
-                          <div class="dropdown-divider"></div>
-                          <a class="dropdown-item text-success" href="#" onclick="showValidateModal({{$leave->id}}, {{$leave->process_id}}, 'accept')">同意簽核</a>
-                          <a class="dropdown-item text-danger" href="#" onclick="showValidateModal({{$leave->id}}, {{$leave->process_id}}, 'reject')">拒絕簽核</a>
+                @if (count($unvalidate_apply) > 0) 
+                  @foreach($unvalidate_apply as $leave)
+                    <tr>
+                      <td> {{$leave->cname}} </td>
+                      <td> 
+                        @if ($leave->apply_type === 'L')
+                          {{$leave->agent_cname}} 
+                        @else
+                          -
+                        @endif
+                      </td>
+                      <td> 
+                        @if ($leave->apply_type === 'L')
+                          {{$leave->leave_name}} ({{$leave->leave_hours}}小時)
+                        @else
+                          加班 ({{$leave->over_work_hours}}小時)
+                        @endif
+                      </td>
+                      <td> 
+                        @if ($leave->apply_type === 'L')
+                          {{strftime('%Y-%m-%d %H:%M', strtotime($leave->start_date))}}
+                        @else
+                          {{strftime('%Y-%m-%d', strtotime($leave->over_work_date))}}
+                        @endif
+                      </td>
+                      <td> 
+                        @if ($leave->apply_type === 'L')
+                          {{strftime('%Y-%m-%d %H:%M', strtotime($leave->end_date))}} 
+                        @else
+                          -
+                        @endif
+                      </td>
+                      <td> {{$leave->comment}} </td>
+                      <td> {{strftime('%Y-%m-%d %H:%M', strtotime($leave->apply_time))}} </td>
+                      <td> 
+                        @if ($leave->apply_status == 'Y')
+                            已通過
+                        @elseif ($leave->apply_status == 'N')
+                            已拒絕
+                        @elseif ($leave->apply_status == 'C')
+                            已取消
+                        @else
+                            簽核中
+                        @endif
+                      </td>
+                      <td>  
+                        <div class="btn-group">
+                          <button type="button" class="btn btn-primary dropdown-toggle btn-sm" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            操作
+                          </button>
+                          <div class="dropdown-menu dropdown-menu-right">
+                            <a class="dropdown-item" href="#" onclick="showDetailModal({{$leave->id}})">簽核紀錄</a>
+                            <a class="dropdown-item" href="#" onclick="showChangeLogModal({{$leave->id}})">更新紀錄</a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item text-success" href="#" onclick="showValidateModal({{$leave->id}}, {{$leave->process_id}}, 'accept')">同意簽核</a>
+                            <a class="dropdown-item text-danger" href="#" onclick="showValidateModal({{$leave->id}}, {{$leave->process_id}}, 'reject')">拒絕簽核</a>
+                          </div>
                         </div>
-                      </div>
-                    </td>
-                  </tr>
-                @endforeach
+                      </td>
+                    </tr>
+                  @endforeach
+                @else
+                  <tr><td class="text-center" colspan="9">目前無資料</td></tr>
+                @endif
             </tbody>
           </table>
         </div>
@@ -138,6 +142,7 @@
                 </tr>
             </thead>
             <tbody>
+              @if (count($validate_apply) > 0) 
                 @foreach($validate_apply as $leave)
                   <tr>
                     <td> {{$leave->cname}} </td>
@@ -195,6 +200,9 @@
                     </td>
                   </tr>
                 @endforeach
+              @else
+                <tr><td class="text-center" colspan="9">目前無資料</td></tr>
+              @endif
             </tbody>
           </table>
         </div>
