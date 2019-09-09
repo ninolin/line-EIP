@@ -18,23 +18,27 @@
                 @if ($is_annual)
                     <div class="weui-cell">
                         <div class="weui-cell__bd">
-                            <p>可使用</p>
+                            <p>今年可使用</p>
                         </div>
                         <div class="weui-cell__ft">{{$annual_hours}}小時</div>
                     </div>
                 @endif
-                <div class="weui-cell">
-                    <div class="weui-cell__bd">
-                        <p>已簽核</p>
+                @if ($show_success_hours)
+                    <div class="weui-cell">
+                        <div class="weui-cell__bd">
+                            <p>今年已簽核</p>
+                        </div>
+                        <div class="weui-cell__ft">{{$success_hours}}小時</div>
                     </div>
-                    <div class="weui-cell__ft">{{$success_hours}}小時</div>
-                </div>
-                <div class="weui-cell">
-                    <div class="weui-cell__bd">
-                        <p>簽核中</p>
+                @endif
+                @if ($show_process_hours)
+                    <div class="weui-cell">
+                        <div class="weui-cell__bd">
+                            <p>今年簽核中</p>
+                        </div>
+                        <div class="weui-cell__ft">{{$process_hours}}小時</div>
                     </div>
-                    <div class="weui-cell__ft">{{$process_hours}}小時</div>
-                </div>
+                @endif
             </div>
             <div class="weui-cells__title"></div>
             <div class="main-section" id="leave_data">

@@ -44,6 +44,7 @@
                 } else {
                     if(v.data.length > 0) $("#leave_type_data").html("");
                     $html = "";
+                    v.data.unshift({name: '簽核中'});
                     v.data.map(item => {     
                         $html +=  '<a class="weui-cell weui-cell_access" href="./individuallog/leavetype/'+item.name+'/'+data.context.userId+'">';
                         $html +=  ' <div class="weui-cell__bd"><p>'+item.name+'</p></div>';

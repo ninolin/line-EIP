@@ -72,30 +72,46 @@ class individuallog extends Controller
         try {
             $user = $this->userService->get_user_info($line_id, 'line');
             if($user['status'] == 'error') throw new Exception($user['message']);
-            $user_no = $user['data']->NO;
-            //透過假別的名稱去找到該假別全部的id
-            $types_id = [];
-            $is_annual = false;
+            $user_no    = $user['data']->NO;
+            $types_id   = [];
+            $leaves     = [];
+            $is_annual  = false;
             $is_compensatory = false;
+            $show_success_hours = true;
+            $show_process_hours = true;
+
             if($type_name == '加班') {
+                $show_process_hours = false;
                 $types = $this->overworkTypeRepo->findAllType();
                 foreach ($types as $t) {
                     array_push($types_id, $t->id);
                 }
                 //取得今年加班全部的紀錄
-                $leaves_result = $this->leaveApplyRepo->findPersonalOverworkLog([$user_no], null, date("Y").'-01-01 00:00:00', date("Y").'-12-31 23:59:59');
+                $leaves_result = $this->leaveApplyRepo->findPersonalOverworkLog([$user_no], ['Y', 'C', 'N'], date("Y").'-01-01 00:00:00', date("Y").'-12-31 23:59:59');
                 if($leaves_result["status"] == "successful") {
                     $leaves = $leaves_result["data"];
                 }
+            } else if($type_name == '簽核中') {
+                $show_success_hours = false;
+                $overwork_result = $this->leaveApplyRepo->findPersonalOverworkLog([$user_no], ['P'], date("Y").'-01-01 00:00:00', date("Y").'-12-31 23:59:59');
+                if($overwork_result["status"] == "successful") {
+                    $leaves = $overwork_result["data"];
+                }
+                $leaves_result = $this->leaveApplyRepo->findPersonalLeaveLog([$user_no], ['P'], date("Y").'-01-01 00:00:00', date("Y").'-12-31 23:59:59', null);
+                if($leaves_result["status"] == "successful") {
+                    $leaves = array_merge($leaves_result["data"], $leaves);
+                }
+                
             } else {
-                $types = $this->leaveTypeRepo->findTypeByName($type_name);
+                $show_process_hours = false;
+                $types = $this->leaveTypeRepo->findTypeByName($type_name); //透過假別的名稱去找到該假別全部的id
                 foreach ($types as $t) {
                     if($t->annual == true) $is_annual = true;
                     if($t->compensatory == true) $is_compensatory = true;
                     array_push($types_id, $t->id);
                 }
                 //取得今年某假別全部的紀錄
-                $leaves_result = $this->leaveApplyRepo->findPersonalLeaveLog([$user_no], null, date("Y").'-01-01 00:00:00', date("Y").'-12-31 23:59:59', $types_id);
+                $leaves_result = $this->leaveApplyRepo->findPersonalLeaveLog([$user_no], ['Y', 'C', 'N'], date("Y").'-01-01 00:00:00', date("Y").'-12-31 23:59:59', $types_id);
                 if($leaves_result["status"] == "successful") {
                     $leaves = $leaves_result["data"];
                 }
@@ -116,6 +132,8 @@ class individuallog extends Controller
             return view('line.individuallog', [
                 'leaves'            =>  $leaves,
                 'today'             =>  date("Y-m-d H:i:s"),
+                'show_success_hours'=>  $show_success_hours,
+                'show_process_hours'=>  $show_process_hours,
                 'success_hours'     =>  $success_hours,
                 'process_hours'     =>  $process_hours,
                 'is_annual'         =>  $is_annual,
