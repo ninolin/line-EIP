@@ -116,24 +116,69 @@ class LeaveProcessRepository {
                 foreach ($next_upper_users as $n) {
                     $next_upper_user_no = $n->upper_user_no;
                     if($next_upper_user_no == $upper_user_no) {
+                        log::info($d->id);
                         array_push($new_data, $d);
                     }
                 }
             }
-            $total_pages = floor(count($new_data)/10);
-            if($total_pages < 1) $total_pages = 1;
-            $new_data = array_slice($new_data, $page-1, 10);
+
+            $total_pages = ceil(count($new_data)/10);
+            if (!is_null($page)) {
+                $new_data = array_slice($new_data, $page-1, 10);
+            }
             return [
-                'status' => 'successful',
-                'data' => $new_data,
-                'total_pages' => $total_pages
+                'status'        => 'successful',
+                'data'          => $new_data,
+                'total_pages'   => $total_pages
             ];
         } catch (Exception $e) {
             return [
-                'status' => 'error',
-                'message' => $e->getMessage()
+                'status'    => 'error',
+                'message'   => $e->getMessage()
             ];
         }
     }
 
+    public function findValidateApplyProcess(
+        $upper_user_no = null, 
+        $page = null
+    ) 
+    {
+        try {
+
+            $sql  = 'select 
+                        a.*, 
+                        u2.cname as cname, 
+                        u1.cname as agent_cname, 
+                        eip_leave_type.name as leave_name
+                    from 
+                        (   select a.id as process_id, b.* 
+                            from eip_leave_apply_process a, eip_leave_apply b 
+                            where 
+                                a.apply_id = b.id and 
+                                a.is_validate IS NOT NULL and 
+                                a.upper_user_no =? 
+                        ) as a
+                        left join user as u1 on a.agent_user_no = u1.NO
+                        left join eip_leave_type on a.leave_type = eip_leave_type.id
+                        left join user as u2 on a.apply_user_no = u2.NO
+                    order by id desc';
+            $data = DB::select($sql, [$upper_user_no]);
+            if (!is_null($page)) {
+                $data = array_slice($data, $page-1, 10);
+            }
+            $total_pages = floor(count($data)/10);
+            
+            return [
+                'status'        => 'successful',
+                'data'          => $data,
+                'total_pages'   => $total_pages
+            ];
+        } catch (Exception $e) {
+            return [
+                'status'    => 'error',
+                'message'   => $e->getMessage()
+            ];
+        }
+    }
 }

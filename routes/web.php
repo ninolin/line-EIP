@@ -21,6 +21,8 @@ Route::get('/validateleave', 'View\validateleave@create');
 //Route::get('/individuallog/{type_id}', 'View\individuallog@show_individual_log_page');
 Route::get('/leavetype', function () {return view('line.leavetype');});
 Route::get('/individuallog/leavetype/{type_name}/{line_id}', 'View\individuallog@get_individual_log');
+Route::get('/validatetype', function () {return view('line.validatetype');});
+Route::get('/validateleave/{type_name}/{line_id}', 'View\validateleave@index');
 
 //Route::middleware('auth')->get('/whmanage', 'View\whmanage@index')->name('whmanage');
 //Route::get('/whmanage', 'View\whmanage@index')->name('whmanage');

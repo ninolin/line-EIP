@@ -8,6 +8,9 @@ use Illuminate\Support\Facades\Input;
 use App\Providers\LineServiceProvider;
 use App\Providers\LeaveProvider;
 use App\Providers\HelperServiceProvider;
+use App\Services\UserService;
+use App\Repositories\LeaveProcessRepository;
+use App\Repositories\LeaveApplyRepository;
 use DB;
 use Log;
 use Config;
@@ -15,58 +18,47 @@ use DateTime;
 
 class validateleave extends Controller
 {
+    protected $userService;
+    protected $leaveProcessRepo;
+    protected $leaveApplyRepo;
+
+    public function __construct(
+        UserService $userService,
+        LeaveProcessRepository $leaveProcessRepo,
+        LeaveApplyRepository $leaveApplyRepo
+    )
+    {
+        $this->userService = $userService;
+        $this->leaveProcessRepo = $leaveProcessRepo;
+        $this->leaveApplyRepo = $leaveApplyRepo;
+    }
     /**
      * 顯示LIFF待審核清單資料
      * @author nino
      * @return \Illuminate\Http\Response
      */
-    public function index($id)
+    public function index($type_name, $line_id)
     {
         $leaves = [];
-        $applies = [];
-        $NO = 0;
-        $sql = 'select NO from user where line_id = ?';
-        $users = DB::select($sql, [$id]);
-        if(count($users) == 0) {
-            return response()->json([
-                'status' => 'successful',
-                'data' => []
-            ]);
+        $user = $this->userService->get_user_info($line_id, 'line');
+        if($user['status'] == 'error') throw new Exception($user['message']);
+        $user_no = $user['data']->NO;
+        if($type_name == 'unvalidate') {
+            $unvalidate_result = $this->leaveProcessRepo->findUnValidateApplyProcess($user_no);
+            if($unvalidate_result["status"] == "successful") {
+                $leaves = $unvalidate_result["data"];
+            }
         } else {
-            foreach ($users as $u) {
-                $NO = $u -> NO;
+            $validate_result = $this->leaveProcessRepo->findValidateApplyProcess($user_no);
+            if($validate_result["status"] == "successful") {
+                $leaves = $validate_result["data"];
             }
         }
-
-        $sql  = 'select a.*, u2.cname as cname, u1.cname as agent_cname, eip_leave_type.name as leave_name ';
-        $sql .= 'from ';
-        $sql .= '(  select a.id as process_id, b.* ';
-        $sql .= '   from eip_leave_apply_process a, eip_leave_apply b ';
-        $sql .= '   where b.apply_status = "P" and a.apply_id = b.id and a.is_validate IS NULL and a.upper_user_no IN ';
-        $sql .= '   (select NO from user where line_id =?)';
-        $sql .= ') as a ';
-        $sql .= 'left join user as u1 ';
-        $sql .= 'on a.agent_user_no = u1.NO ';
-        $sql .= 'left join eip_leave_type ';
-        $sql .= 'on a.leave_type = eip_leave_type.id ';
-        $sql .= 'left join user as u2 on a.apply_user_no = u2.NO';
-        $leaves = DB::select($sql, [$id]);
-        $new_leaves = [];
-        foreach ($leaves as $l) {
-            //去檢查這個no是不是這張假單的下一個簽核人
-            $sql = 'select upper_user_no from eip_leave_apply_process ';
-            $sql .='where apply_id = ? and is_validate IS NULL order by id limit 1 ';
-            $next_upper_users = DB::select($sql, [$l->id]);
-            foreach ($next_upper_users as $n) {
-                $upper_user_no = $n -> upper_user_no;
-                if($upper_user_no == $NO) {
-                    array_push($new_leaves, $l);
-                }
-            }
-        }
-        return response()->json([
-            'status' => 'successful',
-            'data' => $new_leaves
+        
+        return view('line.validateleave', [
+            'leaves'        => $leaves,
+            'login_user_no' => $user_no,
+            'type'          => $type_name
         ]);
     }
 
@@ -196,13 +188,7 @@ class validateleave extends Controller
 
     public function show_other_leaves($id)
     {
-        $apply_user_no = $id;
-        $sql  = "select ela.*, elt.name as leave_name ";
-        $sql .= "from eip_leave_apply ela, eip_leave_type elt ";
-        $sql .= "where ela.apply_user_no =? and ";
-        $sql .= "ela.apply_type = 'L' and ela.apply_status IN ('Y','P') and ";
-        $sql .= "ela.start_date >= now() and ela.leave_type = elt.id";
-        $leaves = DB::select($sql, [$apply_user_no]);
+        $leaves = $this->leaveApplyRepo->findPersonalOtherLeave($id);
         return response()->json([
             'status' => 'successful',
             'data' => $leaves
