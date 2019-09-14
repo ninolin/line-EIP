@@ -18,10 +18,10 @@ class LeaveApplyRepository {
         try {
             $sql  = 'select 
                         a.*, 
-                        DATE_FORMAT(a.start_date, "%Y-%m-%d %H:%m") as start_date_f1,
-                        DATE_FORMAT(a.end_date, "%Y-%m-%d %H:%m") as end_date_f1,
-                        DATE_FORMAT(a.start_date, "%Y-%m-%dT%H:%m") as start_date_f2,
-                        DATE_FORMAT(a.end_date, "%Y-%m-%dT%H:%m") as end_date_f2,
+                        DATE_FORMAT(a.start_date, "%Y-%m-%d %H:%i") as start_date_f1,
+                        DATE_FORMAT(a.end_date, "%Y-%m-%d %H:%i") as end_date_f1,
+                        DATE_FORMAT(a.start_date, "%Y-%m-%dT%H:%i") as start_date_f2,
+                        DATE_FORMAT(a.end_date, "%Y-%m-%dT%H:%i") as end_date_f2,
                         u2.cname as cname, 
                         u2.work_class_id, 
                         u1.cname as agent_cname, 
@@ -55,10 +55,10 @@ class LeaveApplyRepository {
             $query_data = [];
             $sql  = 'select 
                         a.*, 
-                        DATE_FORMAT(a.start_date, "%Y-%m-%d %H:%m") as start_date_f1,
-                        DATE_FORMAT(a.end_date, "%Y-%m-%d %H:%m") as end_date_f1,
-                        DATE_FORMAT(a.start_date, "%Y-%m-%dT%H:%m") as start_date_f2,
-                        DATE_FORMAT(a.end_date, "%Y-%m-%dT%H:%m") as end_date_f2,
+                        DATE_FORMAT(a.start_date, "%Y-%m-%d %H:%i") as start_date_f1,
+                        DATE_FORMAT(a.end_date, "%Y-%m-%d %H:%i") as end_date_f1,
+                        DATE_FORMAT(a.start_date, "%Y-%m-%dT%H:%i") as start_date_f2,
+                        DATE_FORMAT(a.end_date, "%Y-%m-%dT%H:%i") as end_date_f2,
                         u2.cname as cname, 
                         u1.cname as agent_cname, 
                         e.name as leave_name 
@@ -217,10 +217,10 @@ class LeaveApplyRepository {
             $query_data = [$user_no];
             $sql  = 'select 
                         a.*, 
-                        DATE_FORMAT(a.start_date, "%Y-%m-%d %H:%m") as start_date_f1,
-                        DATE_FORMAT(a.end_date, "%Y-%m-%d %H:%m") as end_date_f1,
-                        DATE_FORMAT(a.start_date, "%Y-%m-%dT%H:%m") as start_date_f2,
-                        DATE_FORMAT(a.end_date, "%Y-%m-%dT%H:%m") as end_date_f2,
+                        DATE_FORMAT(a.start_date, "%Y-%m-%d %H:%i") as start_date_f1,
+                        DATE_FORMAT(a.end_date, "%Y-%m-%d %H:%i") as end_date_f1,
+                        DATE_FORMAT(a.start_date, "%Y-%m-%dT%H:%i") as start_date_f2,
+                        DATE_FORMAT(a.end_date, "%Y-%m-%dT%H:%i") as end_date_f2,
                         u2.cname as cname, 
                         u1.cname as agent_cname, 
                         e.name as leave_name 
@@ -280,7 +280,8 @@ class LeaveApplyRepository {
         $login_user_no, 
         $leave_hours, 
         $event_id = null
-    ) {
+    ) 
+    {
         try { 
             $change_desc = "休假起迄更新為".$start_date."到".$end_date;
             $sql = "update eip_leave_apply set start_date =?, end_date =?, leave_hours =? ";
@@ -319,7 +320,8 @@ class LeaveApplyRepository {
         $overwork_hours, 
         $reason,
         $login_user_no
-    ) {
+    ) 
+    {
         try { 
             $change_desc = "加班時間更新為".$overwork_date." ".$overwork_hours."小時";
             DB::beginTransaction(); 
@@ -338,6 +340,30 @@ class LeaveApplyRepository {
                 'status' => 'error',
                 'message' => $e->getMessage()
             ];
+        }
+    }
+
+    public function findPersonalOtherLeave($user_no)
+    {
+        try {
+            $sql  = 'select 
+                        ela.*, 
+                        DATE_FORMAT(ela.start_date, "%Y-%m-%d %H:%i") as start_date_f1,
+                        DATE_FORMAT(ela.end_date, "%Y-%m-%d %H:%i") as end_date_f1,
+                        elt.name as leave_name
+                    from 
+                        eip_leave_apply ela, 
+                        eip_leave_type elt
+                    where 
+                        ela.apply_user_no =? and 
+                        ela.apply_type = "L" and 
+                        ela.apply_status IN ("Y","P") and 
+                        ela.start_date >= now() and 
+                        ela.leave_type = elt.id';
+            $data = DB::select($sql, [$user_no]);
+            return $data;
+        } catch (Exception $e) {
+            throw $e;
         }
     }
 }
