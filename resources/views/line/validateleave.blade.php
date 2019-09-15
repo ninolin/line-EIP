@@ -19,6 +19,10 @@
                 background: #53b4b0;
                 color: white;
             }
+            .other_leaves_table {
+                width: 100%;
+                margin-bottom: 20px;
+            }
         </style>
     </head>
     <body style="background-color: #f1f1f1;">
@@ -102,21 +106,18 @@
                 <div id="result"></div>
             </div>
         </div>
-        <div id="dialogs">
-            <div class="js_dialog" id="other_leaves" style="display: none;">
-                <div class="weui-mask"></div>
-                <div class="weui-half-screen-dialog">
-                    <div class="weui-half-screen-dialog__hd">
+        <div class="js_dialog" id="other_leaves" style="display: none;">
+            <div class="weui-mask"></div>
+            <div class="weui-half-screen-dialog">
+                <div class="weui-half-screen-dialog__hd">
                     <div class="weui-half-screen-dialog__hd__side">
                         <button class="weui-icon-btn weui-icon-btn_close" onclick="javascript:$('#other_leaves').hide();">關閉</button>
                     </div>
                     <div class="weui-half-screen-dialog__hd__main">
                         <strong class="weui-half-screen-dialog__title">申請人未發生請假</strong>
                     </div>
-                    </div>
-                    <div class="weui-half-screen-dialog__bd">
-                    </div>
                 </div>
+                <div class="weui-half-screen-dialog__bd"></div>
             </div>
         </div>
     </body>
@@ -189,7 +190,7 @@
             .then(v => {
                 if(v.status == "successful") {
                     if(v.data.length > 0) $("#other_leaves").find(".weui-half-screen-dialog__bd").html("");
-                    $html = "<table style='width: 100%;margin-bottom: 20px;' class='other_leaves_table'>";
+                    $html = "<table class='other_leaves_table text-center'>";
                     $html += "<thead><tr><th>假別</th><th>起</th><th>迄</th><th>狀態</th></tr></thead>";
                     $html += "<tbody>"
                     v.data.map(item => {
