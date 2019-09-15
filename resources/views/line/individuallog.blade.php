@@ -7,8 +7,22 @@
         <!-- Fonts -->
         <link href="https://fonts.googleapis.com/css?family=Nunito:200,600" rel="stylesheet" type="text/css">
         <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/solid.css" integrity="sha384-+0VIRx+yz1WBcCTXBkVQYIBVNEFH1eP6Zknm16roZCyeNg2maWEpk/l/KsyFKs7G" crossorigin="anonymous">
+        <link href="{{ asset('js/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
         <link href="{{ asset('css/weui.min.css') }}" rel="stylesheet">
         <link href="{{ asset('css/public.css') }}" rel="stylesheet">
+        <style>
+            .logs_history_table tbody tr:nth-child(even){
+                background: #e7e7e7
+            }
+            .logs_history_table thead {
+                background: #53b4b0;
+                color: white;
+            }
+            .logs_history_table {
+                width: 100%;
+                margin-bottom: 20px;
+            }
+        </style>
     </head>
     <body style="background-color: #f1f1f1;">
         <div class="weui-flex"><div class="weui-flex__item mobile_topbar">工時紀錄</div></div>
@@ -63,7 +77,7 @@
                                     @endif
                                 </em>
                             </div>
-                            <div class="weui-form-preview__bd" style="padding: 5px 16px;" onclick="show_process_history('{{$leave->id}}')">
+                            <div class="weui-form-preview__bd" style="padding: 5px 16px;">
                             @if ($leave->apply_type == 'L')
                                 <div class="weui-form-preview__item">
                                     <span class="weui-form-preview__label">代理人</span>
@@ -95,6 +109,9 @@
                                     <span class="weui-form-preview__value">{{$leave->comment}}</span>
                                 </div>
                             @endif
+                                <ul class="weui-media-box__info" style="color:#2c66bc">
+                                    <li class="weui-media-box__info__meta" onclick="show_process_history('{{$leave->id}}')">簽核歷程</li>
+                                </ul>
                             </div>
                             @if ($leave->apply_status == 'P')
                                 <div class="weui-form-preview__ft">
@@ -125,16 +142,6 @@
             </div>
             <div id="useridfield" style="display:none"></div>
         </div>
-        <div style="display: none;" id="logs_history">
-            <div class="weui-mask"></div>
-            <div class="weui-dialog">
-                <div class="weui-dialog__hd"><strong class="weui-dialog__title">簽核歷程</strong></div>
-                <div class="weui-dialog__bd"></div>
-                <div class="weui-dialog__ft">
-                    <a onclick="javascript:$('#logs_history').hide();" href="javascript:;" class="weui-dialog__btn weui-dialog__btn_primary">確定</a>
-                </div>
-            </div>
-        </div>
         <div id="cancel_dialog" style="display: none;">
             <div class="weui-mask"></div>
             <div class="weui-dialog">
@@ -148,19 +155,34 @@
                 </div>
             </div>
         </div>
+        <div class="js_dialog" id="logs_history" style="display: none;">
+            <div class="weui-mask"></div>
+            <div class="weui-half-screen-dialog">
+                <div class="weui-half-screen-dialog__hd">
+                    <div class="weui-half-screen-dialog__hd__side">
+                        <button class="weui-icon-btn weui-icon-btn_close" onclick="javascript:$('#logs_history').hide();">關閉</button>
+                    </div>
+                    <div class="weui-half-screen-dialog__hd__main">
+                        <strong class="weui-half-screen-dialog__title">簽核歷程</strong>
+                    </div>
+                </div>
+                <div class="weui-half-screen-dialog__bd"></div>
+            </div>
+        </div>
     </body>
     <script src="{{ asset('js/jquery/jquery.min.js') }}"></script>
-    <!-- <script src="{{ asset('js/line/individuallog.js') }}"></script> -->
     <script src="https://d.line-scdn.net/liff/1.0/sdk.js"></script>
     <script src="{{ asset('js/restcall.js') }}"></script>
     <script>
         function show_process_history(apply_id) {
             promise_call({
-                url: "/api/leavelog/"+apply_id, 
+                url: "/api/leavelog/process/"+apply_id, 
                 method: "get"
             }).then(v => {
-                if(v.data.length > 0) $("#logs_history").find(".weui-dialog__bd").html("");
-                $html = "<table style='width: 100%;'><tr><th>簽核人</th><th>簽核時間</th><th>簽核狀態</th></tr>";
+                if(v.data.length > 0) $("#logs_history").find(".weui-half-screen-dialog__bd").html("");
+                $html = "<table class='logs_history_table text-center'>";
+                $html +="<thead><tr><th>簽核人</th><th>簽核時間</th><th>簽核狀態</th></tr></thead>";
+                $html +="<tbody>"
                 v.data.map(item => {
                     if(!item.is_validate) item.is_validate = "-";
                     if(item.is_validate == 0) item.is_validate = "拒絕("+item.reject_reason+")";
@@ -168,8 +190,8 @@
                     if(!item.validate_time) item.validate_time = "-";
                     $html += "<tr><td>"+item.cname+"</td><td>"+item.validate_time+"</td><td>"+item.is_validate+"</td></tr>"
                 });
-                $html +="</table>"
-                $("#logs_history").find(".weui-dialog__bd").html($html);
+                $html +="</tbody></table>"
+                $("#logs_history").find(".weui-half-screen-dialog__bd").html($html);
                 $("#logs_history").show();
             })
         }
