@@ -27,8 +27,35 @@ class CalcLeaveDays extends Command
             if(!is_null($onboard_date)) {
                 $leave_day = self::calc_leavedays($onboard_date, date("Y-m-d"));
                 if($leave_day != 10000) {
-                    if(DB::update('update user set year_totalleave = ?, year_useleave = 0 where NO =? ', [$leave_day, $u->NO]) != 1) {
-                        echo 'now update data';
+                    $data = DB::select('select count(1) as count from eip_annual_leave where year =? and user_no =?', [date("Y"), $u->NO]);
+                    foreach($data as $d) {
+                        if($d->count != 0) {
+                            if(DB::update('update eip_annual_leave set labor_annual_leaves =? where year =? and user_no =? ', [$leave_day, date("Y"), $u->NO]) != 1) {
+                                echo 'now update data';
+                            }
+                        } else {
+                            if(DB::insert('insert into eip_annual_leave (user_no, year, annual_leaves, labor_annual_leaves) values (?, ?, ?, ?)', [$u->NO, date("Y"), $leave_day, $leave_day]) != 1) {
+                                echo 'now update data';
+                            }
+                        }
+                    }
+                }
+                //12-01會發放明年的假
+                if(date("m-d") == '12-01') {
+                    $leave_day = self::calc_leavedays($onboard_date, (date("Y")+1)."-01-01");
+                    if($leave_day != 10000) {
+                        $data = DB::select('select count(1) as count from eip_annual_leave where year =? and user_no =?', [date("Y")+1, $u->NO]);
+                        foreach($data as $d) {
+                            if($d->count != 0) {
+                                if(DB::update('update eip_annual_leave set labor_annual_leaves =? where year =? and user_no =? ', [$leave_day, date("Y")+1, $u->NO]) != 1) {
+                                    echo 'now update data';
+                                }
+                            } else {
+                                if(DB::insert('insert into eip_annual_leave (user_no, year, annual_leaves, labor_annual_leaves) values (?, ?, ?, ?)', [$u->NO, date("Y")+1, $leave_day, $leave_day]) != 1) {
+                                    echo 'now update data';
+                                }
+                            }
+                        }
                     }
                 }
             }
