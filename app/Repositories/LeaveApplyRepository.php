@@ -5,6 +5,7 @@ namespace App\Repositories;
 use DB;
 use Exception;
 use Log;
+use App\Providers\LeaveProvider;
 
 class LeaveApplyRepository {
 
@@ -364,6 +365,66 @@ class LeaveApplyRepository {
             return $data;
         } catch (Exception $e) {
             throw $e;
+        }
+    }
+
+    public function get_annual_use_hours($y, $user_no) {
+        try {
+            $start_date     = $y."-01-01";
+            $end_date       = $y."-12-31";
+            $total_hours    = 0;
+            $sql  = "select 
+                        leave_hours, start_date, IF(end_date > DATE(?), 'gt', 'le') as type
+                    from 
+                        eip_leave_apply 
+                    where 
+                        leave_type in (select id from eip_leave_type where annual = '1') and 
+                        apply_status in ('Y', 'P') and 
+                        start_date >= ? and 
+                        start_date <= ? and 
+                        apply_user_no =?";
+            $leaves = DB::select($sql, [$end_date, $start_date, $end_date, $user_no]);
+            foreach ($leaves as $l) {
+                if($l->type == 'le') {
+                    $total_hours += $l->leave_hours;
+                } else {
+                    $data = json_decode(json_encode(LeaveProvider::getLeaveHours($l->start_date, $end_date, $work_class_id)));
+                    if($data->status == "successful") {
+                        $total_hours += $data->leave_hours;
+                    } else {
+                        throw new Exception($r->message);
+                    }
+                }
+            }
+            
+            return [
+                'status'        => 'successful',
+                'total_hours'   => $total_hours
+            ];
+        } catch (Exception $e) {
+            return [
+                'status'    => 'error',
+                'message'   => $e->getMessage()
+            ];
+        }
+    }
+
+    public function get_annual_hours($y, $user_no) {
+        try {
+            $data = DB::select('select annual_leaves from eip_annual_leave where user_no =? and year =?', [$user_no, $y]);
+            $total_hours = 0;
+            foreach ($data as $d) {
+                $total_hours = $d->annual_leaves * 8;
+            }
+            return [
+                'status'        => 'successful',
+                'total_hours'   => $total_hours
+            ];
+        } catch (Exception $e) {
+            return [
+                'status'    => 'error',
+                'message'   => $e->getMessage()
+            ];
         }
     }
 }

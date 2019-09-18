@@ -10,6 +10,7 @@ use App\Providers\HelperServiceProvider;
 use App\Providers\LeaveProvider;
 use App\Services\UserService;
 use App\Repositories\LeaveApplyRepository;
+use App\Services\ApplyLeaveService;
 use DB;
 use Log;
 use Exception;
@@ -21,14 +22,17 @@ class applyleave extends Controller
 {
 
     protected $userService;
+    protected $applyLeaveService;
     protected $leaveApplyRepo;
 
     public function __construct(
         UserService $userService,
+        ApplyLeaveService $applyLeaveService,
         LeaveApplyRepository $leaveApplyRepo
     )
     {
         $this->userService = $userService;
+        $this->applyLeaveService = $applyLeaveService;
         $this->leaveApplyRepo = $leaveApplyRepo;
     }
 
@@ -93,40 +97,41 @@ class applyleave extends Controller
             $apply_user_line_id = $request->get('userId');                      //申請者的line_id
             $leave_agent_user_no= $request->get('leaveAgent');                  //代理人的user_NO
             $leavename          = $request->get('leaveType');                   //假別名稱
+            $start_datetime     = $request->get('startDate');                   //起日時
             $start_date         = explode("T",$request->get('startDate'))[0];   //起日
             $start_time         = explode("T",$request->get('startDate'))[1];   //起時
+            $end_datetime       = $request->get('endDate');                     //迄日時
             $end_date           = explode("T",$request->get('endDate'))[0];     //迄日
             $end_time           = explode("T",$request->get('endDate'))[1];     //迄時
             $comment            = $request->input('comment');                   //備註
             $use_mode           = $request->input('use_mode');         
-
+            if($comment == "") $comment = "-";
+            
+            //檢查不能申請上個月之前的休假(上個月也不行)
             $start_m = date_format(date_create($start_date),"Ym");
             $now_m = date("Ym");
-            if($start_m < $now_m) throw new Exception('只能申請這個月的休假'); 
+            if($start_m < $now_m) throw new Exception('只能申請這個月以後的休假'); 
 
-            if($comment == "") $comment = "-";
-            $diff_min = floor((strtotime($end_date." ".$end_time)-strtotime($start_date." ".$start_time))%86400/60); //請假分鐘
+            //取得申請人的基本資料
+            $user = $this->userService->get_user_info($apply_user_line_id, $use_mode);
+            if($user['status'] == 'error') throw new Exception($user['message']);
+            $apply_user_no = $user['data']->NO;
+            $apply_user_cname = $user['data']->cname;
+            $apply_work_class_id = $user['data']->work_class_id; 
+            $apply_user_line_id = $user['data']->line_id; 
+
             //檢查請假合理性-檢查代理人在該假單請假時間中是否也正在請假
             $sql  = "select start_date from eip_leave_apply where ";
             $sql .= "apply_user_no = ? and start_date <= ? and end_date >= ? and apply_type = 'L' and apply_status IN ('P', 'Y')";
-            $overlap = DB::select($sql, [$leave_agent_user_no, $request->get('startDate'), $request->get('startDate')]);
-            if(count($overlap) > 0) { 
-                return response()->json([
-                    'status' => 'error',
-                    'message' => '失敗:代理人在該假單請假時間中也正在請假'
-                ], 500);
-            }
+            $overlap = DB::select($sql, [$leave_agent_user_no, $start_datetime, $end_datetime]);
+            if(count($overlap) > 0) throw new Exception('代理人在該假單請假時間中也正在請假'); 
+
             //檢查請假合理性-檢查請假時間中有沒有正在擔任代理人
-            $sql  = "select start_date from eip_leave_apply where agent_user_no IN (select NO from user where line_id = ?) ";
+            $sql  = "select start_date from eip_leave_apply where agent_user_no =? ";
             $sql .= "and start_date <= ? and end_date >= ? and apply_type = 'L' and apply_status IN ('P', 'Y')";
-            $overlap = DB::select($sql, [$apply_user_line_id, $request->get('startDate'), $request->get('startDate')]);
-            if(count($overlap) > 0) { 
-                return response()->json([
-                    'status' => 'error',
-                    'message' => '失敗:請假時間中正在擔任代理人'
-                ], 500);
-            }
-            
+            $overlap = DB::select($sql, [$apply_user_no, $start_datetime, $end_datetime]);
+            if(count($overlap) > 0) throw new Exception('請假時間中正在擔任代理人'); 
+
             //取得假別的id
             $leave_days = count(self::dates2array($start_date, $end_date));
             $leave_type_arr = DB::select('select * from eip_leave_type where name =? order by day ASC', [$leavename]);
@@ -138,15 +143,7 @@ class applyleave extends Controller
             $i = 0;
             foreach ($leave_type_arr as $v) {
                 $i++;
-                if($leave_days < $v->day) {
-                    $leave_type_id = $v->id;
-                    $leave_approved_title_id = $v->approved_title_id;
-                    $leave_min_time = $v->min_time;
-                    $leave_compensatory = $v->compensatory;
-                    $leave_annual = $v->annual;
-                    break;
-                }
-                if($leave_type_id == "" && count($leave_type_arr) == $i){
+                if($leave_days < $v->day || count($leave_type_arr) == $i) {
                     $leave_type_id = $v->id;
                     $leave_approved_title_id = $v->approved_title_id;
                     $leave_min_time = $v->min_time;
@@ -155,44 +152,13 @@ class applyleave extends Controller
                     break;
                 }
             }
+            //檢查休假時間是否大於最小請假時間
+            $diff_min = floor((strtotime($end_date." ".$end_time)-strtotime($start_date." ".$start_time))%86400/60); //請假分鐘
+            if((int)$diff_min <= (int)$leave_min_time) throw new Exception('最小請假時間為'.$leave_min_time.'分鐘'); 
 
-            if((int)$diff_min <= (int)$leave_min_time) {
-                return response()->json([
-                    'status' => 'error',
-                    'message' => '失敗:最小請假時間為'.$leave_min_time."分鐘"
-                ], 500);
-            }
-
-            //取得申請人的基本資料
-            $user = $this->userService->get_user_info($apply_user_line_id, $use_mode);
-            if($user['status'] == 'error') throw new Exception($user['message']);
-            $user_no = $user['data']->NO;
-            $apply_user_no = $user['data']->NO;
-            $apply_user_cname = $user['data']->cname;
-            $apply_work_class_id = $user['data']->work_class_id; 
-            $apply_user_line_id = $user['data']->line_id; 
-
-            //取得代理人的資料
-            $agent_users = DB::select('select cname, line_id from user where NO =?', [$leave_agent_user_no]);
-            $agent_cname = ""; //代理人
-            $agent_line_id = ""; //代理人的line_id
-            foreach ($agent_users as $v) {
-                $agent_cname = $v->cname;
-                $agent_line_id = $v->line_id;
-            }
-            //if($agent_line_id == "") throw new Exception('請假失敗:代理人的line未加入EIP中'); 
-            //取得第一簽核人的資料
-            $upper_users = DB::select('select NO, line_id from user where NO in (select upper_user_no from user where NO =?)', [$apply_user_no]);
-            $upper_line_id = "";    //第一簽核人的line_id
-            $upper_user_no = "";    //第一簽核人的user_no
-            foreach ($upper_users as $v) {
-                $upper_line_id = $v->line_id; 
-                $upper_user_no = $v->NO; 
-            }
-            //if($upper_line_id == "") throw new Exception('請假失敗:未設定簽核人或簽核人的line未加入EIP中');
             //計算請假小時
             $leave_hours = 0;
-            $r = json_decode(json_encode(LeaveProvider::getLeaveHours($request->get('startDate'), $request->get('endDate'), $apply_work_class_id)));
+            $r = json_decode(json_encode(LeaveProvider::getLeaveHours($start_datetime, $end_datetime, $apply_work_class_id)));
             if($r->status == "successful") {
                 $leave_hours = $r->leave_hours;
             } else {
@@ -201,21 +167,8 @@ class applyleave extends Controller
 
             //檢查請假合理性-檢查有沒有足夠的休假可用
             if($leave_annual == 1) {
-                $sql  = "select sum(leave_hours) as sum_leave_hours from eip_leave_apply where leave_type in (select id from eip_leave_type where annual = '1') ";
-                $sql .= "and apply_status in ('Y', 'P') and start_date >= ? and apply_user_no =?";
-                $leave_hours_arr = DB::select($sql, [date("Y").'-01-01', $apply_user_no]);
-                $sum_leave_hours = 0;
-                foreach ($leave_hours_arr as $l) {
-                    $sum_leave_hours = $l->sum_leave_hours;
-                }
-                $annual_leaves_arr = DB::select('select annual_leaves from eip_annual_leave where user_no =? and year =?', [$apply_user_no, date("Y")]);
-                $annual_leaves_hours = 0;
-                foreach ($annual_leaves_arr as $l) {
-                    $annual_leaves_hours = $l->annual_leaves * 8;
-                }
-                if(($sum_leave_hours + $leave_hours) > $annual_leaves_hours) {
-                    throw new Exception('請假失敗:已無足夠的休假可用');
-                }
+                $check = $this->applyLeaveService->check_annual_leave($apply_user_no, $start_datetime, $end_datetime, $leave_hours, $apply_work_class_id);
+                if($check['status'] != 'successful') throw new Exception($check['message']);
             }
 
             //檢查請假合理性-檢查有沒有足夠的加班可以補休
@@ -281,7 +234,23 @@ class applyleave extends Controller
                     }
                 }
             }
+            //取得代理人的資料
+            $agent_users = DB::select('select cname, line_id from user where NO =?', [$leave_agent_user_no]);
+            $agent_cname = ""; //代理人
+            $agent_line_id = ""; //代理人的line_id
+            foreach ($agent_users as $v) {
+                $agent_cname = $v->cname;
+                $agent_line_id = $v->line_id;
+            }
 
+            //取得第一簽核人的資料
+            $upper_users = DB::select('select NO, line_id from user where NO in (select upper_user_no from user where NO =?)', [$apply_user_no]);
+            $upper_line_id = "";    //第一簽核人的line_id
+            $upper_user_no = "";    //第一簽核人的user_no
+            foreach ($upper_users as $v) {
+                $upper_line_id = $v->line_id; 
+                $upper_user_no = $v->NO; 
+            }
             //通知申請人、代理人、第一簽核人
             Log::info("agent_line_id:".$agent_line_id);
             Log::info("upper_line_id:".$upper_line_id);
@@ -298,8 +267,8 @@ class applyleave extends Controller
         } catch (Exception $e) {
             return response()->json([
                 'status' => 'error',
-                'message' => $e->getMessage()
-            ]);
+                'message' => $e->getMessage()
+            ], 500);
         }
     }
 

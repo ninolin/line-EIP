@@ -118,7 +118,8 @@ const apply_leave = () => {
         if(v.status == "successful") {
             liff.closeWindow();
         } else {
-            alert(v.message);
+            $("#error_alert").find(".weui-dialog__bd").html(v.message);
+            $("#error_alert").show();
         }
     })
 }
