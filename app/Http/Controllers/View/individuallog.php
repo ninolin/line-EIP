@@ -79,7 +79,8 @@ class individuallog extends Controller
             $is_compensatory = false;
             $show_success_hours = true;
             $show_process_hours = true;
-
+            $next_y_annual_hours = -1;   //-1表示不顯示
+            $pre_y_annual_use_hours = -1;//-1表示不顯示
             if($type_name == '加班') {
                 $show_process_hours = false;
                 $types = $this->overworkTypeRepo->findAllType();
@@ -129,16 +130,27 @@ class individuallog extends Controller
             if($is_annual) {
                 $annual_hours = $this->annualLeaveRepo->findAnnualDays($user_no, date("Y"))*8;
             }
+            if($is_annual && date("Y") == 12) {
+                $next_y_annual_hours = $this->annualLeaveRepo->findAnnualDays($user_no, date("Y")+1)*8;
+            }
+            if($is_annual && date("Y") == 1) {
+                $use_result = $this->leaveApplyRepo->get_annual_use_hours(date("Y")-1, $user_no);
+                if($use_result["status"] == "successful") {
+                    $pre_y_annual_use_hours = $use_result["total_hours"];
+                }
+            }
             return view('line.individuallog', [
-                'leaves'            =>  $leaves,
-                'today'             =>  date("Y-m-d H:i:s"),
-                'show_success_hours'=>  $show_success_hours,
-                'show_process_hours'=>  $show_process_hours,
-                'success_hours'     =>  $success_hours,
-                'process_hours'     =>  $process_hours,
-                'is_annual'         =>  $is_annual,
-                'is_compensatory'   =>  $is_compensatory,
-                'annual_hours'      =>  $annual_hours
+                'leaves'                =>  $leaves,
+                'today'                 =>  date("Y-m-d H:i:s"),
+                'show_success_hours'    =>  $show_success_hours,
+                'show_process_hours'    =>  $show_process_hours,
+                'success_hours'         =>  $success_hours,
+                'process_hours'         =>  $process_hours,
+                'is_annual'             =>  $is_annual,
+                'is_compensatory'       =>  $is_compensatory,
+                'annual_hours'          =>  $annual_hours,
+                'next_y_annual_hours'   => $next_y_annual_hours,
+                'pre_y_annual_use_hours'=> $pre_y_annual_use_hours
             ]);
         } catch (Exception $e) {
             return response()->json([

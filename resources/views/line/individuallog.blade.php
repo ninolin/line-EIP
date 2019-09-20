@@ -26,9 +26,25 @@
     </head>
     <body style="background-color: #f1f1f1;">
         <div class="weui-flex"><div class="weui-flex__item mobile_topbar">工時紀錄</div></div>
-        <div class="text-center">
+        <div>
             <div class="weui-cells__title"></div>
             <div class="weui-cells">
+                @if ($next_y_annual_hours >= 0)
+                    <div class="weui-cell">
+                        <div class="weui-cell__bd">
+                            <p>明年可使用</p>
+                        </div>
+                        <div class="weui-cell__ft">{{$next_y_annual_hours}}小時</div>
+                    </div>
+                @endif
+                @if ($pre_y_annual_use_hours >= 0)
+                    <div class="weui-cell">
+                        <div class="weui-cell__bd">
+                            <p>去年未使用</p>
+                        </div>
+                        <div class="weui-cell__ft">{{$pre_y_annual_use_hours}}小時</div>
+                    </div>
+                @endif
                 @if ($is_annual)
                     <div class="weui-cell">
                         <div class="weui-cell__bd">
