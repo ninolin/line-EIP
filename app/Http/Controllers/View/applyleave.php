@@ -60,8 +60,6 @@ class applyleave extends Controller
                 'data' => $users
             ]);
         }
-    
-        
     }
 
     /**
@@ -120,6 +118,9 @@ class applyleave extends Controller
             $apply_work_class_id = $user['data']->work_class_id; 
             $apply_user_line_id = $user['data']->line_id; 
 
+            if($this->leaveApplyRepo->check_leave_is_overlap($apply_user_no, $start_datetime)) {
+                throw new Exception('請假期間內已有其它休假'); 
+            }
             //檢查請假合理性-檢查代理人在該假單請假時間中是否也正在請假
             $sql  = "select start_date from eip_leave_apply where ";
             $sql .= "apply_user_no = ? and start_date <= ? and end_date >= ? and apply_type = 'L' and apply_status IN ('P', 'Y')";

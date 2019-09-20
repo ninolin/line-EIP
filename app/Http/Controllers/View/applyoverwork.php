@@ -6,12 +6,25 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Input;
 use App\Providers\LineServiceProvider;
+use App\Repositories\LeaveApplyRepository;
+use App\Services\UserService;
 use DB;
 use Log;
 use Exception;
 
 class applyoverwork extends Controller
 {
+    protected $userService;
+    protected $leaveApplyRepo;
+
+    public function __construct(
+        UserService $userService,
+        LeaveApplyRepository $leaveApplyRepo
+    )
+    {
+        $this->userService = $userService;
+        $this->leaveApplyRepo = $leaveApplyRepo;
+    }
 
     /**
      * 顯示applyoverwork頁面
@@ -42,9 +55,20 @@ class applyoverwork extends Controller
             $use_mode       = $request->get('use_mode');    
             if($comment == "") $comment = "-";
             
-            $start_m = date_format(date_create($start_date),"Ym");
+            $start_m = date_format(date_create($overworkDate),"Ym");
             $now_m = date("Ym");
-            if($start_m < $now_m) throw new Exception('只能申請這個月的休假'); 
+            if($start_m < $now_m) throw new Exception('只能申請這個月以後的加班'); 
+
+            //取得申請人的基本資料
+            $user = $this->userService->get_user_info($apply_user_id, $use_mode);
+            if($user['status'] == 'error') throw new Exception($user['message']);
+            $apply_user_no = $user['data']->NO;
+            $apply_user_cname = $user['data']->cname;
+            $apply_user_line_id = $user['data']->line_id; 
+
+            if($this->leaveApplyRepo->check_overwork_is_overlap($apply_user_no, $overworkDate)) {
+                throw new Exception('加班日內已有其它加班'); 
+            }
 
             //透過加班小時找到加班type_id
             $overwork_type_arr = DB::select('select * from eip_overwork_type', []);
@@ -57,16 +81,7 @@ class applyoverwork extends Controller
                     break;
                 }
             }
-            //取得申請人的NO和別名
-            $users = $this->_get_user_info($apply_user_id,$use_mode);
-
-            $apply_user_NO = "";    //申請人NO
-            $apply_user_cname = ""; //申請人別名
-            if(count($users) != 1) throw new Exception('請加班失敗:請先將您的line加入EIP中'); 
-            foreach ($users as $v) {
-                $apply_user_no = $v->NO;
-                $apply_user_cname = $v->cname;
-            }
+            
             //取得第一簽核人的資料
             $upper_users = $this->_get_upper_users_info($apply_user_id,$use_mode);
             $upper_line_id = "";    //第一簽核人的line_id
@@ -118,22 +133,6 @@ class applyoverwork extends Controller
             ]);
         }
     }
-
-    /**
-     * 取得申請人的NO和別名
-     *
-     * @param  string   $apply_user_id
-     * @param  string   $use_mode
-     * @return array    
-     */
-    private function _get_user_info($apply_user_id,$use_mode){
-
-        if($use_mode == 'web'){
-            return DB::select('select NO, cname from user where NO =?', [$apply_user_id]);
-        }
-        return DB::select('select NO, cname from user where line_id =?', [$apply_user_id]);
-    }
-
 
     /**
      * 取得第一簽核人的資料

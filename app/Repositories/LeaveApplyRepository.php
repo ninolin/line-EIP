@@ -368,7 +368,8 @@ class LeaveApplyRepository {
         }
     }
 
-    public function get_annual_use_hours($y, $user_no) {
+    public function get_annual_use_hours($y, $user_no) 
+    {
         try {
             $start_date     = $y."-01-01";
             $end_date       = $y."-12-31";
@@ -409,7 +410,8 @@ class LeaveApplyRepository {
         }
     }
 
-    public function get_annual_hours($y, $user_no) {
+    public function get_annual_hours($y, $user_no) 
+    {
         try {
             $data = DB::select('select annual_leaves from eip_annual_leave where user_no =? and year =?', [$user_no, $y]);
             $total_hours = 0;
@@ -425,6 +427,53 @@ class LeaveApplyRepository {
                 'status'    => 'error',
                 'message'   => $e->getMessage()
             ];
+        }
+    }
+
+    public function check_leave_is_overlap($user_no, $start_datetime) 
+    {
+        try {
+            $overlap = false;
+            $sql  = 'select 
+                        count(1) as count 
+                    from 
+                        eip_leave_apply 
+                    where 
+                        apply_user_no =? and 
+                        start_date <= ? and 
+                        end_date >= ? and 
+                        apply_type = "L" and 
+                        apply_status IN("Y", "P")';
+            $data = DB::select($sql, [$user_no, $start_datetime, $start_datetime]);
+            if($data[0]->count > 0) {
+                $overlap = true;
+            }
+            return $overlap;
+        } catch (Exception $e) {
+            throw $e;
+        }
+    }
+
+    public function check_overwork_is_overlap($user_no, $overwork_date) 
+    {
+        try {
+            $overlap = false;
+            $sql  = 'select 
+                        count(1) as count 
+                    from 
+                        eip_leave_apply 
+                    where 
+                        apply_user_no =? and 
+                        over_work_date =? and 
+                        apply_type = "O" and 
+                        apply_status IN("Y", "P")';
+            $data = DB::select($sql, [$user_no, $overwork_date]);
+            if($data[0]->count > 0) {
+                $overlap = true;
+            }
+            return $overlap;
+        } catch (Exception $e) {
+            throw $e;
         }
     }
 }

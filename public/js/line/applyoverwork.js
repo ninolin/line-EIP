@@ -26,7 +26,8 @@ const apply_overwork = () => {
     const post_data = {
         "userId": document.getElementById('useridfield').textContent,
         "overworkDate": $("#overworkDate").val(),
-        "overworkHour": $("#overworkHour").val()
+        "overworkHour": $("#overworkHour").val(),
+        "use_mode": 'line'
     }
     //alert(JSON.stringify(post_data));
     for (k in post_data) {
