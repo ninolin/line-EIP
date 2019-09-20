@@ -162,9 +162,14 @@ class applyoverwork extends Controller
         $users = DB::select('select title_id, upper_user_no from user where NO =?', [$user_no]);
         if($users > 0) {
             foreach ($users as $u) {
-                if($u-> upper_user_no != 0 && $u-> title_id != $approved_title_id && count($array) < 10) {
-                    array_push($array, $u-> upper_user_no);
-                    return self::find_upper($u-> upper_user_no, $array, $approved_title_id);
+                if(
+                    $u->upper_user_no != 0 && 
+                    $u->title_id != $approved_title_id && 
+                    count($array) < 10 && 
+                    !in_array($u->upper_user_no, $array)
+                ) {
+                    array_push($array, $u->upper_user_no);
+                    return self::find_upper($u->upper_user_no, $array, $approved_title_id);
                 } else {
                     return $array;
                 }

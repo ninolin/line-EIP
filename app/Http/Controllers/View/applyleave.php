@@ -118,6 +118,7 @@ class applyleave extends Controller
             $apply_work_class_id = $user['data']->work_class_id; 
             $apply_user_line_id = $user['data']->line_id; 
 
+            //檢查請假是否有其它休假
             if($this->leaveApplyRepo->check_leave_is_overlap($apply_user_no, $start_datetime)) {
                 throw new Exception('請假期間內已有其它休假'); 
             }
@@ -166,13 +167,13 @@ class applyleave extends Controller
                 throw new Exception($r->message);
             }
 
-            //檢查請假合理性-檢查有沒有足夠的休假可用
+            //檢查特休假合理性-檢查有沒有足夠的休假可用
             if($leave_annual == 1) {
                 $check = $this->applyLeaveService->check_annual_leave($apply_user_no, $start_datetime, $end_datetime, $leave_hours, $apply_work_class_id);
                 if($check['status'] != 'successful') throw new Exception($check['message']);
             }
 
-            //檢查請假合理性-檢查有沒有足夠的加班可以補休
+            //檢查補休假合理性-檢查有沒有足夠的加班可以補休
             if($leave_compensatory == 1) {
                 $sql  = "select sum(over_work_hours) as total_over_work_hours from eip_leave_apply where apply_user_no =? and apply_type = 'O' and DATEDIFF(now(), over_work_date) <= 180 and apply_status = 'Y'";
                 $data = DB::select($sql, [$apply_user_no]);
@@ -321,8 +322,13 @@ class applyleave extends Controller
         $users = DB::select('select title_id, upper_user_no from user where NO =?', [$user_no]);
         if($users > 0) {
             foreach ($users as $u) {
-                if($u-> upper_user_no != 0 && $u-> title_id != $approved_title_id && count($array) < 10) {
-                    array_push($array, $u-> upper_user_no);
+                if(
+                    $u->upper_user_no != 0 && 
+                    $u->title_id != $approved_title_id && 
+                    count($array) < 10 && 
+                    !in_array($u->upper_user_no, $array)
+                ) {
+                    array_push($array, $u->upper_user_no);
                     return self::find_upper($u-> upper_user_no, $array, $approved_title_id);
                 } else {
                     return $array;
