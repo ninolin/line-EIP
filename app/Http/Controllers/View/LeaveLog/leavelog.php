@@ -15,7 +15,7 @@ use DB;
 use Log;
 use Exception;
 use Config;
-
+use Excel;
 class leavelog extends Controller
 {
     private $calcL;
@@ -582,5 +582,120 @@ class leavelog extends Controller
             'status'        => 'successful',
             'data'          => $logs
         ]);
+    }
+
+    public function export(Request $request)
+    {
+        $user_no = $request->input('user_no');
+        $export_startdate = $request->input('export_startdate');
+        $export_enddate = $request->input('export_enddate');
+        $export_leaves = $request->input('export_leaves');
+
+        $export_data = [['申請人','代理人','假別/加班','休假小時','加班小時','起','迄','備註','申請日']];
+        $types = [];
+        $alltypes = $this->leaveTypeRepo->findTypeByName(explode(",",$export_leaves));
+        foreach ($alltypes as $type) {
+            array_push($types, $type->id);
+        }
+        $leaves_result = $this->leaveApplyRepo->findPersonalLeaveLog([$user_no], ["Y"], $export_startdate, $export_enddate, $types);
+        
+        if($leaves_result["status"] == "successful") {
+            $leaves = $leaves_result["data"];
+            foreach ($leaves as $leave) {
+                array_push($export_data, [
+                    $leave->cname,
+                    $leave->agent_cname,
+                    $leave->leave_name,
+                    $leave->leave_hours,
+                    '-',
+                    $leave->start_date_f1,
+                    $leave->end_date_f1,
+                    $leave->comment,
+                    $leave->apply_time
+                ]);
+            }
+        } 
+        
+        if (in_array("加班", explode(",",$export_leaves))) {
+            $overworks_result = $this->leaveApplyRepo->findPersonalOverworkLog([$user_no], ["Y"], $export_startdate, $export_enddate);
+            if($overworks_result["status"] == "successful") {
+                $overworks = $overworks_result["data"];
+                foreach ($overworks as $overwork) {
+                    array_push($export_data, [
+                        $overwork->cname,
+                        $overwork->agent_cname,
+                        '加班',
+                        '-',
+                        $overwork->over_work_hours,
+                        $overwork->over_work_date_f1,
+                        '-',
+                        $overwork->comment,
+                        $overwork->apply_time
+                    ]);
+                }
+            }
+        }
+
+        Excel::create('工時紀錄',function ($excel) use ($export_data){
+            $excel->sheet('score', function ($sheet) use ($export_data){
+            $sheet->rows($export_data);
+            });
+        })->export('xls');
+    }
+
+    public function exportLastMonth()
+    {
+        $export_startdate = date("Y/m/01 00:00:00", strtotime('-1 month'));
+        $export_enddate = date("Y/m/t 00:00:00", strtotime('-1 month'));
+        $types = [];
+        $export_data = [['申請人','代理人','假別/加班','休假小時','加班小時','起','迄','備註','申請日']];
+
+        $alltypes = $this->leaveTypeRepo->findAllType();
+        foreach ($alltypes as $type) {
+            array_push($types, $type->id);
+        }
+
+        $leaves_result = $this->leaveApplyRepo->findPersonalLeaveLog(null, ["Y"], $export_startdate, $export_enddate, $types);
+        
+        if($leaves_result["status"] == "successful") {
+            $leaves = $leaves_result["data"];
+            foreach ($leaves as $leave) {
+                array_push($export_data, [
+                    $leave->cname,
+                    $leave->agent_cname,
+                    $leave->leave_name,
+                    $leave->leave_hours,
+                    '-',
+                    $leave->start_date_f1,
+                    $leave->end_date_f1,
+                    $leave->comment,
+                    $leave->apply_time
+                ]);
+            }
+        } 
+
+        $overworks_result = $this->leaveApplyRepo->findPersonalOverworkLog(null, ["Y"], $export_startdate, $export_enddate);
+        if($overworks_result["status"] == "successful") {
+            $overworks = $overworks_result["data"];
+            foreach ($overworks as $overwork) {
+                array_push($export_data, [
+                    $overwork->cname,
+                    $overwork->agent_cname,
+                    '加班',
+                    '-',
+                    $overwork->over_work_hours,
+                    $overwork->over_work_date_f1,
+                    '-',
+                    $overwork->comment,
+                    $overwork->apply_time
+                ]);
+            }
+        }
+
+        Excel::create('工時紀錄',function ($excel) use ($export_data){
+            $excel->sheet('score', function ($sheet) use ($export_data){
+            $sheet->rows($export_data);
+            });
+        })->export('xls');
     }
 }

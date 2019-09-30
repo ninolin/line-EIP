@@ -143,6 +143,8 @@ class LeaveApplyRepository {
             $query_data = [];
             $sql  = 'select 
                         a.*, 
+                        DATE_FORMAT(a.over_work_date, "%Y-%m-%d %H:%i") as over_work_date_f1,
+                        DATE_FORMAT(a.over_work_date, "%Y-%m-%dT%H:%i") as over_work_date_f2,
                         u2.cname as cname, 
                         u1.cname as agent_cname, 
                         e.name as leave_name 

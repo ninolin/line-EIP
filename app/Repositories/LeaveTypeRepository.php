@@ -33,11 +33,11 @@ class LeaveTypeRepository {
         }
     }
 
-    public function findTypeByName($type_name) 
+    public function findTypeByName($type_names) 
     {
         try {
-            $sql = 'select * from eip_leave_type where name = ?';
-            return DB::select($sql, [$type_name]);
+            $sql = 'select * from eip_leave_type where name IN ('. implode(",", array_fill(0, count($type_names), '?')) . ')';
+            return DB::select($sql, $type_names);
         } catch (Exception $e) {
             throw $e;
         }

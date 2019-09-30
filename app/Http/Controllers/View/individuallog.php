@@ -105,7 +105,7 @@ class individuallog extends Controller
                 
             } else {
                 $show_process_hours = false;
-                $types = $this->leaveTypeRepo->findTypeByName($type_name); //透過假別的名稱去找到該假別全部的id
+                $types = $this->leaveTypeRepo->findTypeByName([$type_name]); //透過假別的名稱去找到該假別全部的id
                 foreach ($types as $t) {
                     if($t->annual == true) $is_annual = true;
                     if($t->compensatory == true) $is_compensatory = true;

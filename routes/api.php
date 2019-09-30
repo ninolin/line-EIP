@@ -59,6 +59,8 @@ Route::put('leavelog/change_agent_user', 'View\LeaveLog\leavelog@change_agent_us
 Route::put('leavelog/change_date', 'View\LeaveLog\leavelog@change_date');
 Route::put('leavelog/change_leave_date', 'View\LeaveLog\leavelog@change_leave_date');
 Route::put('leavelog/change_overwork_date', 'View\LeaveLog\leavelog@change_overwork_date');
+Route::get('leavelog/export', 'View\LeaveLog\leavelog@export')->name('exportExcel');
+Route::get('leavelog/export_last_month', 'View\LeaveLog\leavelog@exportLastMonth')->name('exportLastMonthExcel');
 Route::get('test', 'Line\Test@show');
 
 Route::get('workclass', 'View\WorkSetting\workclass@index');

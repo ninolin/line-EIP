@@ -27,6 +27,9 @@
         <div class="col-auto">
           <button type="submit" class="btn-c">搜尋</button>
         </div>
+        <div class="col-auto" >
+          <button type="button" class="btn-c" onclick="javascript:location.href='{{route('exportLastMonthExcel')}}'">匯出上月全部工時</button>
+        </div>
       </div>
     </div>
   </form>

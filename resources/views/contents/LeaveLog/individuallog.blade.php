@@ -35,6 +35,9 @@
         <div class="col-auto">
           <button type="submit" class="btn-c">搜尋</button>
         </div>
+        <div class="col-auto" @if ($user_no == 0) style="display:none" @endif>
+          <button type="button" class="btn-c" onclick="showExportModal()">匯出{{$cname}}的工時</button>
+        </div>
       </div>
     </div>
   </form>
@@ -478,7 +481,7 @@
     </div>
   </div>
 </div>
-<div class="modal fade" id="changelogModal" tabindex="-1" role="dialog"aria-hidden="true">
+<div class="modal fade" id="changelogModal" tabindex="-1" role="dialog" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
     <div class="modal-content">
       <div class="modal-header">
@@ -509,6 +512,58 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">關閉</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal fade" id="exportModal" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">匯出工時紀錄</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form>
+          <div class="form-group container-fluid">
+            <div class="row">
+              <table class="table table-bordered table-striped">
+                <thead class="table-thead">
+                  <tr>
+                      <th class="text-center">匯出條件</th>
+                      <th class="text-center">條件值</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="text-center">工時起</td>
+                    <td>
+                      <input type="date" style="width:300px" class="form-control date-input export_startdate" value="">
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="text-center">工時迄</td>
+                    <td>
+                      <input type="date" style="width:300px" class="form-control date-input export_enddate" value="">
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="text-center">匯出假別</td>
+                    <td>
+                      <select id="levae_type_select" style="width:300px" name="states[]" multiple="multiple"></select>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">關閉</button>
+        <button type="button" class="btn btn-primary" onclick="exportExcel({{$user_no}})">匯出</button>
       </div>
     </div>
   </div>
@@ -779,8 +834,51 @@
     })
   }
 
+  const showExportModal = () => {
+    promise_call({
+      url: "../api/individuallog/leavetype", 
+      method: "get"
+    })
+    .then(v => {
+      if(v.status != 'successful') {
+        alert("get data error");
+      } else {
+        if(v.data.length > 0) $("#levae_type_select").html("");
+        v.data.map(item => {     
+          $("#levae_type_select").append("<option value='"+item.name+"'>"+item.name+"</option>");
+        });
+        $("#levae_type_select").append("<option value='加班'>加班</option>");
+        $('#levae_type_select').select2();
+        const today = new Date();
+        let dd = today.getDate();
+        let mm = today.getMonth() + 1;
+        let yyyy = today.getFullYear();
+        if(dd < 10) dd = '0'+dd
+        if(mm < 10) mm = '0'+mm
+        $('#exportModal').find('.export_startdate').val(yyyy+"-"+mm+"-"+dd);
+        if(mm == 12) {
+          mm = 01;
+          yyyy = yyyy+1;
+        } else {
+          mm++;
+        }
+        $('#exportModal').find('.export_enddate').val(yyyy+"-"+mm+"-"+dd);
+        $('#exportModal').modal('toggle');     
+      }
+    })
+    
+  }
+
+  const exportExcel = (user_no) => {
+    const export_startdate = $(".export_startdate").val();
+    const export_enddate = $(".export_enddate").val();
+    const export_leaves = $('#levae_type_select').val();
+    const url_parameter = "?user_no="+user_no+"&export_startdate="+export_startdate+"&export_enddate="+export_enddate+"&export_leaves="+export_leaves;
+    location.href='{{route('exportExcel')}}'+url_parameter;
+  }
   window.onload = function() {
     $('.blade_select2').select2();
+    $('#levae_type_select').select2();
   };
 </script>
 @endsection
