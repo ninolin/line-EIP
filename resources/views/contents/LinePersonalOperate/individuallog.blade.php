@@ -29,7 +29,7 @@
             <div class="placeholder mobile_topbar" style="padding-left: 5px;">
                 <i class="fas fa-arrow-left" onclick="javascript:{history.go(-1)}"></i>
             </div>
-            <div class="weui-flex__item mobile_topbar">工時紀錄a</div>
+            <div class="weui-flex__item mobile_topbar">工時紀錄</div>
         </div>
         <div>
             <div class="weui-cells__title"></div>
