@@ -5,9 +5,9 @@ namespace App\Http\Controllers\View;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Input;
-use App\Providers\LineServiceProvider;
 use App\Repositories\LeaveApplyRepository;
 use App\Services\UserService;
+use App\Services\SendLineMessageService;
 use DB;
 use Log;
 use Exception;
@@ -16,14 +16,17 @@ class applyoverwork extends Controller
 {
     protected $userService;
     protected $leaveApplyRepo;
+    protected $sendLineMessageService;
 
     public function __construct(
         UserService $userService,
-        LeaveApplyRepository $leaveApplyRepo
+        LeaveApplyRepository $leaveApplyRepo,
+        SendLineMessageService $sendLineMessageService
     )
     {
         $this->userService = $userService;
         $this->leaveApplyRepo = $leaveApplyRepo;
+        $this->sendLineMessageService = $sendLineMessageService;
     }
 
     /**
@@ -118,10 +121,9 @@ class applyoverwork extends Controller
             }
 
             //通知申請人、代理人、第一簽核人
-            Log::info("upper_line_id:".$upper_line_id);
-            $msg = ["加班日::". $overworkDate,"加班小時::".$overworkHour,"備住::". $comment];
-            LineServiceProvider::sendNotifyFlexMeg($apply_user_id, array_merge(["加班送出，請等待簽核"], $msg));
-            LineServiceProvider::sendNotifyFlexMeg($upper_line_id, array_merge(["請審核".$apply_user_cname."送出的加班申請"], $msg));
+            //發出line通知
+            $this->sendLineMessageService->sendApplyNotify($last_appy_id, 'overwork');
+
             return response()->json([
                 'status' => 'successful'
             ]);

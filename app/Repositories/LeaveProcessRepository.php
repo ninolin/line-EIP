@@ -76,6 +76,10 @@ class LeaveProcessRepository {
         }
     }
 
+    /**
+     * 尋找用戶未簽核過的紀錄
+     * 
+     */
     public function findUnValidateApplyProcess(
         $upper_user_no = null, 
         $page = null
@@ -139,6 +143,10 @@ class LeaveProcessRepository {
         }
     }
 
+    /**
+     * 尋找用戶已簽核過的紀錄
+     * 
+     */
     public function findValidateApplyProcess(
         $upper_user_no = null, 
         $page = null
@@ -181,4 +189,74 @@ class LeaveProcessRepository {
             ];
         }
     }
+
+    /**
+     * 休假/加班申請的下一個簽核人資料
+     * 
+     */
+    public function findNextUpperUser($apply_id) 
+    {
+        try {
+            $sql = 'select 
+                        u.* 
+                    from 
+                        eip_leave_apply_process e,
+                        user u 
+                    where 
+                        e.apply_id = ? and 
+                        e.is_validate IS NULL and 
+                        e.upper_user_no = u.NO
+                    order by id ASC limit 1 ';
+            return DB::select($sql, [$apply_id]);
+        } catch (Exception $e) {
+            throw $e;
+        }
+    }
+
+    /**
+     * 休假/加班申請已簽核過的紀錄
+     * 
+     */
+    public function findApplyValidateRecord($apply_id) 
+    {
+        try {
+            $sql = 'select 
+                        e.upper_user_no, 
+                        e.is_validate, 
+                        u.line_id
+                    from 
+                        eip_leave_apply_process e left join 
+                        user u
+                    on 
+                        e.upper_user_no = u.NO
+                    where
+                        e.apply_id = ? and 
+                        e.is_validate IS NOT NULL';
+            return DB::select($sql, [$apply_id]);
+        } catch (Exception $e) {
+            throw $e;
+        }
+    }
+    /**
+     * 休假/加班申請的拒絕原因
+     * 
+     */
+    public function findRejectReason($apply_id)
+    {
+        try {
+            
+            $reject_reason = DB::table('eip_leave_apply_process')
+                ->where('apply_id', $apply_id)
+                ->where('is_validate', 0)
+                ->value('reject_reason');
+            return $reject_reason;
+
+        } catch (Exception $e) {
+            throw $e;
+        }
+
+        
+    }
+
+    
 }

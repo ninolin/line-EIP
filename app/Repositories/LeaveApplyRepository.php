@@ -23,9 +23,12 @@ class LeaveApplyRepository {
                         DATE_FORMAT(a.end_date, "%Y-%m-%d %H:%i") as end_date_f1,
                         DATE_FORMAT(a.start_date, "%Y-%m-%dT%H:%i") as start_date_f2,
                         DATE_FORMAT(a.end_date, "%Y-%m-%dT%H:%i") as end_date_f2,
-                        u2.cname as cname, 
+                        DATE_FORMAT(a.over_work_date, "%Y-%m-%d %H:%i") as overwork_date_f1,
+                        u2.cname as cname,
+                        u2.line_id as apply_line_id, 
                         u2.work_class_id, 
                         u1.cname as agent_cname, 
+                        u1.line_id as agent_line_id, 
                         e.name as leave_name 
                     from eip_leave_apply as a
                         left join user as u1 on a.agent_user_no = u1.NO 

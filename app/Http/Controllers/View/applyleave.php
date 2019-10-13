@@ -5,10 +5,10 @@ namespace App\Http\Controllers\View;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Input;
-use App\Providers\LineServiceProvider;
 use App\Providers\HelperServiceProvider;
 use App\Providers\LeaveProvider;
 use App\Services\UserService;
+use App\Services\SendLineMessageService;
 use App\Repositories\LeaveApplyRepository;
 use App\Services\ApplyLeaveService;
 use DB;
@@ -23,17 +23,20 @@ class applyleave extends Controller
 
     protected $userService;
     protected $applyLeaveService;
+    protected $sendLineMessageService;
     protected $leaveApplyRepo;
 
     public function __construct(
         UserService $userService,
         ApplyLeaveService $applyLeaveService,
-        LeaveApplyRepository $leaveApplyRepo
+        LeaveApplyRepository $leaveApplyRepo,
+        SendLineMessageService $sendLineMessageService
     )
     {
         $this->userService = $userService;
         $this->applyLeaveService = $applyLeaveService;
         $this->leaveApplyRepo = $leaveApplyRepo;
+        $this->sendLineMessageService = $sendLineMessageService;
     }
 
     /**
@@ -236,31 +239,8 @@ class applyleave extends Controller
                     }
                 }
             }
-            //取得代理人的資料
-            $agent_users = DB::select('select cname, line_id from user where NO =?', [$leave_agent_user_no]);
-            $agent_cname = ""; //代理人
-            $agent_line_id = ""; //代理人的line_id
-            foreach ($agent_users as $v) {
-                $agent_cname = $v->cname;
-                $agent_line_id = $v->line_id;
-            }
-
-            //取得第一簽核人的資料
-            $upper_users = DB::select('select NO, line_id from user where NO in (select upper_user_no from user where NO =?)', [$apply_user_no]);
-            $upper_line_id = "";    //第一簽核人的line_id
-            $upper_user_no = "";    //第一簽核人的user_no
-            foreach ($upper_users as $v) {
-                $upper_line_id = $v->line_id; 
-                $upper_user_no = $v->NO; 
-            }
-            //通知申請人、代理人、第一簽核人
-            Log::info("agent_line_id:".$agent_line_id);
-            Log::info("upper_line_id:".$upper_line_id);
-            //echo $agent_line_id;
-            $msg = ["假別::". $leavename,"代理人::".$agent_cname,"起日::".$start_date." ".$start_time,"迄日::". $end_date ." ".$end_time,"備住::". $comment];
-            LineServiceProvider::sendNotifyFlexMeg($apply_user_line_id, array_merge(["假單送出，請等待簽核"], $msg));
-            LineServiceProvider::sendNotifyFlexMeg($upper_line_id, array_merge(["請審核".$apply_user_cname."送出的假單"], $msg));
-            LineServiceProvider::sendNotifyFlexMeg($agent_line_id, array_merge([$apply_user_cname."指定您為請假代理人"], $msg));
+            //發出line通知
+            $this->sendLineMessageService->sendNotify($last_appy_id, 'apply_leave');
 
             return response()->json([
                 'status' => 'successful'

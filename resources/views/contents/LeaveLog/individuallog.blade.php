@@ -120,7 +120,7 @@
                         操作
                       </button>
                       <div class="dropdown-menu dropdown-menu-right">
-                        <a class="dropdown-item" href="#" onclick="showDetailModal({{$leave->id}}, {{$login_user_no}})">簽核紀錄</a>
+                        <a class="dropdown-item" href="#" onclick="showDetailModal({{$leave->id}}, {{$login_user_no}}, 'L')">簽核紀錄</a>
                         <a class="dropdown-item" href="#" onclick="showChangeLogModal({{$leave->id}})">更新紀錄</a>
                         @if ($leave->apply_status != 'N' && $leave->apply_status != 'C') 
                           <a class="dropdown-item" href="#" onclick="showChangeLeaveDateModal({{$leave->id}}, {{$login_user_no}})">更新起迄</a>
@@ -189,7 +189,7 @@
                         操作
                       </button>
                       <div class="dropdown-menu dropdown-menu-right">
-                        <a class="dropdown-item" href="#" onclick="showDetailModal({{$overwork->id}}, {{$login_user_no}})">簽核紀錄</a>
+                        <a class="dropdown-item" href="#" onclick="showDetailModal({{$overwork->id}}, {{$login_user_no}}, 'O')">簽核紀錄</a>
                         <a class="dropdown-item" href="#" onclick="showChangeLogModal({{$overwork->id}})">更新紀錄</a>
                         @if ($overwork->apply_status != 'N' && $overwork->apply_status != 'C') 
                           <a class="dropdown-item" href="#" onclick="showChangeOverworkDateModal({{$overwork->id}}, {{$login_user_no}})">更新起迄</a>
@@ -290,7 +290,7 @@
                         操作
                       </button>
                       <div class="dropdown-menu dropdown-menu-right">
-                        <a class="dropdown-item" href="#" onclick="showDetailModal({{$agent->id}}, {{$login_user_no}})">簽核紀錄</a>
+                        <a class="dropdown-item" href="#" onclick="showDetailModal({{$agent->id}}, {{$login_user_no}}, {{$agent->apply_type}})">簽核紀錄</a>
                         <a class="dropdown-item" href="#" onclick="showChangeLogModal({{$agent->id}})">更新紀錄</a>
                       </div>
                     </div>
@@ -575,7 +575,7 @@
     $("#search_form").submit();
   }
 
-  const showDetailModal = async (apply_id, login_user_no) => {
+  const showDetailModal = async (apply_id, login_user_no, apply_type) => {
       const users_res = await promise_call({
         url: "../api/userlist", 
         method: "get"
@@ -607,7 +607,7 @@
                 html += "<td>"+item.cname+"</td>";
                 html += "<td>拒絕</td>";
               } else {
-                html += "<td><select id='upper_user_select_"+item.id+"' onchange='confirm_change_upper_user("+item.apply_id+", "+item.id+", "+item.upper_user_no+", \""+item.cname+"\", "+login_user_no+")'></select></td>";
+                html += "<td><select id='upper_user_select_"+item.id+"' onchange='confirm_change_upper_user("+item.apply_id+", "+item.id+", "+item.upper_user_no+", \""+item.cname+"\", "+login_user_no+", \""+apply_type+"\")'></select></td>";
                 html += "<td>未簽核</td>";
               }
               if(item.reject_reason) {
@@ -704,7 +704,7 @@
     })
   }
 
-  const confirm_change_upper_user = (apply_id, apply_process_id, old_upper_user_no, old_upper_user_cname, login_user_no) => {
+  const confirm_change_upper_user = (apply_id, apply_process_id, old_upper_user_no, old_upper_user_cname, login_user_no, apply_type) => {
     //因為用select2要先trigger change一次，所以這邊會要檢查新的簽核人是否跟舊的簽核人不同人，才會去執行換簽核人的程式
     if(old_upper_user_no != $("#upper_user_select_"+apply_process_id).val()) {
       const new_cname = $("#upper_user_select_"+apply_process_id).select2('data')[0].cname;
@@ -725,7 +725,7 @@
       $('#changeModal').css('z-index', '1060');
       $($('.modal-backdrop')[1]).css('z-index', '1051');
 
-      $("#changeModal").find(".todo").attr("onclick", "change_upper_user('"+apply_id+"', '"+apply_process_id+"', '"+login_user_no+"')");
+      $("#changeModal").find(".todo").attr("onclick", "change_upper_user('"+apply_id+"', '"+apply_process_id+"', '"+login_user_no+"', '"+apply_type+"')");
       $("#changeModal").find(".tocancel").attr("onclick", "cancel_change_upper_user('"+apply_process_id+"', '"+old_upper_user_no+"')");
     }
   }
@@ -735,12 +735,13 @@
     $('#changeModal').modal('toggle');
   }
 
-  const change_upper_user = (apply_id, apply_process_id, login_user_no) => {
+  const change_upper_user = (apply_id, apply_process_id, login_user_no, apply_type) => {
     const user_NO = $("#upper_user_select_"+apply_process_id).val();
     promise_call({
       url: "../api/leavelog/change_upper_user", 
       data: {
         "apply_id": apply_id,
+        "apply_type": apply_type, 
         "apply_process_id": apply_process_id,
         "user_NO": user_NO,
         "reason": $(".confirm_reason").val(),

@@ -5,12 +5,12 @@ namespace App\Http\Controllers\View;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Input;
-use App\Providers\LineServiceProvider;
 use App\Providers\LeaveProvider;
 use App\Providers\HelperServiceProvider;
 use App\Services\UserService;
 use App\Repositories\LeaveProcessRepository;
 use App\Repositories\LeaveApplyRepository;
+use App\Services\SendLineMessageService;
 use DB;
 use Log;
 use Config;
@@ -21,16 +21,19 @@ class validateleave extends Controller
     protected $userService;
     protected $leaveProcessRepo;
     protected $leaveApplyRepo;
+    protected $sendLineMessageService;
 
     public function __construct(
         UserService $userService,
         LeaveProcessRepository $leaveProcessRepo,
-        LeaveApplyRepository $leaveApplyRepo
+        LeaveApplyRepository $leaveApplyRepo,
+        SendLineMessageService $sendLineMessageService
     )
     {
         $this->userService = $userService;
         $this->leaveProcessRepo = $leaveProcessRepo;
         $this->leaveApplyRepo = $leaveApplyRepo;
+        $this->sendLineMessageService = $sendLineMessageService;
     }
     /**
      * 顯示LIFF待審核清單資料
@@ -112,9 +115,9 @@ class validateleave extends Controller
                             //拒絕加班補休要把用那天加班來補的紀錄刪掉
                             DB::delete("delete from eip_compensatory_relationship where leave_apply_id = ?", [$apply_id]);
                         }
-                        LineServiceProvider::sendNotifyFlexMeg($apply_data->apply_user_line_id, array_merge(["請假不通過","原因::".$reject_reason,"假別::".$apply_data->leave_name,"起日::".$apply_data->start_date,"迄日::".$apply_data->end_date,"備註::". $apply_data->comment]));
+                        $this->sendLineMessageService->sendNotify($apply_id, 'reject_leave');
                     } else {
-                        LineServiceProvider::sendNotifyFlexMeg($apply_data->apply_user_line_id, array_merge(["加班不通過","原因::".$reject_reason,"加班日::".$apply_data->over_work_date,"加班小時::".$apply_data->over_work_hours,"備註::". $apply_data->comment]));
+                        $this->sendLineMessageService->sendNotify($apply_id, 'reject_overwork');
                     }
                     return response()->json([
                         'status' => 'successful'
@@ -127,8 +130,7 @@ class validateleave extends Controller
                 foreach ($processes as $v) {
                     $last_approved_id = $v->id;
                 }
-                log::info($last_approved_id);
-                log::info($process_id);
+
                 if($last_approved_id == $process_id) {
                     //全部審核完了
                     $insert_event = LeaveProvider::insert_event2gcalendar($apply_data->start_date, $apply_data->end_date, $apply_data->apply_user_cname."的".$apply_data->leave_name);
@@ -140,9 +142,9 @@ class validateleave extends Controller
                             if($apply_data->leave_compensatory == 1) {
                                 self::use_compensatory_leave($apply_data);
                             }
-                            LineServiceProvider::sendNotifyFlexMeg($apply_data->apply_user_line_id, array_merge(["請假已通過","假別::".$apply_data->leave_name,"起日::".$apply_data->start_date,"迄日::".$apply_data->end_date,"備註::". $apply_data->comment]));
+                            $this->sendLineMessageService->sendNotify($apply_id, 'pass_leave');
                         } else {
-                            LineServiceProvider::sendNotifyFlexMeg($apply_data->apply_user_line_id, array_merge(["加班已通過","加班日::".$apply_data->over_work_date,"加班小時::".$apply_data->over_work_hours,"備註::". $apply_data->comment]));
+                            $this->sendLineMessageService->sendNotify($apply_id, 'pass_overwork');
                         }
                         return response()->json([
                             'status' => 'successful'
@@ -155,23 +157,23 @@ class validateleave extends Controller
                     }
                 } else {
                     //繼續給下一個人審核
-                    $next_process_sql  = "select upper_user_no from eip_leave_apply_process where apply_id = ? and id > ? ";
-                    $next_process_sql .= "order by id desc limit 1 ";
-                    $next_process = DB::select($next_process_sql, [$apply_id, $process_id]);
-                    $next_approved_user_no = 0;
-                    foreach ($next_process as $v) {
-                        $next_approved_user_no = $v->upper_user_no;
-                    }
+                    // $next_process_sql  = "select upper_user_no from eip_leave_apply_process where apply_id = ? and id > ? ";
+                    // $next_process_sql .= "order by id desc limit 1 ";
+                    // $next_process = DB::select($next_process_sql, [$apply_id, $process_id]);
+                    // $next_approved_user_no = 0;
+                    // foreach ($next_process as $v) {
+                    //     $next_approved_user_no = $v->upper_user_no;
+                    // }
 
-                    $upper_users = DB::select('select line_id from user where NO = ?', [$next_approved_user_no]);
-                    $upper_user_line_id = "";   //審核人的下一個審核人的line_id
-                    foreach ($upper_users as $v) {
-                        $upper_user_line_id = $v->line_id;
-                    }
+                    // $upper_users = DB::select('select line_id from user where NO = ?', [$next_approved_user_no]);
+                    // $upper_user_line_id = "";   //審核人的下一個審核人的line_id
+                    // foreach ($upper_users as $v) {
+                    //     $upper_user_line_id = $v->line_id;
+                    // }
                     if($apply_data->apply_type == 'L') {
-                        LineServiceProvider::sendNotifyFlexMeg($upper_user_line_id, array_merge(["請審核".$apply_data->apply_user_cname."送出的假單","假別::".$apply_data->leave_name,"起日::".$apply_data->start_date,"迄日::".$apply_data->end_date,"備註::". $apply_data->comment]));
+                        $this->sendLineMessageService->sendNotify($apply_id, 'apply_leave', 'validate_user');
                     } else {
-                        LineServiceProvider::sendNotifyFlexMeg($upper_user_line_id, ["請審核".$apply_data->apply_user_cname."送出的加班","加班日::".$apply_data->over_work_date,"加班小時::".$apply_data->over_work_hours,"備註::". $apply_data->comment]);
+                        $this->sendLineMessageService->sendNotify($apply_id, 'apply_overwork', 'validate_user');
                     }
                     return response()->json([
                         'status' => 'successful'
