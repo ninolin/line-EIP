@@ -193,7 +193,6 @@ class leavelog extends Controller
 
     /**
      * 更新簽核人
-     * 更新eip_leave_apply, 寫入eip_leave_apply_change_log
      * 
      * @param \Illuminate\Http\Request
      */
@@ -258,10 +257,6 @@ class leavelog extends Controller
     
     /**
      * 更新代理人
-     * 3個step:
-     * step1: 檢查代理人是不是在代理期間內也有請假
-     * step2: 更新eip_leave_apply, 寫入eip_leave_apply_change_log
-     * step3: 通知申請人、新舊代理人、已簽核過的簽核人和下一個簽核人
      * 
      * @param \Illuminate\Http\Request
      */
@@ -316,13 +311,9 @@ class leavelog extends Controller
             ], 500);
         }
     }
+
     /**
      * 更新休假起迄日
-     * 4個step:
-     * step1: 重算小時
-     * step2: 更新google calendar
-     * step3: 更新eip_leave_apply
-     * step4: 通知申請人、代理人、已簽核過的簽核人和下一個簽核人
      * 
      * @param \Illuminate\Http\Request
      */
@@ -343,6 +334,7 @@ class leavelog extends Controller
         $leave_hours        = 0;
         $insert_event       = null;
 
+        //重算休假小時
         $r = json_decode(json_encode(LeaveProvider::getLeaveHours($new_leave_start_date, $new_leave_end_date, $work_class_id)));
         if($r->status == "successful") {
             $leave_hours = $r->leave_hours;
@@ -368,6 +360,11 @@ class leavelog extends Controller
         ]);
     }
 
+    /**
+     * 更新加班日期
+     * 
+     * @param \Illuminate\Http\Request
+     */
     public function change_overwork_date(Request $request)
     {
         $apply_id           = $request->get('apply_id');
