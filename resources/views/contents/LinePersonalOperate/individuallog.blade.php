@@ -6,7 +6,7 @@
         <title>EIP</title>
         <!-- Fonts -->
         <link href="https://fonts.googleapis.com/css?family=Nunito:200,600" rel="stylesheet" type="text/css">
-        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/solid.css" integrity="sha384-+0VIRx+yz1WBcCTXBkVQYIBVNEFH1eP6Zknm16roZCyeNg2maWEpk/l/KsyFKs7G" crossorigin="anonymous">
+        <link href="{{ asset('css/all.min.css') }}" rel="stylesheet">
         <link href="{{ asset('js/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
         <link href="{{ asset('css/weui.min.css') }}" rel="stylesheet">
         <link href="{{ asset('css/public.css') }}" rel="stylesheet">
@@ -25,7 +25,12 @@
         </style>
     </head>
     <body style="background-color: #f1f1f1;">
-        <div class="weui-flex"><div class="weui-flex__item mobile_topbar">工時紀錄</div></div>
+        <div class="weui-flex">
+            <div class="placeholder mobile_topbar" style="padding-left: 5px;">
+                <i class="fas fa-arrow-left" onclick="javascript:{history.go(-1)}"></i>
+            </div>
+            <div class="weui-flex__item mobile_topbar">工時紀錄a</div>
+        </div>
         <div>
             <div class="weui-cells__title"></div>
             <div class="weui-cells">

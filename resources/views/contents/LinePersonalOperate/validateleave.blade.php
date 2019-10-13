@@ -6,8 +6,7 @@
         <title>EIP</title>
         <!-- Fonts -->
         <link href="https://fonts.googleapis.com/css?family=Nunito:200,600" rel="stylesheet" type="text/css">
-        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/solid.css" integrity="sha384-+0VIRx+yz1WBcCTXBkVQYIBVNEFH1eP6Zknm16roZCyeNg2maWEpk/l/KsyFKs7G" crossorigin="anonymous">
-        <link href="{{ asset('js/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
+        <link href="{{ asset('css/all.min.css') }}" rel="stylesheet">
         <link href="{{ asset('css/weui.min.css') }}" rel="stylesheet">
         <link href="{{ asset('css/public.css') }}" rel="stylesheet">
         <link href="{{ asset('css/validateLeave.css') }}" rel="stylesheet">
@@ -23,10 +22,19 @@
                 width: 100%;
                 margin-bottom: 20px;
             }
+            .weui-form-preview {
+                margin-bottom: 15px;
+            }
+            .prev_page {
+
+            }
         </style>
     </head>
     <body style="background-color: #f1f1f1;">
         <div class="weui-flex">
+            <div class="placeholder mobile_topbar" style="padding-left: 5px;">
+                <i class="fas fa-arrow-left" onclick="javascript:{history.go(-1)}"></i>
+            </div>
             <div class="weui-flex__item mobile_topbar">
                 @if ($type == 'unvalidate')
                     未簽核工時
@@ -40,7 +48,7 @@
                 <div id="leave_data">
                     @if (count($leaves) > 0) 
                         @foreach($leaves as $leave)
-                            <div class="weui-form-preview mb-3" id="apply_{{$leave->id}}">
+                            <div class="weui-form-preview" id="apply_{{$leave->id}}">
                                 <div class="weui-form-preview__hd" style="padding: 5px 16px;">
                                 @if ($leave->apply_type === 'L')
                                     <em class="weui-form-preview__value" style="color: black;font-size: 1.2em;text-align:left;">{{$leave->leave_name}}</em>
