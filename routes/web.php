@@ -16,7 +16,7 @@ Route::get('/', function () {return view('login');})->name('login');        //lo
 Route::post('/login', 'Auth\AuthController@login')->name('doLogin');        //一般登入 
 Route::post('/logout', 'Auth\AuthController@logout')->name('doLogout');     //登出
 Route::post('/glogin', 'Auth\AuthController@glogin')->name('doGLogin');     //google登入
-//Route::get('/glogin', 'Auth\AuthController@glogin')->name('getGLoginData'); //google登入
+Route::get('/glogin', 'Auth\AuthController@glogin')->name('getGLoginData'); //google登入
 
 Route::get('/applyleave', 'View\applyleave@create');
 Route::get('/applyoverwork', 'View\applyoverwork@create');
