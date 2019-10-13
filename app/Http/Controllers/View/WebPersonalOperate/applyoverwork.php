@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Http\Controllers\View\PersonalOperate;
+namespace App\Http\Controllers\View\WebPersonalOperate;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Log;
 
-class applyoverwork_web extends Controller
+class applyoverwork extends Controller
 {
 
     /**
@@ -23,7 +23,7 @@ class applyoverwork_web extends Controller
             exit;
         }
 
-        return view('contents.PersonalOperate.applyoverwork', [
+        return view('contents.WebPersonalOperate.applyoverwork', [
             'tab'       => 'applyoverwork',
             'nowdate'   => date("Y-m-d"),
             'user_id'   => $user_no,

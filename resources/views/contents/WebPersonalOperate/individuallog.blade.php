@@ -1,4 +1,4 @@
-@extends('contents.PersonalOperate.master')
+@extends('contents.WebPersonalOperate.master')
 @section('content3')
 <style>
   .nav-item {

@@ -13,7 +13,19 @@ use Illuminate\Http\Request;
 |
 */
 
-//Route::middleware('auth:api')->get('/user', function (Request $request) {return $request->user();});
+Route::post('applyleave', 'View\LinePersonalOperate\applyleave@store');
+Route::get('applyleave/{id}', 'View\LinePersonalOperate\applyleave@show');
+Route::get('applyleave/user/{line_id}', 'View\LinePersonalOperate\applyleave@get_user_by_line_id');
+Route::post('applyoverwork', 'View\LinePersonalOperate\applyoverwork@store');
+Route::get('applyoverwork/{id}', 'View\LinePersonalOperate\applyoverwork@show');
+Route::get('validateleave/{id}', 'View\LinePersonalOperate\validateleave@index');
+Route::put('validateleave/{id}', 'View\LinePersonalOperate\validateleave@update');
+Route::get('validateleave/show_other_leaves/{id}', 'View\LinePersonalOperate\validateleave@show_other_leaves');
+Route::put('individuallog/{id}', 'View\LinePersonalOperate\individuallog@cancel');
+Route::get('individuallog/leavetype', 'View\LinePersonalOperate\individuallog@get_leavetype');
+
+Route::post('receive', 'View\receive@receive');
+
 Route::get('userlist', 'View\userlist@index');
 Route::put('userlist/{id}', 'View\userlist@update');
 Route::put('userlist/bindlineid/{id}', 'View\userlist@bindlineid');
@@ -36,27 +48,10 @@ Route::post('overworktype', 'View\WorkSetting\overworktype@store');
 Route::put('overworktype/{id}', 'View\WorkSetting\overworktype@update');
 Route::delete('overworktype/{id}', 'View\WorkSetting\overworktype@destroy');
 
-Route::post('applyleave', 'View\applyleave@store');
-Route::get('applyleave/{id}', 'View\applyleave@show');
-Route::get('applyleave/user/{line_id}', 'View\applyleave@get_user_by_line_id');
-
-Route::post('applyoverwork', 'View\applyoverwork@store');
-Route::get('applyoverwork/{id}', 'View\applyoverwork@show');
-
-Route::post('receive', 'Line\Receive@receive');
-Route::get('validateleave/{id}', 'View\validateleave@index');
-Route::put('validateleave/{id}', 'View\validateleave@update');
-Route::get('validateleave/show_other_leaves/{id}', 'View\validateleave@show_other_leaves');
-
-//Route::get('individuallog/{id}', 'View\individuallog@index');
-Route::put('individuallog/{id}', 'View\individuallog@cancel');
-Route::get('individuallog/leavetype', 'View\individuallog@get_leavetype');
-
 Route::get('leavelog/process/{id}', 'View\LeaveLog\leavelog@list_process_logs');
 Route::get('leavelog/changelog/{id}', 'View\LeaveLog\leavelog@list_change_logs');
 Route::put('leavelog/change_upper_user', 'View\LeaveLog\leavelog@change_upper_user');
 Route::put('leavelog/change_agent_user', 'View\LeaveLog\leavelog@change_agent_user');
-//Route::put('leavelog/change_date', 'View\LeaveLog\leavelog@change_date');
 Route::put('leavelog/change_leave_date', 'View\LeaveLog\leavelog@change_leave_date');
 Route::put('leavelog/change_overwork_date', 'View\LeaveLog\leavelog@change_overwork_date');
 Route::get('leavelog/export', 'View\LeaveLog\leavelog@export')->name('exportExcel');
@@ -71,4 +66,3 @@ Route::delete('workclass/{id}', 'View\WorkSetting\workclass@destroy');
 Route::get('lineDefaultMsg/{id}', 'View\WorkSetting\LineDefaultMessage@get_one_message');
 Route::put('lineDefaultMsg/{id}', 'View\WorkSetting\LineDefaultMessage@update_message');
 
-//Route::post('/glogin', 'Auth\AuthController@glogin')->name('doGLogin'); //google登入

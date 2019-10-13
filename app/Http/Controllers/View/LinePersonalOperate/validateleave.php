@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\View;
+namespace App\Http\Controllers\View\LinePersonalOperate;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -58,21 +58,11 @@ class validateleave extends Controller
             }
         }
         
-        return view('line.validateleave', [
+        return view('contents.LinePersonalOperate.validateleave', [
             'leaves'        => $leaves,
             'login_user_no' => $user_no,
             'type'          => $type_name
         ]);
-    }
-
-    /**
-     * 顯示LIFF待審核清單頁面
-     * @author nino
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        return view('line.validateleave', []);
     }
 
     /**

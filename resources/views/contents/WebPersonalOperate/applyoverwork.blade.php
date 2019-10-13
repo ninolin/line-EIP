@@ -1,4 +1,4 @@
-@extends('contents.PersonalOperate.master')
+@extends('contents.WebPersonalOperate.master')
 @section('title', 'Home')
 @section('content3')
 <div class="container-fluid pt-lg-4">

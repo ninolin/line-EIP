@@ -1,16 +1,15 @@
 <?php
 
-namespace App\Http\Controllers\View\PersonalOperate;
+namespace App\Http\Controllers\View\WebPersonalOperate;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\Http\Controllers\View\applyleave;
 use App\Repositories\LeaveTypeRepository;
 use App\Repositories\UserRepository;
 use DB;
 use Log;
 
-class applyleave_web extends applyleave
+class applyleave extends Controller
 {
     protected $leaveTypeRepo;
     protected $userRepo;
@@ -48,7 +47,7 @@ class applyleave_web extends applyleave
         $endHour = date_format(date_create($user_profile[0]->work_end),"H");
         $endMin = date_format(date_create($user_profile[0]->work_end),"i");
 
-        return view('contents.PersonalOperate.applyleave', [
+        return view('contents.WebPersonalOperate.applyleave', [
             'leavetypes'    => $leavetypes,
             'users'         => $users,
             'user_profile'  => $user_profile,

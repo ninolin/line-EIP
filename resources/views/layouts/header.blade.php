@@ -7,7 +7,7 @@
                 <a class="angle-down nav-link">工時管理</a>
                 <ul>
                     <div>
-                        <li><a class="@if (Request::is('po_applyleave')) active @endif" href="{{ route('po_applyleave') }}">個人工時</a></li>
+                        <li><a class="@if (Request::is('webpo_applyleave')) active @endif" href="{{ route('webpo_applyleave') }}">個人工時</a></li>
                         @if (\Session::get('eip_level') == 'admin')
                             <li><a class="@if (Request::is('calendar')) active @endif" href="{{ route('calendar') }}">工時日曆</a></li>
                             <li><a class="@if (Request::is('userlist')) active @endif" href="{{ route('userlist') }}">員工設定</a></li>

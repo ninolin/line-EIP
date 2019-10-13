@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\View;
+namespace App\Http\Controllers\View\LinePersonalOperate;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -139,7 +139,7 @@ class individuallog extends Controller
                     $pre_y_annual_use_hours = $use_result["total_hours"];
                 }
             }
-            return view('line.individuallog', [
+            return view('contents.LinePersonalOperate.individuallog', [
                 'leaves'                =>  $leaves,
                 'today'                 =>  date("Y-m-d H:i:s"),
                 'show_success_hours'    =>  $show_success_hours,

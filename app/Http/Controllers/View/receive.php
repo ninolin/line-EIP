@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Line;
+namespace App\Http\Controllers\View;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -11,7 +11,7 @@ use App\Services\UserService;
 use App\Services\SendLineMessageService;
 use Exception;
 
-class Receive extends Controller
+class receive extends Controller
 {
     protected $userService;
     protected $sendLineMessageService;

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\View\PersonalOperate;
+namespace App\Http\Controllers\View\WebPersonalOperate;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -56,7 +56,7 @@ class validate extends Controller
             $unvalidate_apply_t_pages = $unvalidate_result["total_pages"];
         }
 
-        return view('contents.PersonalOperate.validate', [
+        return view('contents.WebPersonalOperate.validate', [
             'tab'                       => 'validate',
             'login_user_no'             => $user_no,
             'show_tab'                  => $show_tab,

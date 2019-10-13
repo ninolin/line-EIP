@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\View;
+namespace App\Http\Controllers\View\LinePersonalOperate;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -75,7 +75,7 @@ class applyleave extends Controller
         $leavetypes = DB::select($sql, []);
         //用戶只列出有加入line的而且是status是T(True)
         $users = DB::select("select * from user where status = 'T' order by cname", []);
-        return view('line.applyleave', [
+        return view('contents.LinePersonalOperate.applyleave', [
             'leavetypes' => $leavetypes,
             'users' => $users,
             'nowdate' => date("Y-m-d")

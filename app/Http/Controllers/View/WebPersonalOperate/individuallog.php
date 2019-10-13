@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\View\PersonalOperate;
+namespace App\Http\Controllers\View\WebPersonalOperate;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -41,7 +41,7 @@ class individuallog extends Controller
      * @param  string  id
      * @return \Illuminate\Http\Response
      */
-    public function show_individual() 
+    public function show_view() 
     {
         $leave_year         = Input::get('leave_year', date('Y'));
         $leaves_page        = Input::get('leaves_page', 1);
@@ -100,7 +100,7 @@ class individuallog extends Controller
             array_push($types, (object) array('name' => '可用休假', 'hours' => $leave_day*8));
         }
 
-        return view('contents.PersonalOperate.individuallog', [
+        return view('contents.WebPersonalOperate.individuallog', [
             'user_no'           => $user_no, 
             'show_tab'          => $show_tab,
             'cname'             => $cname,

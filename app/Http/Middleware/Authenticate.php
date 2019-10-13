@@ -7,7 +7,7 @@ use Log;
 class Authenticate
 {
     const SESSION = 'code';//存放在Session的Key值
-    const REDIRECT_TO = 'po_applyleave';//轉跳的主頁
+    const REDIRECT_TO = 'webpo_applyleave';//轉跳的主頁
     const EXPIRED_MINS = '+ 15min'; //輸入Session過期時間
 
     public function handle($request, Closure $next) {

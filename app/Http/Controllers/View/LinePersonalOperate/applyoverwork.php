@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\View;
+namespace App\Http\Controllers\View\LinePersonalOperate;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -34,7 +34,7 @@ class applyoverwork extends Controller
      */
     public function create()
     {
-        return view('line.applyoverwork', [
+        return view('contents.LinePersonalOperate.applyoverwork', [
             'nowdate' => date("Y-m-d")
         ]);
     }
