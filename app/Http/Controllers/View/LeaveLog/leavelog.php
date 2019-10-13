@@ -7,7 +7,6 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Input;
 use App\Console\commands\CalcLeaveDays;
 use App\Providers\LeaveProvider;
-use App\Providers\LineServiceProvider;
 use App\Repositories\LeaveApplyRepository;
 use App\Repositories\LeaveTypeRepository;
 use App\Repositories\UserRepository;

@@ -174,7 +174,6 @@ return [
         // App\Providers\BroadcastServiceProvider::class,
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
-        App\Providers\LineServiceProvider::class,
         App\Providers\ReceiveServiceProvider::class,
         Maatwebsite\Excel\ExcelServiceProvider::class,
     ],
