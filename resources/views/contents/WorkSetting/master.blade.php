@@ -7,6 +7,7 @@
       <a class="nav-link @if ($tab == 'leavetype') active @endif" href="{{ route('ws_leavetype') }}">假別設定</a>
       <a class="nav-link @if ($tab == 'overworktype') active @endif" href="{{ route('ws_overworktype') }}">加班設定</a>
       <a class="nav-link @if ($tab == 'workclass') active @endif" href="{{ route('ws_class') }}">班表設定</a>
+      <a class="nav-link @if ($tab == 'linedefaultmsg') active @endif" href="{{ route('ws_linedefaultmsg') }}">LINE預設訊息設定</a>
     </div>
   </div>
 </nav>

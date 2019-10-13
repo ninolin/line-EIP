@@ -31,13 +31,14 @@ Route::middleware('auth')->post('/userlist', 'View\userlist@create')->name('user
 Route::middleware('auth')->get('/titlelist', 'View\titlelist@create')->name('titlelist');
 Route::middleware('auth')->get('/leavetypelist', 'View\leavetypelist@create')->name('leavetypelist');
 Route::middleware('auth')->get('/overworktypelist', 'View\overworktypelist@create')->name('overworktypelist');
-Route::middleware('auth')->get('/leavelog', 'View\leavelog@create')->name('leavelog');
 Route::middleware('auth')->get('/messagelog', 'View\messagelog@create')->name('messagelog');
 Route::middleware('auth')->post('/messagelog', 'View\messagelog@create')->name('messagelog');
 Route::middleware('auth')->get('/work/setting/class', 'View\WorkSetting\workclass@create')->name('ws_class');
 Route::middleware('auth')->get('/work/setting/title', 'View\WorkSetting\title@create')->name('ws_title');
 Route::middleware('auth')->get('/work/setting/leavetype', 'View\WorkSetting\leavetype@create')->name('ws_leavetype');
 Route::middleware('auth')->get('/work/setting/overworktype', 'View\WorkSetting\overworktype@create')->name('ws_overworktype');
+Route::middleware('auth')->get('/work/setting/linedefaultmsg', 'View\WorkSetting\LineDefaultMessage@show_page')->name('ws_linedefaultmsg');
+// Route::middleware('auth')->get('/leavelog', 'View\leavelog@create')->name('leavelog');
 Route::middleware('auth')->get('/leavelog/last', 'View\LeaveLog\leavelog@show_last')->name('ll_last');
 Route::middleware('auth')->get('/leavelog/individual', 'View\LeaveLog\leavelog@show_individual')->name('ll_individual');
 Route::middleware('auth')->get('/PersonalOperate/applyleave', 'View\PersonalOperate\applyleave_web@show_view')->name('po_applyleave');

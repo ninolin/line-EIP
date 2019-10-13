@@ -56,7 +56,7 @@ Route::get('leavelog/process/{id}', 'View\LeaveLog\leavelog@list_process_logs');
 Route::get('leavelog/changelog/{id}', 'View\LeaveLog\leavelog@list_change_logs');
 Route::put('leavelog/change_upper_user', 'View\LeaveLog\leavelog@change_upper_user');
 Route::put('leavelog/change_agent_user', 'View\LeaveLog\leavelog@change_agent_user');
-Route::put('leavelog/change_date', 'View\LeaveLog\leavelog@change_date');
+//Route::put('leavelog/change_date', 'View\LeaveLog\leavelog@change_date');
 Route::put('leavelog/change_leave_date', 'View\LeaveLog\leavelog@change_leave_date');
 Route::put('leavelog/change_overwork_date', 'View\LeaveLog\leavelog@change_overwork_date');
 Route::get('leavelog/export', 'View\LeaveLog\leavelog@export')->name('exportExcel');
@@ -67,4 +67,8 @@ Route::get('workclass', 'View\WorkSetting\workclass@index');
 Route::post('workclass', 'View\WorkSetting\workclass@store');
 Route::put('workclass/{id}', 'View\WorkSetting\workclass@update');
 Route::delete('workclass/{id}', 'View\WorkSetting\workclass@destroy');
+
+Route::get('lineDefaultMsg/{id}', 'View\WorkSetting\LineDefaultMessage@get_one_message');
+Route::put('lineDefaultMsg/{id}', 'View\WorkSetting\LineDefaultMessage@update_message');
+
 //Route::post('/glogin', 'Auth\AuthController@glogin')->name('doGLogin'); //google登入
