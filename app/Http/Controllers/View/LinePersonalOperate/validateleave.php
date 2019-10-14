@@ -50,6 +50,7 @@ class validateleave extends Controller
             $unvalidate_result = $this->leaveProcessRepo->findUnValidateApplyProcess($user_no);
             if($unvalidate_result["status"] == "successful") {
                 $leaves = $unvalidate_result["data"];
+                
             }
         } else {
             $validate_result = $this->leaveProcessRepo->findValidateApplyProcess($user_no);
@@ -57,11 +58,14 @@ class validateleave extends Controller
                 $leaves = $validate_result["data"];
             }
         }
-        
+
+        $unique_leaves = self::_unique_multidim_array(json_decode(json_encode($leaves), true), 'apply_user_no');
+
         return view('contents.LinePersonalOperate.validateleave', [
             'leaves'        => $leaves,
             'login_user_no' => $user_no,
-            'type'          => $type_name
+            'type'          => $type_name,
+            'unique_leaves' => $unique_leaves
         ]);
     }
 
@@ -187,4 +191,19 @@ class validateleave extends Controller
         ]);
     }
     
+    private static function _unique_multidim_array($array, $key) {
+        $temp_array = array();
+        $i = 0;
+        $key_array = array();
+       
+        foreach($array as $val) {
+            if (!in_array($val[$key], $key_array)) {
+                $key_array[$i] = $val[$key];
+                $temp_array[$i] = $val;
+            }
+            $i++;
+        }
+        return $temp_array;
+    }
+
 }

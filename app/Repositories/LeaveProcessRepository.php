@@ -120,7 +120,6 @@ class LeaveProcessRepository {
                 foreach ($next_upper_users as $n) {
                     $next_upper_user_no = $n->upper_user_no;
                     if($next_upper_user_no == $upper_user_no) {
-                        log::info($d->id);
                         array_push($new_data, $d);
                     }
                 }

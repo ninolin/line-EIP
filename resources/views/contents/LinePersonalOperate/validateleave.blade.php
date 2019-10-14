@@ -9,7 +9,7 @@
         <link href="{{ asset('css/all.min.css') }}" rel="stylesheet">
         <link href="{{ asset('css/weui.min.css') }}" rel="stylesheet">
         <link href="{{ asset('css/public.css') }}" rel="stylesheet">
-        <link href="{{ asset('css/validateLeave.css') }}" rel="stylesheet">
+        <!-- <link href="{{ asset('css/validateLeave.css') }}" rel="stylesheet"> -->
         <style>
             .other_leaves_table tbody tr:nth-child(even){
                 background: #e7e7e7
@@ -25,8 +25,9 @@
             .weui-form-preview {
                 margin-bottom: 15px;
             }
-            .prev_page {
-
+            .search_flex {
+                background: white;
+                margin-bottom: 10px;
             }
         </style>
     </head>
@@ -43,12 +44,25 @@
                 @endif
             </div>
         </div>
+        <div class="weui-flex search_flex">
+            <div class="weui-cell weui-cell_select weui-cell_select-after" style="width: 100%;">
+                <div class="weui-cell__hd"><label class="weui-label">申請人</label></div>
+                <div class="weui-cell__bd">
+                    <select id="apply_user_select" class="weui-select" onchange="search()">
+                        <option value="0">全部</option>
+                        @foreach($unique_leaves as $ul)
+                            <option value="{{$ul['apply_user_no']}}">{{$ul['cname']}}</option>
+                        @endforeach
+                    </select>
+                </div>
+            </div>
+        </div> 
         <div class="text-center">
             <div class="main-section">
                 <div id="leave_data">
                     @if (count($leaves) > 0) 
                         @foreach($leaves as $leave)
-                            <div class="weui-form-preview" id="apply_{{$leave->id}}">
+                            <div class="weui-form-preview apply_user_{{$leave->apply_user_no}}" id="apply_{{$leave->id}}">
                                 <div class="weui-form-preview__hd" style="padding: 5px 16px;">
                                 @if ($leave->apply_type === 'L')
                                     <em class="weui-form-preview__value" style="color: black;font-size: 1.2em;text-align:left;">{{$leave->leave_name}}</em>
@@ -151,6 +165,7 @@
             <p class="weui-toast__content">審核</p>
         </div>
     </div>
+
     <script src="{{ asset('js/jquery/jquery.min.js') }}"></script>
     <script src="{{ asset('js/restcall.js') }}"></script>
     <script src="https://d.line-scdn.net/liff/1.0/sdk.js"></script>
@@ -226,6 +241,14 @@
                     $("#other_leaves").show();
                 } 
             })
+        }
+        const search = () => {
+            $(".weui-form-preview").hide();
+            if($("#apply_user_select").val() == 0) {
+                $(".weui-form-preview").show();
+            } else {
+                $(".apply_user_"+$("#apply_user_select").val()).show();
+            }
         }
     </script>
 </html>
