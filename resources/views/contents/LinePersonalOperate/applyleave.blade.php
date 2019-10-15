@@ -41,7 +41,8 @@
                     <div class="weui-cell__hd"><label for="" class="weui-label">開始時間</label></div>
                     <div class="weui-cell__bd weui-flex">
                         <input class="weui-input weui-flex__item" type="date" id="startDate" min="{{$nowdate}}" value="{{$nowdate}}" placeholder=""/>
-                        <div class="weui-input weui-flex__item" id="startTime" onclick="setTime('startTime')" value=""></div>
+                        <!-- <div class="weui-input weui-flex__item" id="startTime" onclick="setTime('startTime')" value=""></div> -->
+                        <input class="weui-input weui-flex__item" type="time" id="startTime" min="09:00" max="18:00" required>
                     </div>
                 </div>
                 <div class="weui-cell">
