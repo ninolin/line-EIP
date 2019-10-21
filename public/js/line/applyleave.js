@@ -1,4 +1,4 @@
-var isMobile = false;
+var apply_time = {'start_hour': 8, 'start_min': '00', 'end_hour': 17, 'end_min': '00'};
 window.onload = function (e) {
     $("#toast").show();
     liff.init(function (data) {
@@ -29,61 +29,76 @@ function initializeApp(data) {
             if(user.default_agent_user_no != 0) $("#leaveAgent").val(user.default_agent_user_no);
             user.work_start = user.work_start || '08:00:00';
             user.work_end = user.work_end || '17:00:00';
-            $("#startTime").html(user.work_start.split(':')[0]+':'+user.work_start.split(':')[1]);
-            $("#endTime").html(user.work_end.split(':')[0]+':'+user.work_end.split(':')[1]);
+            apply_time = {
+                'start_hour': user.work_start.split(':')[0], 
+                'start_min': user.work_start.split(':')[1], 
+                'end_hour': user.work_end.split(':')[0], 
+                'end_min': user.work_end.split(':')[1]
+            };
+            $("#startTime").html(apply_time.start_hour+':'+apply_time.start_min);
+            $("#endTime").html(apply_time.end_hour+':'+apply_time.end_min);
             $("#toast").hide();
         }
         
     })
 }
 
-const setTime = (id) => {
+const setTime = (type) => {
+    if(type == 'startTime') {
+        $("#add_hour").attr("onclick", "time_calculate('startTime', 'add_hour')");
+        $("#add_min").attr("onclick", "time_calculate('startTime', 'add_min')");
+        $("#sub_hour").attr("onclick", "time_calculate('startTime', 'sub_hour')");
+        $("#sub_min").attr("onclick", "time_calculate('startTime', 'sub_min')");
+        $("#apply_time_hour").html(apply_time.start_hour);
+        $("#apply_time_min").html(apply_time.start_min);
+    } else {
+        $("#add_hour").attr("onclick", "time_calculate('endTime', 'add_hour')");
+        $("#add_min").attr("onclick", "time_calculate('endTime', 'add_min')");
+        $("#sub_hour").attr("onclick", "time_calculate('endTime', 'sub_hour')");
+        $("#sub_min").attr("onclick", "time_calculate('endTime', 'sub_min')");
+        $("#apply_time_hour").html(apply_time.end_hour);
+        $("#apply_time_min").html(apply_time.end_min);
+    }
     $("#time_select").show();
 }
-// const setTime = (id) => {
-//     const hour = $("#"+id).html().split(':')[0];
-//     const min = $("#"+id).html().split(':')[1];
-//     let defaultValue = [hour, min];
-//     if(id == "endTime") defaultValue = [hour, min];
-//     weui.picker(
-//         [
-//             {label: '01', value: '01'}, 
-//             {label: '02', value: '02'}, 
-//             {label: '03', value: '03'},
-//             {label: '04', value: '04'},
-//             {label: '05', value: '05'},
-//             {label: '06', value: '06'},
-//             {label: '07', value: '07'},
-//             {label: '08', value: '08'},
-//             {label: '09', value: '09'},
-//             {label: '10', value: '10'},
-//             {label: '11', value: '11'},
-//             {label: '12', value: '12'},
-//             {label: '13', value: '13'},
-//             {label: '14', value: '14'},
-//             {label: '15', value: '15'},
-//             {label: '16', value: '16'},
-//             {label: '17', value: '17'},
-//             {label: '18', value: '18'},
-//             {label: '19', value: '19'},
-//             {label: '20', value: '20'},
-//             {label: '21', value: '21'},
-//             {label: '22', value: '22'},
-//             {label: '23', value: '23'}
-//         ], 
-//         [
-//             {label: '00', value: '00'}, {label: '30',value: '30'}
-//         ], 
-//         {
-//             defaultValue: defaultValue,
-//             onConfirm: function (result) {
-//                 console.log(result[0].value + ":" + result[1].value);
-//                 $("#"+id).html(result[0].value + ":" + result[1].value);
-//             },
-//             id: id
-//         }
-//     );
-// }
+
+const time_calculate = (time_type, action_type) => {
+    if(time_type == 'startTime') {
+        if(action_type == 'add_hour') {
+            apply_time.start_hour++;
+            if(apply_time.start_hour == 24) apply_time.start_hour = 0;
+        } else if(action_type == 'sub_hour') {
+            apply_time.start_hour--;
+            if(apply_time.start_hour == -1) apply_time.start_hour = 23;
+        } else {
+            if(apply_time.start_min == '00') {
+                apply_time.start_min = '30';
+            } else {
+                apply_time.start_min = '00';
+            }
+        }
+        $("#apply_time_hour").html(apply_time.start_hour);
+        $("#apply_time_min").html(apply_time.start_min);
+        $("#startTime").html(apply_time.start_hour+':'+apply_time.start_min);
+    } else {
+        if(action_type == 'add_hour') {
+            apply_time.end_hour++;
+            if(apply_time.end_hour == 24) apply_time.end_hour = 0;
+        } else if(action_type == 'sub_hour') {
+            apply_time.end_hour--;
+            if(apply_time.end_hour == -1) apply_time.end_hour = 23;
+        } else {
+            if(apply_time.end_min == '00') {
+                apply_time.end_min = '30';
+            } else {
+                apply_time.end_min = '00';
+            }
+        }
+        $("#apply_time_hour").html(apply_time.end_hour);
+        $("#apply_time_min").html(apply_time.end_min);
+        $("#endTime").html(apply_time.end_hour+':'+apply_time.end_min);
+    }
+}
 
 const apply_leave = () => {
     
@@ -91,8 +106,8 @@ const apply_leave = () => {
         "userId": document.getElementById('useridfield').textContent,
         "leaveType": $("#leaveType").val(),
         "leaveAgent": $("#leaveAgent").val(),
-        "startDate": $("#startDate").val()+"T"+$("#startTime").html(),
-        "endDate": $("#endDate").val()+"T"+$("#endTime").html(),
+        "startDate": $("#startDate").val()+"T"+apply_time.start_hour+":"+apply_time.start_min,
+        "endDate": $("#endDate").val()+"T"+apply_time.end_hour+":"+apply_time.end_min,
         "use_mode": 'line'
     }
     const start_time = new Date(post_data.startDate);

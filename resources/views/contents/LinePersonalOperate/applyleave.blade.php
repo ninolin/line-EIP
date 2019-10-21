@@ -40,7 +40,7 @@
                 <div class="weui-cell__hd"><label for="" class="weui-label">開始時間</label></div>
                 <div class="weui-cell__bd weui-flex">
                     <input class="weui-input weui-flex__item" type="date" id="startDate" min="{{$nowdate}}" value="{{$nowdate}}" placeholder=""/>
-                    <div class="weui-input weui-flex__item" id="startTime" onclick="javascript:$('#time_select').show();" value=""></div>
+                    <div class="weui-input weui-flex__item" id="startTime" onclick="setTime('startTime')"></div>
                 </div>
             </div>
             <div class="weui-cell">
@@ -99,23 +99,23 @@
                 </div>
                 <div class="weui-half-screen-dialog__bd" style="padding-bottom: 25px;">
                     <div class="weui-flex" style="padding: 5px;">
-                        <div class="weui-flex__item" style="text-align: center"><i class="fas fa-angle-up"></i></div>
+                        <div class="weui-flex__item" style="text-align: center" id="add_hour" onclick="time_calculate('add_hour')"><i class="fas fa-angle-up"></i></div>
                         <div></div>
-                        <div class="weui-flex__item" style="text-align: center"><i class="fas fa-angle-up"></i></div>
+                        <div class="weui-flex__item" style="text-align: center" id="add_min" onclick="time_calculate('add_min')"><i class="fas fa-angle-up"></i></div>
                     </div>
                     <div class="weui-flex" style="padding: 5px;">
-                        <div class="weui-flex__item" style="text-align: center">111</div>
+                        <div class="weui-flex__item" style="text-align: center" id="apply_time_hour"></div>
                         <div>:</div>
-                        <div class="weui-flex__item" style="text-align: center">222</div>
+                        <div class="weui-flex__item" style="text-align: center" id="apply_time_min"></div>
                     </div>
                     <div class="weui-flex" style="padding: 5px;">
-                        <div class="weui-flex__item" style="text-align: center"><i class="fas fa-angle-down"></i></div>
+                        <div class="weui-flex__item" style="text-align: center" id="sub_hour" onclick="time_calculate('sub_hour')"><i class="fas fa-angle-down"></i></div>
                         <div></div>
-                        <div class="weui-flex__item" style="text-align: center"><i class="fas fa-angle-down"></i></div>
+                        <div class="weui-flex__item" style="text-align: center" id="sub_min" onclick="time_calculate('sub_min')"><i class="fas fa-angle-down"></i></div>
                     </div>
                     <div class="weui-flex" style="padding: 5px;">
                         <div class="weui-flex__item" style="text-align: center">
-                            <a class="weui-btn weui-btn_primary mobile_btn" href="javascript:" id="showTooltips" onclick="apply_leave()">確認</a>
+                            <a class="weui-btn weui-btn_primary mobile_btn" href="javascript:" id="showTooltips" onclick="javascript:$('#time_select').hide();">確認</a>
                         </div>
                     </div>
                 </div>
