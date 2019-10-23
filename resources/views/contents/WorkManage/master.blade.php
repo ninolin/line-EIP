@@ -5,7 +5,7 @@
     <div class="navbar-nav">
       <a class="nav-link @if ($tab == 'applyleave') active @endif" href="{{ route('wm_applyleave') }}">申請休假</a>
       <a class="nav-link @if ($tab == 'applyoverwork') active @endif" href="{{ route('wm_applyoverwork') }}">申請加班</a>
-      <a class="nav-link @if ($tab == 'last') active @endif" href="{{ route('wm_last') }}">簽核中紀錄</a>
+      <!-- <a class="nav-link @if ($tab == 'last') active @endif" href="{{ route('wm_last') }}">簽核中紀錄</a> -->
       <a class="nav-link @if ($tab == 'individual') active @endif" href="{{ route('wm_individual') }}">員工紀錄查詢</a>
     </div>
   </div>
