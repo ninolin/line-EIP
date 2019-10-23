@@ -1,4 +1,4 @@
-@extends('contents.LeaveLog.master')
+@extends('contents.WorkManage.master')
 @section('content2')
 <style>
   .nav-item {
@@ -17,7 +17,7 @@
   }
 </style>
 <div class="container-fluid pt-lg-4">
-  <form id="search_form" method="GET" action="{{ route('ll_last') }}">
+  <form id="search_form" method="GET" action="{{ route('wm_last') }}">
     {{ csrf_field() }}
     <div class="row">
       <div class="col-sm-12 form-row">

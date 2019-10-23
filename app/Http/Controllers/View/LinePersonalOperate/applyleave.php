@@ -267,27 +267,6 @@ class applyleave extends Controller
             'status'    => 'successful',
             'data'      => $apply_leave
         ]);
-        // $sql  = 'select a.*, ';
-        // $sql .= 'DATE_FORMAT(a.start_date, "%Y-%m-%d %H:%m") as start_date_f1,
-        // DATE_FORMAT(a.end_date, "%Y-%m-%d %H:%m") as end_date_f1,
-        // DATE_FORMAT(a.start_date, "%Y-%m-%dT%H:%m") as start_date_f2,
-        // DATE_FORMAT(a.end_date, "%Y-%m-%dT%H:%m") as end_date_f2,
-        // u2.cname as cname, u2.work_class_id, u1.cname as agent_cname, eip_leave_type.name as leave_name ';
-        // $sql .= 'from ';
-        // $sql .= '(select * from eip_leave_apply where id = ?) as a ';
-        // $sql .= 'left join user as u1 ';
-        // $sql .= 'on a.agent_user_no = u1.no ';
-        // $sql .= 'left join eip_leave_type ';
-        // $sql .= 'on a.leave_type = eip_leave_type.id ';
-        // $sql .= 'left join user as u2 ';
-        // $sql .= 'on a.apply_user_no = u2.NO ';
-        // debug($sql);
-        // $leaves = DB::select($sql, [$id]);
-        // debug($leaves);
-        // return response()->json([
-        //     'status' => 'successful',
-        //     'data' => $leaves
-        // ]);
     }
 
     /**

@@ -27,6 +27,7 @@ Route::get('individuallog/leavetype', 'View\LinePersonalOperate\individuallog@ge
 Route::post('receive', 'View\receive@receive');
 
 Route::get('userlist', 'View\userlist@index');
+Route::get('userlist/{id}', 'View\userlist@get_user_data');
 Route::put('userlist/{id}', 'View\userlist@update');
 Route::put('userlist/bindlineid/{id}', 'View\userlist@bindlineid');
 Route::put('userlist/unbindlineid/{id}', 'View\userlist@unbindlineid');
@@ -48,14 +49,14 @@ Route::post('overworktype', 'View\WorkSetting\overworktype@store');
 Route::put('overworktype/{id}', 'View\WorkSetting\overworktype@update');
 Route::delete('overworktype/{id}', 'View\WorkSetting\overworktype@destroy');
 
-Route::get('leavelog/process/{id}', 'View\LeaveLog\leavelog@list_process_logs');
-Route::get('leavelog/changelog/{id}', 'View\LeaveLog\leavelog@list_change_logs');
-Route::put('leavelog/change_upper_user', 'View\LeaveLog\leavelog@change_upper_user');
-Route::put('leavelog/change_agent_user', 'View\LeaveLog\leavelog@change_agent_user');
-Route::put('leavelog/change_leave_date', 'View\LeaveLog\leavelog@change_leave_date');
-Route::put('leavelog/change_overwork_date', 'View\LeaveLog\leavelog@change_overwork_date');
-Route::get('leavelog/export', 'View\LeaveLog\leavelog@export')->name('exportExcel');
-Route::get('leavelog/export_last_month', 'View\LeaveLog\leavelog@exportLastMonth')->name('exportLastMonthExcel');
+Route::get('leavelog/process/{id}', 'View\LeaveWorkManageLog\leavelog@list_process_logs');
+Route::get('leavelog/changelog/{id}', 'View\WorkManage\leavelog@list_change_logs');
+Route::put('leavelog/change_upper_user', 'View\WorkManage\leavelog@change_upper_user');
+Route::put('leavelog/change_agent_user', 'View\WorkManage\leavelog@change_agent_user');
+Route::put('leavelog/change_leave_date', 'View\WorkManage\leavelog@change_leave_date');
+Route::put('leavelog/change_overwork_date', 'View\WorkManage\leavelog@change_overwork_date');
+Route::get('leavelog/export', 'View\WorkManage\leavelog@export')->name('exportExcel');
+Route::get('leavelog/export_last_month', 'View\WorkManage\leavelog@exportLastMonth')->name('exportLastMonthExcel');
 Route::get('test', 'Line\Test@show');
 
 Route::get('workclass', 'View\WorkSetting\workclass@index');

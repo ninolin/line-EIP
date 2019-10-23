@@ -1,4 +1,4 @@
-@extends('contents.LeaveLog.master')
+@extends('contents.WorkManage.master')
 @section('content2')
 <style>
   .nav-item {
@@ -17,7 +17,7 @@
   }
 </style>
 <div class="container-fluid pt-lg-4">
-  <form id="search_form" method="GET" action="{{ route('ll_individual') }}">
+  <form id="search_form" method="GET" action="{{ route('wm_individual') }}">
     {{ csrf_field() }}
     <div class="row">
       <div class="col-sm-12 form-row">
@@ -37,6 +37,9 @@
         </div>
         <div class="col-auto" @if ($user_no == 0) style="display:none" @endif>
           <button type="button" class="btn-c" onclick="showExportModal()">匯出{{$cname}}的工時</button>
+        </div>
+        <div class="col-auto" >
+          <button type="button" class="btn-c" onclick="javascript:location.href='{{route('exportLastMonthExcel')}}'">匯出上月全部工時</button>
         </div>
       </div>
     </div>

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\View\LeaveLog;
+namespace App\Http\Controllers\View\WorkManage;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -90,7 +90,7 @@ class leavelog extends Controller
             $leaves_t_pages = $leaves_result["total_pages"];
         } 
 
-        return view('contents.LeaveLog.leavelog', [
+        return view('contents.WorkManage.leavelog', [
             'leaves'            => $leaves,
             'leaves_page'       => $leaves_page, 
             'leaves_t_pages'    => $leaves_t_pages, 
@@ -169,7 +169,7 @@ class leavelog extends Controller
             array_push($types, (object) array('name' => '可用休假', 'hours' => $leave_day*8));
         }
 
-        return view('contents.LeaveLog.individuallog', [
+        return view('contents.WorkManage.individuallog', [
             'user_no'           => $user_no, 
             'cname'             => $cname,
             'onboard_date'      => $onboard_date,

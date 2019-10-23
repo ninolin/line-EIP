@@ -37,8 +37,10 @@ Route::middleware('auth')->get('/work/setting/title', 'View\WorkSetting\title@cr
 Route::middleware('auth')->get('/work/setting/leavetype', 'View\WorkSetting\leavetype@create')->name('ws_leavetype');
 Route::middleware('auth')->get('/work/setting/overworktype', 'View\WorkSetting\overworktype@create')->name('ws_overworktype');
 Route::middleware('auth')->get('/work/setting/linedefaultmsg', 'View\WorkSetting\LineDefaultMessage@show_page')->name('ws_linedefaultmsg');
-Route::middleware('auth')->get('/leavelog/last', 'View\LeaveLog\leavelog@show_last')->name('ll_last');
-Route::middleware('auth')->get('/leavelog/individual', 'View\LeaveLog\leavelog@show_individual')->name('ll_individual');
+Route::middleware('auth')->get('/work/manage/last', 'View\WorkManage\leavelog@show_last')->name('wm_last');
+Route::middleware('auth')->get('/work/manage/individual', 'View\WorkManage\leavelog@show_individual')->name('wm_individual');
+Route::middleware('auth')->get('/work/manage/applyleave', 'View\WorkManage\applyleave@show_view')->name('wm_applyleave');
+Route::middleware('auth')->get('/work/manage/applyoverwork', 'View\WorkManage\applyoverwork@show_view')->name('wm_applyoverwork');
 Route::middleware('auth')->get('/webpo/applyleave', 'View\WebPersonalOperate\applyleave@show_view')->name('webpo_applyleave');
 Route::middleware('auth')->get('/webpo/applyoverwork', 'View\WebPersonalOperate\applyoverwork@show_view')->name('webpo_applyoverwork');
 Route::middleware('auth')->get('/webpo/validate', 'View\WebPersonalOperate\validate@show_view')->name('webpo_validate');

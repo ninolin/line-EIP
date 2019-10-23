@@ -6,8 +6,10 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Input;
 use App\Repositories\UserRepository;
-use DB;
 use App\Console\commands\CalcLeaveDays;
+use DB;
+use Exception;
+use Log;
 
 class userlist extends Controller
 {
@@ -163,6 +165,32 @@ class userlist extends Controller
             'status' => 'successful',
             'data' => $user
         ]);
+    }
+
+    /**
+     * 取得用戶的個人資料
+     * 
+     * @author nino
+     * @return \Illuminate\Http\Response
+     */
+    public function get_user_data(Request $request, $id)
+    {
+        try {    
+            $user_profile = $this->userRepo->findUserByUserNo($id);
+            if(count($user_profile) == 1) {
+                return response()->json([
+                    'status' => 'successful',
+                    'data' => $user_profile[0]
+                ]);
+            } else {
+                throw new Exception('user not found'); 
+            }
+        } catch (Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => $e->getMessage()
+            ]);
+        }
     }
 
     public function get_annualleave(Request $request, $id)
