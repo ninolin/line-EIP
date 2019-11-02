@@ -440,7 +440,8 @@
     })
     .then(v => {
         if(v.status == "successful") {
-          $('#validateModal').modal('toggle');
+          window.location.reload();
+          //$('#validateModal').modal('toggle');
         } 
     })
   }
