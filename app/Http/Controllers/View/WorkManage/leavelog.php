@@ -164,9 +164,16 @@ class leavelog extends Controller
                     }
                 }
             }
-
-            $leave_day = $this->calcL->calc_leavedays($onboard_date, $leave_year."-01-01");
-            array_push($types, (object) array('name' => '可用休假', 'hours' => $leave_day*8));
+            if(!is_null($onboard_date)) {
+                $leave_day = $this->calcL->calc_leavedays($onboard_date, $leave_year."-01-01");
+                if($leave_day == 10000) {
+                    $leave_day = 0;
+                }
+                array_push($types, (object) array('name' => '可用休假', 'hours' => $leave_day*8));
+            } else {
+                $onboard_date = '未設定';
+            }
+            
         }
 
         return view('contents.WorkManage.individuallog', [

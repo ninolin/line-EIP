@@ -56,6 +56,7 @@ class individuallog extends Controller
         $leaves_t_pages     = 0;
         $overworks_t_pages  = 0;
         $agents_t_pages     = 0;
+        $leave_day          = 0;
         $onboard_date       = "";
         $cname              = "";
         $user_no            = \Session::get('user_no') ?? null;
@@ -95,8 +96,14 @@ class individuallog extends Controller
                     }
                 }
             }
-
-            $leave_day = $this->calcL->calc_leavedays($onboard_date, $leave_year."-01-01");
+            if(!is_null($onboard_date)) {
+                $leave_day = $this->calcL->calc_leavedays($onboard_date, $leave_year."-01-01");
+                if($leave_day == 10000) {
+                    $leave_day = 0;
+                }
+            } else {
+                $onboard_date = '未設定';
+            }
             array_push($types, (object) array('name' => '可用休假', 'hours' => $leave_day*8));
         }
 

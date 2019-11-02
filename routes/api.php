@@ -49,7 +49,7 @@ Route::post('overworktype', 'View\WorkSetting\overworktype@store');
 Route::put('overworktype/{id}', 'View\WorkSetting\overworktype@update');
 Route::delete('overworktype/{id}', 'View\WorkSetting\overworktype@destroy');
 
-Route::get('leavelog/process/{id}', 'View\LeaveWorkManageLog\leavelog@list_process_logs');
+Route::get('leavelog/process/{id}', 'View\WorkManage\leavelog@list_process_logs');
 Route::get('leavelog/changelog/{id}', 'View\WorkManage\leavelog@list_change_logs');
 Route::put('leavelog/change_upper_user', 'View\WorkManage\leavelog@change_upper_user');
 Route::put('leavelog/change_agent_user', 'View\WorkManage\leavelog@change_agent_user');

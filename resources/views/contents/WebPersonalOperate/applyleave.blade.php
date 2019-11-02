@@ -15,7 +15,7 @@
             <label>代理人</label>
             <select class="form-control" id="leaveAgent">
                 @foreach($users as $user)
-                    <option value="{{$user->NO}}">{{$user->cname}}</option>
+                    <option value="{{$user->NO}}" @if($user->NO == $default_agent_user_no) selected @endif>{{$user->cname}}</option>
                 @endforeach
             </select>
         </div>

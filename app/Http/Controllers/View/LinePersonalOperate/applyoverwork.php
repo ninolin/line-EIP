@@ -122,7 +122,7 @@ class applyoverwork extends Controller
 
             //通知申請人、代理人、第一簽核人
             //發出line通知
-            $this->sendLineMessageService->sendApplyNotify($last_appy_id, 'overwork');
+            $this->sendLineMessageService->sendNotify($last_appy_id, 'apply_overwork');
 
             return response()->json([
                 'status' => 'successful'

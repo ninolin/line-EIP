@@ -41,24 +41,24 @@ class applyleave extends Controller
             echo 'user no not found';
             exit;
         }  
-
         $startHour = date_format(date_create($user_profile[0]->work_start),"H");
         $startMin = date_format(date_create($user_profile[0]->work_start),"i");
         $endHour = date_format(date_create($user_profile[0]->work_end),"H");
         $endMin = date_format(date_create($user_profile[0]->work_end),"i");
-
+        $default_agent_user_no = $user_profile[0]->default_agent_user_no;
         return view('contents.WebPersonalOperate.applyleave', [
-            'leavetypes'    => $leavetypes,
-            'users'         => $users,
-            'user_profile'  => $user_profile,
-            'nowdate'       => date("Y-m-d"),
-            'user_id'       => $user_no,
-            'tab'           => 'applyleave',
-            'hours_select'  => $hours_select,
-            'startHour'     => $startHour,
-            'startMin'      => $startMin,
-            'endHour'       => $endHour,
-            'endMin'        => $endMin
+            'leavetypes'            => $leavetypes,
+            'users'                 => $users,
+            'user_profile'          => $user_profile,
+            'nowdate'               => date("Y-m-d"),
+            'user_id'               => $user_no,
+            'tab'                   => 'applyleave',
+            'hours_select'          => $hours_select,
+            'startHour'             => $startHour,
+            'startMin'              => $startMin,
+            'endHour'               => $endHour,
+            'endMin'                => $endMin,
+            'default_agent_user_no' => $default_agent_user_no
         ]);
     }
 }

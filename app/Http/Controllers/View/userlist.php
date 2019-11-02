@@ -211,7 +211,17 @@ class userlist extends Controller
 
     public function cal_laborannualleave(Request $request, $onboard_date)
     {
-        $labor_annual_leaves = $this->calcL->calc_leavedays($onboard_date, date("Y")."-01-01");
+        $labor_annual_leaves = 0;
+        $onboard_array = explode('-',$onboard_date);
+
+        $onboard_y = $onboard_array[0];
+        $onboard_m = $onboard_array[1];
+        $onboard_d = $onboard_array[2];
+        if($onboard_y == date("Y") && (date("m")-$onboard_m>=6)) {
+            $labor_annual_leaves = $this->calcL->calc_leavedays($onboard_date, date("Y")."-".($onboard_m+6)."-".$onboard_d);
+        } else {
+            $labor_annual_leaves = $this->calcL->calc_leavedays($onboard_date, date("Y")."-01-01");
+        }
         if($labor_annual_leaves == 10000) {
             $labor_annual_leaves = 0;
         }

@@ -168,40 +168,46 @@
               </tr>
             </thead>
             <tbody>
-              @foreach($overworks as $overwork)
-                <tr>
-                  <td> {{$overwork->cname}} </td>
-                  <td> {{$overwork->over_work_date}} </td>
-                  <td> {{$overwork->over_work_hours}}小時 </td>
-                  <td> {{$overwork->comment}} </td>
-                  <td> {{$overwork->apply_time}} </td>
-                  <td> 
-                    @if ($overwork->apply_status == 'Y')
-                        已通過
-                    @elseif ($overwork->apply_status == 'N')
-                        已拒絕
-                    @elseif ($overwork->apply_status == 'C')
-                        已取消
-                    @else
-                        簽核中
-                    @endif
-                  </td>
-                  <td>  
-                    <div class="btn-group">
-                      <button type="button" class="btn btn-primary dropdown-toggle btn-sm" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        操作
-                      </button>
-                      <div class="dropdown-menu dropdown-menu-right">
-                        <a class="dropdown-item" href="#" onclick="showDetailModal({{$overwork->id}}, {{$login_user_no}}, 'O')">簽核紀錄</a>
-                        <a class="dropdown-item" href="#" onclick="showChangeLogModal({{$overwork->id}})">更新紀錄</a>
-                        @if ($overwork->apply_status != 'N' && $overwork->apply_status != 'C') 
-                          <a class="dropdown-item" href="#" onclick="showChangeOverworkDateModal({{$overwork->id}}, {{$login_user_no}})">更新起迄</a>
-                        @endif
+              @if (count($overworks) > 0)
+                @foreach($overworks as $overwork)
+                  <tr>
+                    <td> {{$overwork->cname}} </td>
+                    <td> {{$overwork->over_work_date}} </td>
+                    <td> {{$overwork->over_work_hours}}小時 </td>
+                    <td> {{$overwork->comment}} </td>
+                    <td> {{$overwork->apply_time}} </td>
+                    <td> 
+                      @if ($overwork->apply_status == 'Y')
+                          已通過
+                      @elseif ($overwork->apply_status == 'N')
+                          已拒絕
+                      @elseif ($overwork->apply_status == 'C')
+                          已取消
+                      @else
+                          簽核中
+                      @endif
+                    </td>
+                    <td>  
+                      <div class="btn-group">
+                        <button type="button" class="btn btn-primary dropdown-toggle btn-sm" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                          操作
+                        </button>
+                        <div class="dropdown-menu dropdown-menu-right">
+                          <a class="dropdown-item" href="#" onclick="showDetailModal({{$overwork->id}}, {{$login_user_no}}, 'O')">簽核紀錄</a>
+                          <a class="dropdown-item" href="#" onclick="showChangeLogModal({{$overwork->id}})">更新紀錄</a>
+                          @if ($overwork->apply_status != 'N' && $overwork->apply_status != 'C') 
+                            <a class="dropdown-item" href="#" onclick="showChangeOverworkDateModal({{$overwork->id}}, {{$login_user_no}})">更新起迄</a>
+                          @endif
+                        </div>
                       </div>
-                    </div>
-                  </td>
+                    </td>
+                  </tr>
+                @endforeach
+              @else
+                <tr>
+                  <td colspan=7 class="text-center">目前無資料</td>
                 </tr>
-              @endforeach
+              @endif
             </tbody>
           </table>
       </div>
@@ -239,6 +245,7 @@
               </tr>
           </thead>
           <tbody>
+            @if (count($agents) > 0)
               @foreach($agents as $agent)
                 <tr>
                   <td> {{$agent->cname}} </td>
@@ -300,6 +307,11 @@
                   </td>
                 </tr>
               @endforeach
+            @else
+              <tr>
+                <td colspan=9 class="text-center">目前無資料</td>
+              </tr>
+            @endif
           </tbody>
         </table>
       </div>

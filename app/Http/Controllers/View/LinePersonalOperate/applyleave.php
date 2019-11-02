@@ -120,7 +120,10 @@ class applyleave extends Controller
             $apply_user_cname = $user['data']->cname;
             $apply_work_class_id = $user['data']->work_class_id; 
             $apply_user_line_id = $user['data']->line_id; 
-
+            //檢查是否有設定班別
+            if($apply_work_class_id == 0) {
+                throw new Exception('請先設定班別'); 
+            }
             //檢查請假是否有其它休假
             if($this->leaveApplyRepo->check_leave_is_overlap($apply_user_no, $start_datetime)) {
                 throw new Exception('請假期間內已有其它休假'); 
@@ -159,7 +162,7 @@ class applyleave extends Controller
             }
             //檢查休假時間是否大於最小請假時間
             $diff_min = floor((strtotime($end_date." ".$end_time)-strtotime($start_date." ".$start_time))%86400/60); //請假分鐘
-            if((int)$diff_min <= (int)$leave_min_time) throw new Exception('最小請假時間為'.$leave_min_time.'分鐘'); 
+            if((int)$diff_min < (int)$leave_min_time) throw new Exception('最小請假時間為'.$leave_min_time.'分鐘'); 
 
             //計算請假小時
             $leave_hours = 0;
