@@ -68,13 +68,13 @@
   </div>
   <nav @if ($user_no == 0) style="display:none" @endif>
     <div class="nav nav-tabs" id="nav-tab" role="tablist">
-      <a class="nav-item nav-link active" id="nav-leave-tab" data-toggle="tab" href="#nav-leave" role="tab" aria-controls="nav-leave" aria-selected="true">休假</a>
-      <a class="nav-item nav-link" id="nav-overwork-tab" data-toggle="tab" href="#nav-overwork" role="tab" aria-controls="nav-overwork" aria-selected="false">加班</a>
-      <a class="nav-item nav-link" id="nav-agent-tab" data-toggle="tab" href="#nav-agent" role="tab" aria-controls="nav-agent" aria-selected="false">代理人</a>
+      <a class="nav-item nav-link @if ($show_tab === 'leave') active @endif" id="nav-leave-tab" data-toggle="tab" href="#nav-leave" role="tab" aria-controls="nav-leave" aria-selected="true">休假</a>
+      <a class="nav-item nav-link @if ($show_tab === 'overwork') active @endif" id="nav-overwork-tab" data-toggle="tab" href="#nav-overwork" role="tab" aria-controls="nav-overwork" aria-selected="false">加班</a>
+      <a class="nav-item nav-link @if ($show_tab === 'agent') active @endif" id="nav-agent-tab" data-toggle="tab" href="#nav-agent" role="tab" aria-controls="nav-agent" aria-selected="false">代理人</a>
     </div>
   </nav>
   <div class="tab-content" id="nav-tabContent" @if ($user_no == 0) style="display:none" @endif>
-    <div class="tab-pane fade show active" id="nav-leave" role="tabpanel" aria-labelledby="nav-leave-tab">
+    <div class="tab-pane fade @if ($show_tab === 'leave') show active @endif" id="nav-leave" role="tabpanel" aria-labelledby="nav-leave-tab">
       <div class="row p-lg-3">
         <table class="table table-bordered table-striped">
           <thead class="table-thead">
@@ -91,6 +91,7 @@
               </tr>
           </thead>
           <tbody>
+            @if (count($leaves) > 0)
               @foreach($leaves as $leave)
                 <tr>
                   <td> {{$leave->cname}} </td>
@@ -133,6 +134,11 @@
                   </td>
                 </tr>
               @endforeach
+            @else
+              <tr>
+                <td colspan=9 class="text-center">目前無資料</td>
+              </tr>
+            @endif
           </tbody>
         </table>
       </div>
@@ -141,19 +147,19 @@
           <nav aria-label="Page navigation example">
           <ul class="pagination justify-content-center">
             <li class="page-item @if ($leaves_page == 1) disabled @endif ">
-              <a class="page-link" href="./individual?leave_year={{$leave_year}}&search={{$search}}&leaves_page={{ $leaves_page-1 }}&overworks_page={{ $overworks_page }}&agents_page={{ $agents_page }}">上一頁</a>
+              <a class="page-link" href="./individual?leave_year={{$leave_year}}&show_tab=leave&search={{$search}}&leaves_page={{ $leaves_page-1 }}&overworks_page={{ $overworks_page }}&agents_page={{ $agents_page }}">上一頁</a>
             </li>
             @for ($i = 1; $i <= $leaves_t_pages; $i++)
-              <li class="page-item @if ($i == $leaves_page) active @endif"><a class="page-link" href="./individual?leave_year={{$leave_year}}&search={{$search}}&leaves_page={{ $i }}&overworks_page={{ $overworks_page }}&agents_page={{ $agents_page }}">{{$i}}</a></li>
+              <li class="page-item @if ($i == $leaves_page) active @endif"><a class="page-link" href="./individual?leave_year={{$leave_year}}&show_tab=leave&search={{$search}}&leaves_page={{ $i }}&overworks_page={{ $overworks_page }}&agents_page={{ $agents_page }}">{{$i}}</a></li>
             @endfor
             <li class="page-item @if ($leaves_page == $leaves_t_pages) disabled @endif">
-              <a class="page-link" href="./individual?leave_year={{$leave_year}}&search={{$search}}&leaves_page={{ $leaves_page+1 }}&overworks_page={{ $overworks_page }}&agents_page={{ $agents_page }}">下一頁</a>
+              <a class="page-link" href="./individual?leave_year={{$leave_year}}&show_tab=leave&search={{$search}}&leaves_page={{ $leaves_page+1 }}&overworks_page={{ $overworks_page }}&agents_page={{ $agents_page }}">下一頁</a>
             </li>
           </ul>
         </div>
       </div>
     </div>
-    <div class="tab-pane fade" id="nav-overwork" role="tabpanel" aria-labelledby="nav-overwork-tab">
+    <div class="tab-pane fade @if ($show_tab === 'overwork') show active @endif" id="nav-overwork" role="tabpanel" aria-labelledby="nav-overwork-tab">
       <div class="row p-lg-3">
         <table class="table table-bordered table-striped">
             <thead class="table-thead">
@@ -216,19 +222,19 @@
           <nav aria-label="Page navigation example">
           <ul class="pagination justify-content-center">
             <li class="page-item @if ($overworks_page == 1) disabled @endif ">
-              <a class="page-link" href="./individual?leave_year={{$leave_year}}&search={{$search}}&leaves_page={{ $leaves_page }}&overworks_page={{ $overworks_page-1 }}&agents_page={{ $agents_page }}">上一頁</a>
+              <a class="page-link" href="./individual?leave_year={{$leave_year}}&show_tab=overwork&search={{$search}}&leaves_page={{ $leaves_page }}&overworks_page={{ $overworks_page-1 }}&agents_page={{ $agents_page }}">上一頁</a>
             </li>
             @for ($i = 1; $i <= $overworks_t_pages; $i++)
-              <li class="page-item @if ($i == $overworks_page) active @endif"><a class="page-link" href="./individual?leave_year={{$leave_year}}&search={{$search}}&leaves_page={{ $leaves_page }}&overworks_page={{ $i }}&agents_page={{ $agents_page }}">{{$i}}</a></li>
+              <li class="page-item @if ($i == $overworks_page) active @endif"><a class="page-link" href="./individual?leave_year={{$leave_year}}&show_tab=overwork&search={{$search}}&leaves_page={{ $leaves_page }}&overworks_page={{ $i }}&agents_page={{ $agents_page }}">{{$i}}</a></li>
             @endfor
             <li class="page-item @if ($overworks_page == $overworks_t_pages) disabled @endif">
-              <a class="page-link" href="./individual?leave_year={{$leave_year}}&search={{$search}}&leaves_page={{ $leaves_page }}&overworks_page={{ $overworks_page+1 }}&agents_page={{ $agents_page }}">下一頁</a>
+              <a class="page-link" href="./individual?leave_year={{$leave_year}}&show_tab=overwork&search={{$search}}&leaves_page={{ $leaves_page }}&overworks_page={{ $overworks_page+1 }}&agents_page={{ $agents_page }}">下一頁</a>
             </li>
           </ul>
         </div>
       </div>
     </div>
-    <div class="tab-pane fade" id="nav-agent" role="tabpanel" aria-labelledby="nav-agent-tab">
+    <div class="tab-pane fade @if ($show_tab === 'agent') show active @endif" id="nav-agent" role="tabpanel" aria-labelledby="nav-agent-tab">
       <div class="row p-lg-3">
         <table class="table table-bordered table-striped">
           <thead class="table-thead">
@@ -320,13 +326,13 @@
           <nav aria-label="Page navigation example">
           <ul class="pagination justify-content-center">
             <li class="page-item @if ($agents_page == 1) disabled @endif ">
-              <a class="page-link" href="./individual?leave_year={{$leave_year}}&search={{$search}}&leaves_page={{ $leaves_page }}&overworks_page={{ $overworks_page }}&agents_page={{ $agents_page-1 }}">上一頁</a>
+              <a class="page-link" href="./individual?leave_year={{$leave_year}}&show_tab=agent&search={{$search}}&leaves_page={{ $leaves_page }}&overworks_page={{ $overworks_page }}&agents_page={{ $agents_page-1 }}">上一頁</a>
             </li>
             @for ($i = 1; $i <= $agents_t_pages; $i++)
-              <li class="page-item @if ($i == $agents_page) active @endif"><a class="page-link" href="./individual?leave_year={{$leave_year}}&search={{$search}}&leaves_page={{ $leaves_page }}&overworks_page={{ $overworks_page }}&agents_page={{ $i }}">{{$i}}</a></li>
+              <li class="page-item @if ($i == $agents_page) active @endif"><a class="page-link" href="./individual?leave_year={{$leave_year}}&show_tab=agent&search={{$search}}&leaves_page={{ $leaves_page }}&overworks_page={{ $overworks_page }}&agents_page={{ $i }}">{{$i}}</a></li>
             @endfor
             <li class="page-item @if ($agents_page == $agents_t_pages) disabled @endif">
-              <a class="page-link" href="./individual?leave_year={{$leave_year}}&search={{$search}}&leaves_page={{ $leaves_page }}&overworks_page={{ $overworks_page }}&agents_page={{ $agents_page+1 }}">下一頁</a>
+              <a class="page-link" href="./individual?leave_year={{$leave_year}}&show_tab=agent&search={{$search}}&leaves_page={{ $leaves_page }}&overworks_page={{ $overworks_page }}&agents_page={{ $agents_page+1 }}">下一頁</a>
             </li>
           </ul>
         </div>
@@ -852,7 +858,7 @@
 
   const showExportModal = () => {
     promise_call({
-      url: "../api/individuallog/leavetype", 
+      url: "../../api/individuallog/leavetype", 
       method: "get"
     })
     .then(v => {

@@ -26,7 +26,7 @@ class AuthController extends Controller
         $users = DB::select('select * from user where username = ? and password = ?', [$account, md5($password)]);
         if(sizeof($users) == 1 ) {
             foreach ($users as $u) {
-                if ($this->auth->setVerified($u->NO, $u->eip_level, null)) {
+                if ($this->auth->setVerified($u->NO, $u->eip_level, $u->username, null)) {
                     return $this->auth->redirect();
                 }
             }
@@ -77,7 +77,7 @@ class AuthController extends Controller
             $users = DB::select('select * from user where gmail = ?', [$profile->email]);
             if(sizeof($users) == 1 ) {
                 foreach ($users as $u) {
-                    if ($this->auth->setVerified($u->NO, $u->eip_level, null)) {
+                    if ($this->auth->setVerified($u->NO, $u->eip_level, $u->username, null)) {
                         return $this->auth->redirect();
                     }
                 }

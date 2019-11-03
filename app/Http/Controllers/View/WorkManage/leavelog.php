@@ -117,6 +117,7 @@ class leavelog extends Controller
         $leaves_page        = Input::get('leaves_page', 1);
         $overworks_page     = Input::get('overworks_page', 1);
         $agents_page        = Input::get('agents_page', 1);
+        $show_tab           = Input::get('show_tab', 'leave');
         $leaves             = [];
         $overworks          = [];
         $agents             = [];
@@ -194,6 +195,7 @@ class leavelog extends Controller
             'leave_year'        => $leave_year,
             'search'            => $search,
             'tab'               => 'individual',
+            'show_tab'          => $show_tab,
             'login_user_no'     => session('user_no')
         ]);
     }

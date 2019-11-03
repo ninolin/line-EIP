@@ -32,6 +32,7 @@
     <div class="ml-md-auto">
         <form method="POST" action="{{ route('doLogout') }}">
             {{ csrf_field() }}
+            <span style="color: white;margin-right: 15px;">Hi, {{ Session::get('user_name') }}</span>
             <button class="btn-c">登出</button>
         </form>
     </div>

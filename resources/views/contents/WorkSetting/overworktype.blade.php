@@ -44,13 +44,13 @@
       <nav aria-label="Page navigation example">
       <ul class="pagination justify-content-center">
         <li class="page-item @if ($page == 1) disabled @endif ">
-          <a class="page-link" href="./titlelist?page={{ $page-1 }}">上一頁</a>
+          <a class="page-link" href="./overworktype?page={{ $page-1 }}">上一頁</a>
         </li>
         @for ($i = 1; $i <= $total_pages; $i++)
-          <li class="page-item @if ($i == $page) active @endif"><a class="page-link" href="./titlelist?page={{ $i }}">{{$i}}</a></li>
+          <li class="page-item @if ($i == $page) active @endif"><a class="page-link" href="./overworktype?page={{ $i }}">{{$i}}</a></li>
         @endfor
         <li class="page-item @if ($page == $total_pages) disabled @endif">
-          <a class="page-link" href="./titlelist?page={{ $page+1 }}">下一頁</a>
+          <a class="page-link" href="./overworktype?page={{ $page+1 }}">下一頁</a>
         </li>
       </ul>
     </div>

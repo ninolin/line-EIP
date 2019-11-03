@@ -54,7 +54,7 @@ class LeaveApplyRepository {
     {
         try {
             $count_data = [];
-            $count_sql = 'select count(1) as count from eip_leave_apply where apply_type = "L" ';
+            $count_sql = 'select if(count(1) = 0, 1, count(1)) as count from eip_leave_apply where apply_type = "L" ';
             
             $query_data = [];
             $sql  = 'select 
@@ -141,7 +141,7 @@ class LeaveApplyRepository {
     {
         try {
             $count_data = [];
-            $count_sql = 'select count(1) as count from eip_leave_apply where apply_type = "O" ';
+            $count_sql = 'select if(count(1) = 0, 1, count(1)) as count from eip_leave_apply where apply_type = "O" ';
             
             $query_data = [];
             $sql  = 'select 
@@ -217,7 +217,7 @@ class LeaveApplyRepository {
     ) 
     {
         try {
-            $total_logs = DB::select('select count(1) as count from eip_leave_apply where agent_user_no =? and apply_type = "L"', [$user_no]);
+            $total_logs = DB::select('select if(count(1) = 0, 1, count(1)) as count from eip_leave_apply where agent_user_no =? and apply_type = "L"', [$user_no]);
             $total_pages = ceil($total_logs[0]->count/10);
 
             $query_data = [$user_no];

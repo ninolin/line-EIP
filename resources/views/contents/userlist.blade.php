@@ -101,16 +101,16 @@
     <div class="col-md-6 offset-md-3">
       <nav aria-label="Page navigation example">
       <ul class="pagination justify-content-center">
-        <li class="page-item @if ($page == 1) disabled @endif " onclick="reload_page({{$page-1}}, '{{$order_col}}', '{{$order_type}}', 'page')">
-          <a class="page-link">上一頁</a>
+        <li class="page-item @if ($page == 1) disabled @endif ">
+          <a class="page-link" onclick="reload_page({{$page-1}}, '{{$order_col}}', '{{$order_type}}', 'page')">上一頁</a>
         </li>
         @for ($i = 1; $i <= $total_pages; $i++)
           <li class="page-item @if ($i == $page) active @endif" onclick="reload_page({{$i}}, '{{$order_col}}', '{{$order_type}}', 'page')">
             <a class="page-link">{{$i}}</a>
           </li>
         @endfor
-        <li class="page-item @if ($page == $total_pages) disabled @endif" onclick="reload_page({{$page+1}}, '{{$order_col}}', '{{$order_type}}', 'page')">
-          <a class="page-link">下一頁</a>
+        <li class="page-item @if ($page == $total_pages) disabled @endif" >
+          <a class="page-link" onclick="reload_page({{$page+1}}, '{{$order_col}}', '{{$order_type}}', 'page')">下一頁</a>
         </li>
       </ul>
     </div>
