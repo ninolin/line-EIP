@@ -598,7 +598,7 @@
 
   const showDetailModal = async (apply_id, login_user_no, apply_type) => {
       const users_res = await promise_call({
-        url: "../api/userlist", 
+        url: "../../api/userlist", 
         method: "get"
       });
       let all_users = [];
@@ -611,7 +611,7 @@
       }
 
       const res = await promise_call({
-          url: "../api/leavelog/process/"+apply_id, 
+          url: "../../api/leavelog/process/"+apply_id, 
           method: "get"
       });
 
@@ -671,7 +671,7 @@
 
   const change_leave_date = (apply_id, login_user_no) => {
     promise_call({
-      url: "../api/leavelog/change_leave_date", 
+      url: "../../api/leavelog/change_leave_date", 
       data: {
         "apply_id": apply_id,
         "new_leave_start_date": $('#changeLeaveDateModal').find('.new_leave_start_date').val(),
@@ -706,7 +706,7 @@
 
   const change_overwork_date = (apply_id, login_user_no) => {
     promise_call({
-      url: "../api/leavelog/change_overwork_date", 
+      url: "../../api/leavelog/change_overwork_date", 
       data: {
         "apply_id": apply_id,
         "new_overwork_date": $('#changeOverworkDateModal').find('.new_overwork_date').val(),
@@ -759,7 +759,7 @@
   const change_upper_user = (apply_id, apply_process_id, login_user_no, apply_type) => {
     const user_NO = $("#upper_user_select_"+apply_process_id).val();
     promise_call({
-      url: "../api/leavelog/change_upper_user", 
+      url: "../../api/leavelog/change_upper_user", 
       data: {
         "apply_id": apply_id,
         "apply_type": apply_type, 
@@ -809,7 +809,7 @@
   const change_agent_user = (tag_name, apply_id, old_agent_user_no, login_user_no) => {
     const user_no = $("#"+tag_name).val();
     promise_call({
-      url: "../api/leavelog/change_agent_user", 
+      url: "../../api/leavelog/change_agent_user", 
       data: {
         "apply_id": apply_id,
         "user_NO": user_no,
@@ -832,7 +832,7 @@
 
   const showChangeLogModal = async (apply_id) => {
     const res = await promise_call({
-          url: "../api/leavelog/changelog/"+apply_id, 
+          url: "../../api/leavelog/changelog/"+apply_id, 
           method: "get"
     });
     if(res.status == "successful") {
@@ -851,7 +851,7 @@
 
   const get_applyleave = (apply_id) => {
     return promise_call({
-        url: "../api/applyleave/"+apply_id, 
+        url: "../../api/applyleave/"+apply_id, 
         method: "get"
     })
   }
