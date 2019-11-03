@@ -18,26 +18,37 @@
 </style>
 <div class="container-fluid pt-lg-4">
   <div class="row p-lg-3" @if ($user_no == 0) style="display:none" @endif>
-    <table class="table table-bordered table-striped">
-      <thead class="table-thead">
-        <tr>
-          <th scope="col">員工</th>
-          <th scope="col">到職日:</th>
-          @foreach($types as $type)
-            <th scope="col">{{$type->name}}</th>
-          @endforeach
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td scope="col">{{$cname}}</td>
-          <td scope="col">{{$onboard_date}}</td>
-          @foreach($types as $type)
-            <td> {{$type->hours}}小時 </td>
-          @endforeach
-        </tr>
-      </tbody>
-    </table>
+    <form name="search_form" method="GET" action="./individual" style="width:100%">  
+      <table class="table table-bordered table-striped">
+        <thead class="table-thead">
+          <tr>
+            <th scope="col">年份</th>
+            <th scope="col">員工</th>
+            <th scope="col">到職日:</th>
+            @foreach($types as $type)
+              <th scope="col">{{$type->name}}</th>
+            @endforeach
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td scope="col">
+              <select name="leave_year" class="browser-default custom-select" onchange="change_year()">
+                <option value="2019" @if ($leave_year == '2019') selected @endif>2019</option>
+                <option value="2020" @if ($leave_year == '2020') selected @endif>2020</option>
+                <option value="2021" @if ($leave_year == '2021') selected @endif>2021</option>
+                <option value="2022" @if ($leave_year == '2022') selected @endif>2022</option>
+              </select>
+            </td>
+            <td scope="col">{{$cname}}</td>
+            <td scope="col">{{$onboard_date}}</td>
+            @foreach($types as $type)
+              <td> {{$type->hours}}小時 </td>
+            @endforeach
+          </tr>
+        </tbody>
+      </table>
+    </form>
   </div>
   <nav @if ($user_no == 0) style="display:none" @endif>
     <div class="nav nav-tabs" id="nav-tab" role="tablist">
@@ -467,6 +478,9 @@
     })
   }
 
+  const change_year = () => {
+    document.forms['search_form'].submit();
+  }
   window.onload = function() {
     $('.blade_select2').select2();
   };
