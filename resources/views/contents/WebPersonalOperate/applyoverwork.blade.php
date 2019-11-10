@@ -52,7 +52,7 @@
         })
         .then(v => {
             if(v.status == "successful") {
-                alert("申請成功");
+                alert("送簽中");
             } else {
                 alert(v.message);
             }

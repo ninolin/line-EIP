@@ -125,7 +125,7 @@ class applyleave extends Controller
                 throw new Exception('請先設定班別'); 
             }
             //檢查請假是否有其它休假
-            if($this->leaveApplyRepo->check_leave_is_overlap($apply_user_no, $start_datetime)) {
+            if($this->leaveApplyRepo->check_leave_is_overlap($apply_user_no, $start_datetime, $end_datetime)) {
                 throw new Exception('請假期間內已有其它休假'); 
             }
             //檢查請假合理性-檢查代理人在該假單請假時間中是否也正在請假

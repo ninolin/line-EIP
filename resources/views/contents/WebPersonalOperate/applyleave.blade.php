@@ -22,7 +22,7 @@
         <div><label>休假開始時間</label></div>
         <div class="row form-group">
             <div class="col-6">
-                <input class="form-control" id="startDate" type="date" value="{{$nowdate}}"/>
+                <input class="form-control" id="startDate" type="date" value="{{$nowdate}}" onchange="change_startdate()"/>
             </div>
             <div class="col-3">
                 <select class="form-control" id="startHour">
@@ -86,6 +86,14 @@
                 return;
             }
         }
+
+        const start_time = new Date(post_data.startDate);
+        const end_time = new Date(post_data.endDate);
+        if(start_time >= end_time) {
+            alert("結束時間需大於開始時間");
+            return;
+        } 
+
         post_data.comment = $("#comment").val();
         promise_call({
             url: "/api/applyleave", 
@@ -94,11 +102,15 @@
         })
         .then(v => {
             if(v.status == "successful") {
-                alert("申請成功");
+                alert("送簽中");
             } else {
                 alert(v.message);
             }
         })
+    }
+
+    const change_startdate = () => {
+        $("#endDate").val($("#startDate").val())
     }
 </script>
 @endsection

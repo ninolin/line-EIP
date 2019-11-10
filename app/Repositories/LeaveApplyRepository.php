@@ -435,7 +435,7 @@ class LeaveApplyRepository {
         }
     }
 
-    public function check_leave_is_overlap($user_no, $start_datetime) 
+    public function check_leave_is_overlap($user_no, $start_datetime, $end_datetime) 
     {
         try {
             $overlap = false;
@@ -444,12 +444,13 @@ class LeaveApplyRepository {
                     from 
                         eip_leave_apply 
                     where 
-                        apply_user_no =? and 
-                        start_date <= ? and 
-                        end_date >= ? and 
+                        apply_user_no =? and  
                         apply_type = "L" and 
-                        apply_status IN("Y", "P")';
-            $data = DB::select($sql, [$user_no, $start_datetime, $start_datetime]);
+                        apply_status IN("Y", "P") and (
+                            (start_date <= ? and end_date >= ?) or 
+                            (start_date <= ? and end_date >= ?) 
+                        )';
+            $data = DB::select($sql, [$user_no, $start_datetime, $start_datetime, $end_datetime, $end_datetime]);
             if($data[0]->count > 0) {
                 $overlap = true;
             }
