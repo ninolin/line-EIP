@@ -96,11 +96,15 @@
                 <tr>
                   <td> {{$leave->cname}} </td>
                   <td> 
-                    <select class="blade_select2" id='leave_agent_user_select_{{$leave->id}}' onchange='confirm_change_agent_user("leave_agent_user_select_{{$leave->id}}", {{$leave->id}}, {{$leave->agent_user_no}}, "{{$leave->agent_cname}}", {{$login_user_no}})'>
-                      @foreach($users as $u)
-                        <option value='{{$u->NO}}' @if ($u->cname == $leave->agent_cname) selected @endif> {{$u->cname}}</option>
-                      @endforeach
-                    </select>
+                    @if (strtotime($leave->start_date) >= strtotime(date('Y-m-01')))
+                      <select class="blade_select2" id='leave_agent_user_select_{{$leave->id}}' onchange='confirm_change_agent_user("leave_agent_user_select_{{$leave->id}}", {{$leave->id}}, {{$leave->agent_user_no}}, "{{$leave->agent_cname}}", {{$login_user_no}})'>
+                        @foreach($users as $u)
+                          <option value='{{$u->NO}}' @if ($u->cname == $leave->agent_cname) selected @endif> {{$u->cname}}</option>
+                        @endforeach
+                      </select>
+                    @else
+                      {{$leave->agent_cname}}
+                    @endif
                   </td>
                   <td> {{$leave->leave_name}} ({{$leave->leave_hours}}小時) </td>
                   <td> {{strftime('%Y-%m-%d %H:%M', strtotime($leave->start_date))}} </td>
@@ -124,9 +128,13 @@
                         操作
                       </button>
                       <div class="dropdown-menu dropdown-menu-right">
-                        <a class="dropdown-item" href="#" onclick="showDetailModal({{$leave->id}}, {{$login_user_no}}, 'L')">簽核紀錄</a>
+                        @if (strtotime($leave->start_date) >= strtotime(date('Y-m-01')))
+                          <a class="dropdown-item" href="#" onclick="showDetailModal({{$leave->id}}, {{$login_user_no}}, 'L', true)">簽核紀錄</a>
+                        @else
+                          <a class="dropdown-item" href="#" onclick="showDetailModal({{$leave->id}}, {{$login_user_no}}, 'L', false)">簽核紀錄</a>
+                        @endif
                         <a class="dropdown-item" href="#" onclick="showChangeLogModal({{$leave->id}})">更新紀錄</a>
-                        @if ($leave->apply_status != 'N' && $leave->apply_status != 'C') 
+                        @if ($leave->apply_status != 'N' && $leave->apply_status != 'C' && strtotime($leave->start_date) >= strtotime(date('Y-m-01'))) 
                           <a class="dropdown-item" href="#" onclick="showChangeLeaveDateModal({{$leave->id}}, {{$login_user_no}})">更新起迄</a>
                         @endif
                       </div>
@@ -199,9 +207,13 @@
                           操作
                         </button>
                         <div class="dropdown-menu dropdown-menu-right">
-                          <a class="dropdown-item" href="#" onclick="showDetailModal({{$overwork->id}}, {{$login_user_no}}, 'O')">簽核紀錄</a>
+                          @if (strtotime($overwork->over_work_date) >= strtotime(date('Y-m-01')))
+                            <a class="dropdown-item" href="#" onclick="showDetailModal({{$overwork->id}}, {{$login_user_no}}, 'O', true)">簽核紀錄</a>
+                          @else
+                            <a class="dropdown-item" href="#" onclick="showDetailModal({{$overwork->id}}, {{$login_user_no}}, 'O', false)">簽核紀錄</a>
+                          @endif
                           <a class="dropdown-item" href="#" onclick="showChangeLogModal({{$overwork->id}})">更新紀錄</a>
-                          @if ($overwork->apply_status != 'N' && $overwork->apply_status != 'C') 
+                          @if ($overwork->apply_status != 'N' && $overwork->apply_status != 'C' && strtotime($overwork->over_work_date) >= strtotime(date('Y-m-01'))) 
                             <a class="dropdown-item" href="#" onclick="showChangeOverworkDateModal({{$overwork->id}}, {{$login_user_no}})">更新起迄</a>
                           @endif
                         </div>
@@ -256,15 +268,19 @@
                 <tr>
                   <td> {{$agent->cname}} </td>
                   <td> 
-                    <select class="blade_select2" id='agent_agent_user_select_{{$agent->id}}' onchange='confirm_change_agent_user("agent_agent_user_select_{{$agent->id}}", {{$agent->id}}, {{$agent->agent_user_no}}, "{{$agent->agent_cname}}", {{$login_user_no}})'>
-                      @foreach($users as $u)
-                        @if ($u->cname == $agent->agent_cname) 
-                          <option value='{{$u->NO}}' selected> {{$u->cname}}</option>
-                        @else
-                          <option value='{{$u->NO}}'> {{$u->cname}}</option>
-                        @endif
-                      @endforeach
-                    </select>
+                    @if (strtotime($agent->start_date) >= strtotime(date('Y-m-01')))
+                      <select class="blade_select2" id='agent_agent_user_select_{{$agent->id}}' onchange='confirm_change_agent_user("agent_agent_user_select_{{$agent->id}}", {{$agent->id}}, {{$agent->agent_user_no}}, "{{$agent->agent_cname}}", {{$login_user_no}})'>
+                        @foreach($users as $u)
+                          @if ($u->cname == $agent->agent_cname) 
+                            <option value='{{$u->NO}}' selected> {{$u->cname}}</option>
+                          @else
+                            <option value='{{$u->NO}}'> {{$u->cname}}</option>
+                          @endif
+                        @endforeach
+                      </select>
+                    @else
+                      {{ $agent->agent_cname }}
+                    @endif
                   </td>
                   <td> 
                     @if ($agent->apply_type == 'L')
@@ -306,7 +322,11 @@
                         操作
                       </button>
                       <div class="dropdown-menu dropdown-menu-right">
-                        <a class="dropdown-item" href="#" onclick="showDetailModal({{$agent->id}}, {{$login_user_no}}, {{$agent->apply_type}})">簽核紀錄</a>
+                        @if (strtotime($agent->start_date) >= strtotime(date('Y-m-01')))
+                          <a class="dropdown-item" href="#" onclick="showDetailModal({{$agent->id}}, {{$login_user_no}}, '{{$agent->apply_type}}', true)">簽核紀錄</a>
+                        @else
+                          <a class="dropdown-item" href="#" onclick="showDetailModal({{$agent->id}}, {{$login_user_no}}, '{{$agent->apply_type}}', false)">簽核紀錄</a>
+                        @endif  
                         <a class="dropdown-item" href="#" onclick="showChangeLogModal({{$agent->id}})">更新紀錄</a>
                       </div>
                     </div>
@@ -596,7 +616,7 @@
     $("#search_form").submit();
   }
 
-  const showDetailModal = async (apply_id, login_user_no, apply_type) => {
+  const showDetailModal = async (apply_id, login_user_no, apply_type, can_update) => {
       const users_res = await promise_call({
         url: "../../api/userlist", 
         method: "get"
@@ -628,7 +648,11 @@
                 html += "<td>"+item.cname+"</td>";
                 html += "<td>拒絕</td>";
               } else {
-                html += "<td><select id='upper_user_select_"+item.id+"' onchange='confirm_change_upper_user("+item.apply_id+", "+item.id+", "+item.upper_user_no+", \""+item.cname+"\", "+login_user_no+", \""+apply_type+"\")'></select></td>";
+                if(can_update) {
+                  html += "<td><select id='upper_user_select_"+item.id+"' onchange='confirm_change_upper_user("+item.apply_id+", "+item.id+", "+item.upper_user_no+", \""+item.cname+"\", "+login_user_no+", \""+apply_type+"\")'></select></td>";
+                } else {
+                  html += "<td>"+item.cname+"</td>";
+                }
                 html += "<td>未簽核</td>";
               }
               if(item.reject_reason) {
@@ -683,6 +707,8 @@
     })
     .then(v => {
         if(v.status == "successful") {
+          let url_str = location.href.toString();
+          location.href = url_str.substring(0,url_str.length-1)+ "&show_tab=leave";
           $('#changeLeaveDateModal').modal('toggle');
         } else {
           alert(v.message);
@@ -718,6 +744,8 @@
     })
     .then(v => {
         if(v.status == "successful") {
+          let url_str = location.href.toString();
+          location.href = url_str.substring(0,url_str.length-1)+ "&show_tab=overwork";
           $('#changeOverworkDateModal').modal('toggle');
         } else {
           alert(v.message);
