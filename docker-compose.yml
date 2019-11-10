@@ -1,0 +1,40 @@
+version: '3' # 目前使用的版本，可以參考官網：
+networks:
+  laravel-net:
+services:
+  nginx:
+    image: nginx:latest
+    ports:          # 外部露出開放的 port 對應到 docker container 的 port
+      - "80:80"     
+    volumes:        # 要從本地資料夾 mount 掛載進去的資料
+      - .:/var/www  
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - laravel
+      - mysql
+    networks:
+      - laravel-net
+  mysql:
+    image: mysql:5.7
+    restart: unless-stopped
+    tty: true
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_DATABASE: erp_tools
+      MYSQL_USER: erptools
+      MYSQL_PASSWORD: erpapp_erp
+      MYSQL_ROOT_PASSWORD: erpapp_erp
+    networks:
+      - laravel-net
+  laravel:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: php-fpm
+    volumes:
+      - .:/var/www
+    ports:
+      - "9000:9000"
+    networks:
+      - laravel-net
