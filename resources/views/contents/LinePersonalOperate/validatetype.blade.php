@@ -22,12 +22,12 @@
     <script src="https://d.line-scdn.net/liff/1.0/sdk.js"></script>
     <script>
         window.onload = function (e) {
-            // liff.init(function (data) {
-            //     initializeApp(data);
-            // }, function (err) {
-            //     alert(err);
-            // });
-            initializeApp({context: {userId: "U8d41dfb18097f57080858e39b929ce39"}});
+            liff.init(function (data) {
+                initializeApp(data);
+            }, function (err) {
+                alert(err);
+            });
+            //initializeApp({context: {userId: "U8d41dfb18097f57080858e39b929ce39"}});
         };
 
         function initializeApp(data) {
