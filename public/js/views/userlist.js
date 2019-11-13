@@ -83,7 +83,7 @@ const cal_laborannualleave = () => {
     })
     .then(v => {
         if(v.status == "successful") {
-            $("#labor_annual_leaves").html(v.labor_annual_leaves);
+            $("#labor_annual_leaves").html(v.labor_annual_leaves + "(按勞基法計算)");
         }
     })
 }

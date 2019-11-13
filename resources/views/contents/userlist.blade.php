@@ -192,11 +192,11 @@
               </div>
             </div>
             <div class="row">
-              <label class="col-form-label w-25">勞基法年休:</label>
+              <label class="col-form-label w-25">建議給予年休:</label>
               <label class="col-form-label w-75" id="labor_annual_leaves">勞基法年休:</label>
             </div>
             <div class="row">
-              <label class="col-form-label w-25">年休:</label>
+              <label class="col-form-label w-25">實際給予年休:</label>
               <input type="text" class="form-control w-75" id="annual_leaves">
             </div>
           </div>
