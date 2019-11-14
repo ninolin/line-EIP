@@ -6,7 +6,6 @@ use App\Repositories\UserRepository;
 use App\Repositories\LeaveApplyRepository;
 use App\Providers\LeaveProvider;
 use Log;
-use DB;
 use Exception;
 
 class ApplyLeaveService 
@@ -141,7 +140,7 @@ class ApplyLeaveService
      * @return array    
      */
     public function find_upper($apply_user_no, $user_no, $array, $approved_title_id) {
-        $users = DB::select('select title_id, upper_user_no from user where NO =?', [$user_no]);
+        $users = $this->userRepo->findUserByUserNo($user_no);
         if($users > 0) {
             foreach ($users as $u) {
                 if(
