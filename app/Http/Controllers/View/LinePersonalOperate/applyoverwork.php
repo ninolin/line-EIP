@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Input;
 use App\Repositories\LeaveApplyRepository;
 use App\Services\UserService;
 use App\Services\SendLineMessageService;
+use App\Services\ApplyLeaveService;
 use DB;
 use Log;
 use Exception;
@@ -15,16 +16,19 @@ use Exception;
 class applyoverwork extends Controller
 {
     protected $userService;
+    protected $applyLeaveService;
     protected $leaveApplyRepo;
     protected $sendLineMessageService;
 
     public function __construct(
         UserService $userService,
+        ApplyLeaveService $applyLeaveService,
         LeaveApplyRepository $leaveApplyRepo,
         SendLineMessageService $sendLineMessageService
     )
     {
         $this->userService = $userService;
+        $this->applyLeaveService = $applyLeaveService;
         $this->leaveApplyRepo = $leaveApplyRepo;
         $this->sendLineMessageService = $sendLineMessageService;
     }
@@ -111,7 +115,7 @@ class applyoverwork extends Controller
             }
             
             //寫入簽核流程紀錄(該table沒有紀錄申請人和簽核人的line_id是因為可能會有換line帳號的情況發生)
-            $upper_users = self::find_upper($apply_user_no, [], $overwork_approved_title_id);
+            $upper_users = $this->applyLeaveService->find_upper($apply_user_no, $apply_user_no, [], $overwork_approved_title_id);
             foreach ($upper_users as $u) {
                 if(DB::insert("insert into eip_leave_apply_process (apply_id, apply_type, apply_user_no, upper_user_no) value (?, ?, ?, ?)", [$last_appy_id, 'O', $apply_user_no, $u]) != 1) {
                     DB::delete("delete from eip_leave_apply where id = ?", [$last_appy_id]);
@@ -149,34 +153,6 @@ class applyoverwork extends Controller
             return  DB::select('select NO, line_id from user where NO in (select upper_user_no from user where NO =?)', [$apply_user_id]);
         }
         return DB::select('select NO, line_id from user where NO in (select upper_user_no from user where line_id =?)', [$apply_user_id]);
-    }
-
-
-    /**
-     * 回傳下一個簽核人，因為有互相指定為下一個簽核人造成無窮迴圈的狀況，所以array最長為10
-     *
-     * @param  int      $user_no
-     * @param  array    $array
-     * @param  int      $approved_title_id
-     * @return array    
-     */
-    static protected function find_upper($user_no, $array, $approved_title_id) {
-        $users = DB::select('select title_id, upper_user_no from user where NO =?', [$user_no]);
-        if($users > 0) {
-            foreach ($users as $u) {
-                if(
-                    $u->upper_user_no != 0 && 
-                    $u->title_id != $approved_title_id && 
-                    count($array) < 10 && 
-                    !in_array($u->upper_user_no, $array)
-                ) {
-                    array_push($array, $u->upper_user_no);
-                    return self::find_upper($u->upper_user_no, $array, $approved_title_id);
-                } else {
-                    return $array;
-                }
-            }
-        }
     }
 
 }

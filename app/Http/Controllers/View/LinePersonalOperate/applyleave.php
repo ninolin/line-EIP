@@ -216,7 +216,7 @@ class applyleave extends Controller
             foreach ($last_appy_record as $v) {
                 $last_appy_id = $v->last_id;
             }
-            $upper_users = self::find_upper($apply_user_no, [], $leave_approved_title_id);
+            $upper_users = $this->applyLeaveService->find_upper($apply_user_no, $apply_user_no, [], $leave_approved_title_id);
             foreach ($upper_users as $u) {
                 //寫入簽核流程紀錄(該table沒有紀錄申請人和簽核人的line_id是因為可能會有換line帳號的情況發生)
                 if(DB::insert("insert into eip_leave_apply_process (apply_id, apply_type, apply_user_no, upper_user_no) value (?, ?, ?, ?)", [$last_appy_id, 'L', $apply_user_no, $u]) != 1) {
@@ -270,33 +270,6 @@ class applyleave extends Controller
             'status'    => 'successful',
             'data'      => $apply_leave
         ]);
-    }
-
-    /**
-     * 回傳下一個簽核人，因為有互相指定為下一個簽核人造成無窮迴圈的狀況，所以array最長為10
-     *
-     * @param  int      $user_no
-     * @param  array    $array
-     * @param  int      $approved_title_id
-     * @return array    
-     */
-    static protected function find_upper($user_no, $array, $approved_title_id) {
-        $users = DB::select('select title_id, upper_user_no from user where NO =?', [$user_no]);
-        if($users > 0) {
-            foreach ($users as $u) {
-                if(
-                    $u->upper_user_no != 0 && 
-                    $u->title_id != $approved_title_id && 
-                    count($array) < 10 && 
-                    !in_array($u->upper_user_no, $array)
-                ) {
-                    array_push($array, $u->upper_user_no);
-                    return self::find_upper($u-> upper_user_no, $array, $approved_title_id);
-                } else {
-                    return $array;
-                }
-            }
-        }
     }
 
     /**

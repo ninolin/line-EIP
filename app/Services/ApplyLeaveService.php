@@ -6,6 +6,7 @@ use App\Repositories\UserRepository;
 use App\Repositories\LeaveApplyRepository;
 use App\Providers\LeaveProvider;
 use Log;
+use DB;
 use Exception;
 
 class ApplyLeaveService 
@@ -124,4 +125,38 @@ class ApplyLeaveService
         }
     }
 
+    /**
+     * 找出簽核路徑，一直找第一簽核人下去，直到下列條件任一發生就停止
+     * 1. 找不到第一簽核人
+     * 2. 找到休假的簽核職等
+     * 3. 回傳下一個簽核人，因為有互相指定為下一個簽核人造成無窮迴圈的狀況，所以array最長為10
+     * 4. 第一簽核人重覆
+     * 5. 第一簽核人等於休假申請人
+     * 
+     * @author nino
+     * @param  int      $apply_user_no
+     * @param  int      $user_no
+     * @param  array    $array
+     * @param  int      $approved_title_id
+     * @return array    
+     */
+    public function find_upper($apply_user_no, $user_no, $array, $approved_title_id) {
+        $users = DB::select('select title_id, upper_user_no from user where NO =?', [$user_no]);
+        if($users > 0) {
+            foreach ($users as $u) {
+                if(
+                    $u->upper_user_no != 0 &&               //找不到第一簽核人
+                    $u->title_id != $approved_title_id &&   //找到休假的簽核職等
+                    count($array) < 10 && 
+                    !in_array($u->upper_user_no, $array) && 
+                    $u->upper_user_no != $apply_user_no
+                ) {
+                    array_push($array, $u->upper_user_no);
+                    return self::find_upper($apply_user_no, $u->upper_user_no, $array, $approved_title_id);
+                } else {
+                    return $array;
+                }
+            }
+        }
+    }
 }
