@@ -447,8 +447,8 @@ class LeaveApplyRepository {
                         apply_user_no =? and  
                         apply_type = "L" and 
                         apply_status IN("Y", "P") and (
-                            (start_date <= ? and end_date >= ?) or 
-                            (start_date <= ? and end_date >= ?) 
+                            (start_date <= ? and end_date > ?) or 
+                            (start_date < ? and end_date >= ?) 
                         )';
             $data = DB::select($sql, [$user_no, $start_datetime, $start_datetime, $end_datetime, $end_datetime]);
             if($data[0]->count > 0) {
@@ -472,7 +472,7 @@ class LeaveApplyRepository {
                         apply_user_no =? and 
                         over_work_date =? and 
                         apply_type = "O" and 
-                        apply_status IN("Y", "P")';
+                        apply_status IN ("Y", "P")';
             $data = DB::select($sql, [$user_no, $overwork_date]);
             if($data[0]->count > 0) {
                 $overlap = true;
