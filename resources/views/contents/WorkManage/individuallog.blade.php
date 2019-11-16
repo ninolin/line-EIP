@@ -96,7 +96,7 @@
                 <tr>
                   <td> {{$leave->cname}} </td>
                   <td> 
-                    @if (strtotime($leave->start_date) >= strtotime(date('Y-m-01')))
+                    @if ($leave->apply_status != 'N' && $leave->apply_status != 'C' && strtotime($leave->start_date) >= strtotime(date('Y-m-01')))
                       <select class="blade_select2" id='leave_agent_user_select_{{$leave->id}}' onchange='confirm_change_agent_user("leave_agent_user_select_{{$leave->id}}", {{$leave->id}}, {{$leave->agent_user_no}}, "{{$leave->agent_cname}}", {{$login_user_no}})'>
                         @foreach($users as $u)
                           <option value='{{$u->NO}}' @if ($u->cname == $leave->agent_cname) selected @endif> {{$u->cname}}</option>
@@ -128,7 +128,7 @@
                         操作
                       </button>
                       <div class="dropdown-menu dropdown-menu-right">
-                        @if (strtotime($leave->start_date) >= strtotime(date('Y-m-01')))
+                        @if ($leave->apply_status != 'N' && $leave->apply_status != 'C' && strtotime($leave->start_date) >= strtotime(date('Y-m-01')))
                           <a class="dropdown-item" href="#" onclick="showDetailModal({{$leave->id}}, {{$login_user_no}}, 'L', true)">簽核紀錄</a>
                         @else
                           <a class="dropdown-item" href="#" onclick="showDetailModal({{$leave->id}}, {{$login_user_no}}, 'L', false)">簽核紀錄</a>
