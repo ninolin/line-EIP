@@ -43,7 +43,7 @@
             <td scope="col">{{$cname}}</td>
             <td scope="col">{{$onboard_date}}</td>
             @foreach($types as $type)
-              <td> {{$type->hours}}小時 </td>
+              <td> {{$type->days}}天({{$type->hours}}小時) </td>
             @endforeach
           </tr>
         </tbody>

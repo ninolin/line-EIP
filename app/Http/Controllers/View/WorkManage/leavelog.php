@@ -170,7 +170,11 @@ class leavelog extends Controller
                 }
             }
             $leave_day = $this->annualLeaveRepo->findAnnualDays($user_no, date('Y'));
-            array_push($types, (object) array('name' => '可用休假', 'hours' => $leave_day*8));
+            foreach ($types as $type) {
+                $type->name = "已用".$type->name;
+                $type->days = round($type->hours/8, 2);
+            }
+            array_push($types, (object) array('name' => '可用休假總數', 'hours' => $leave_day*8, 'days' => $leave_day));
         }
 
         return view('contents.WorkManage.individuallog', [
