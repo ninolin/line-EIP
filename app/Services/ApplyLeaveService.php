@@ -4,9 +4,10 @@ namespace App\Services;
 
 use App\Repositories\UserRepository;
 use App\Repositories\LeaveApplyRepository;
-use App\Providers\LeaveProvider;
+use Config;
 use Log;
 use Exception;
+use DB;
 
 class ApplyLeaveService 
 {
@@ -43,7 +44,7 @@ class ApplyLeaveService
                 strtotime($end_datetime)>strtotime(date("Y").'-12-31 23:59:59')
             ) {
                 //檢查今年的假夠不夠
-                $r = json_decode(json_encode(LeaveProvider::getLeaveHours($start_datetime, date("Y").'-12-31 23:59:59', $work_class_id)));
+                $r = json_decode(json_encode(self::getLeaveHours($start_datetime, date("Y").'-12-31 23:59:59', $work_class_id)));
                 if($r->status != "successful") throw new Exception($r->message);
                 $leave_this_y_hours = $r->leave_hours;
 
@@ -59,7 +60,7 @@ class ApplyLeaveService
                     throw new Exception('請假失敗:今年已無足夠的休假可用'); 
                 }
                 //檢查明年的假夠不夠
-                $r = json_decode(json_encode(LeaveProvider::getLeaveHours((date("Y")+1).'-01-01 00:00:00', $end_datetime, $work_class_id)));
+                $r = json_decode(json_encode(self::getLeaveHours((date("Y")+1).'-01-01 00:00:00', $end_datetime, $work_class_id)));
                 if($r->status != "successful") throw new Exception($r->message);
                 $leave_next_y_hours = $r->leave_hours;
                 
@@ -157,5 +158,141 @@ class ApplyLeaveService
                 }
             }
         }
+    }
+
+    /**
+     * 回傳2個時間的休假小時
+     *
+     * @param  datetime  $start_datetime Y-m-dTH:i
+     * @param  datetime  $end_datetime  Y-m-dTH:i
+     * @param  int  $work_class_id
+     * @return float 
+     */
+    public static function getLeaveHours($start_datetime, $end_datetime, $work_class_id) {
+        try {
+            $start_date = date_format(date_create($start_datetime),"Y-m-d");
+            $end_date = date_format(date_create($end_datetime),"Y-m-d");
+            $start_time = date_format(date_create($start_datetime),"H:i:s");
+            $end_time = date_format(date_create($end_datetime),"H:i:s");
+
+            $work_start = "";
+            $work_end = "";
+            $lunch_start = "";
+            $lunch_end = "";
+            $sql  = 'select * from eip_work_class where id =?';
+            $workclasses = DB::select($sql, [$work_class_id]);
+            if(count($workclasses) == 1) {
+                foreach ($workclasses as $w) {
+                    $work_start = $w->work_start;
+                    $work_end = $w->work_end;
+                    $lunch_start = $w->lunch_start;
+                    $lunch_end = $w->lunch_end;
+                }
+            } else {
+                throw new Exception('work_class_id error');
+            }
+
+            $dates = self::dates2array($start_date, $end_date);
+            $leave_hours = 0;
+            if(count($dates) == 1) { 
+                //只請一天
+                if(self::is_offday_by_gcalendar($start_date) == 8) { //先確定當天是不是休息日，不是休息日的話再來算請假小時
+                    $xx = self::cal_timediff($start_time, $end_time, $work_start, $work_end, $lunch_start, $lunch_end);
+                    $leave_hours += self::cal_timediff($start_time, $end_time, $work_start, $work_end, $lunch_start, $lunch_end);
+                }
+            } else if(count($dates) > 1){    
+                //請超過一天(正常上班時間為08:00-17:00)
+                foreach ($dates as $key=>$d) {
+                    if($key == 0) {
+                        if(self::is_offday_by_gcalendar($start_date) == 8) {
+                            $leave_hours += self::cal_timediff($start_time, $work_end, $work_start, $work_end, $lunch_start, $lunch_end);
+                        }
+                    } else if($key == count($dates)-1) {
+                        if(self::is_offday_by_gcalendar($end_date) == 8) {
+                            $leave_hours += self::cal_timediff($work_start, $end_time, $work_start, $work_end, $lunch_start, $lunch_end);
+                        }
+                    } else {
+                        $leave_hours += self::is_offday_by_gcalendar($d);
+                    }
+                }
+            } else {
+                throw new Exception('日期區間不合理');
+            }
+            return array('status' => 'successful', 'leave_hours' => $leave_hours);
+        } catch (Exception $e) {
+            return array('status' => 'error', 'message' => $e->getMessage());
+        }
+    }
+
+    /**
+     * 回傳2個時間間的相差小時
+     *
+     * @param  time  $time1
+     * @param  time  $time2
+     * @param  date  $work_start
+     * @param  date  $work_end
+     * @param  date  $lunch_start
+     * @param  date  $lunch_end
+     * @return float 
+     */
+    static protected function cal_timediff($time1, $time2, $work_start, $work_end, $lunch_start, $lunch_end) {
+        if($time1 <= $work_start) $time1 = $work_start;
+        if($time2 >= $work_end) $time2 = $work_end;
+
+        if(strtotime($time1) >= strtotime($lunch_end) || strtotime($time2) <= strtotime($lunch_start)) {
+            return (strtotime($time2) - strtotime($time1))/(60*60);
+        } else if(strtotime($time1) > strtotime($lunch_start) && strtotime($time1) < strtotime($lunch_end)) {
+            return (strtotime($time2) - strtotime($lunch_end))/(60*60);
+        } else if(strtotime($time2) > strtotime($lunch_start) && strtotime($time2) < strtotime($lunch_end)){
+            return (strtotime($lunch_start) - strtotime($time1))/(60*60);
+        } else {
+            return ((strtotime($time2) - strtotime($time1)) - (strtotime($lunch_end) - strtotime($lunch_start)))/(60*60);
+        }
+    }
+
+    /**
+     * 回傳2個日期間的所有日期，日期不合理回傳空array，date1和date2同天會回傳當天的array
+     *
+     * @param  date  $date1 Y-m-d
+     * @param  date  $date2 Y-m-d
+     * @return array [date, date]
+     */
+    static protected function dates2array($date1, $date2) {
+        $return= array();
+        $diff_date = (strtotime($date2) - strtotime($date1))/ (60*60*24); //計算相差之天數
+        for ($i=0; $i<=$diff_date; $i++) {
+            array_push($return, date('Y-m-d', strtotime('+'.$i.' days', strtotime($date1))));
+        }
+        return $return;
+    }
+
+    /**
+     * 檢查是否為上班日
+     *
+     * @param  date  $check_date Y-m-d
+     * @return int  8:上班日,0:休息日
+     */
+    static protected function is_offday_by_gcalendar($check_date) {
+        $gcalendar_appscript_uri = Config::get('eip.gcalendar_appscript_uri');
+        $calevents_str = self::get_req($gcalendar_appscript_uri."?type=check&checkDate=".$check_date);
+        $calevents = explode(",", $calevents_str);
+        $offhours = 8;
+        foreach ($calevents as $e) {
+            if(strpos($e,'休息日') !== false) {
+                $offhours = $offhours - 8;
+            }
+        }
+        return $offhours;
+    }
+
+    static protected function get_req($_url) {
+        $ch = curl_init(trim($_url));
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        $result = curl_exec($ch);
+        curl_close($ch);
+        return $result;
     }
 }

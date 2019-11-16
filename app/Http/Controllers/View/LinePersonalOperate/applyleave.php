@@ -6,7 +6,6 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Input;
 use App\Providers\HelperServiceProvider;
-use App\Providers\LeaveProvider;
 use App\Services\UserService;
 use App\Services\SendLineMessageService;
 use App\Repositories\LeaveApplyRepository;
@@ -166,12 +165,13 @@ class applyleave extends Controller
 
             //計算請假小時
             $leave_hours = 0;
-            $r = json_decode(json_encode(LeaveProvider::getLeaveHours($start_datetime, $end_datetime, $apply_work_class_id)));
+            $r = json_decode(json_encode($this->applyLeaveService->getLeaveHours($start_datetime, $end_datetime, $apply_work_class_id)));
             if($r->status == "successful") {
                 $leave_hours = $r->leave_hours;
             } else {
                 throw new Exception($r->message);
             }
+            if($leave_hours == 0) throw new Exception("請假小時計算後為0小時，無需請假");
 
             //檢查特休假合理性-檢查有沒有足夠的休假可用
             if($leave_annual == 1) {
