@@ -2,7 +2,7 @@
 @section('title', 'Home')
 @section('content3')
 <div class="container-fluid pt-lg-4">
-    <form>
+    <form id="apply_from">
         <div class="form-group">
             <label>假別</label>
             <select class="form-control" id="leaveType">
@@ -102,6 +102,7 @@
         })
         .then(v => {
             if(v.status == "successful") {
+                $("#apply_from")[0].reset()
                 alert("送簽中");
             } else {
                 alert(v.message);
