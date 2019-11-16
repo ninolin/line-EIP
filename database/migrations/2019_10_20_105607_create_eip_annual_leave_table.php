@@ -18,8 +18,8 @@ class CreateEipAnnualLeaveTable extends Migration
             $table->increments('id');
             $table->integer('user_no')->unsigned();
             $table->integer('year')->unsigned()->comment('年份');
-            $table->integer('annual_leaves')->unsigned()->comment('年假總天數(預設為勞基法,但可以人為修改)');
-            $table->integer('labor_annual_leaves')->unsigned()->comment('勞基法年假天數');
+            $table->float('annual_leaves', 8, 2)->unsigned()->comment('年假總天數(預設為勞基法,但可以人為修改)');
+            $table->float('labor_annual_leaves', 8, 2)->unsigned()->comment('勞基法年假天數');
         });
     }
 
