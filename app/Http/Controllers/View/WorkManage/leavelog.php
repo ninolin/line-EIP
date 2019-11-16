@@ -11,6 +11,7 @@ use App\Repositories\LeaveApplyRepository;
 use App\Repositories\LeaveTypeRepository;
 use App\Repositories\UserRepository;
 use App\Services\SendLineMessageService;
+use App\Repositories\AnnualLeaveRepository;
 use DB;
 use Log;
 use Exception;
@@ -23,13 +24,15 @@ class leavelog extends Controller
     protected $leaveTypeRepo;
     protected $userRepo;
     protected $sendLineMessageService;
+    protected $annualLeaveRepo;
 
     public function __construct(
         CalcLeaveDays $calcL,
         LeaveApplyRepository $leaveApplyRepo,
         LeaveTypeRepository $leaveTypeRepo,
         UserRepository $userRepo,
-        SendLineMessageService $sendLineMessageService
+        SendLineMessageService $sendLineMessageService,
+        AnnualLeaveRepository $annualLeaveRepo
     )
     {
         $this->calcL = $calcL;
@@ -37,6 +40,7 @@ class leavelog extends Controller
         $this->leaveTypeRepo = $leaveTypeRepo;
         $this->userRepo = $userRepo;
         $this->sendLineMessageService = $sendLineMessageService;
+        $this->annualLeaveRepo = $annualLeaveRepo;
     }
 
     /**
@@ -165,16 +169,8 @@ class leavelog extends Controller
                     }
                 }
             }
-            if(!is_null($onboard_date)) {
-                $leave_day = $this->calcL->calc_leavedays($onboard_date, $leave_year."-01-01");
-                if($leave_day == 10000) {
-                    $leave_day = 0;
-                }
-                array_push($types, (object) array('name' => '可用休假', 'hours' => $leave_day*8));
-            } else {
-                $onboard_date = '未設定';
-            }
-            
+            $leave_day = $this->annualLeaveRepo->findAnnualDays($user_no, date('Y'));
+            array_push($types, (object) array('name' => '可用休假', 'hours' => $leave_day*8));
         }
 
         return view('contents.WorkManage.individuallog', [
