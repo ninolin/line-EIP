@@ -145,11 +145,11 @@ class ApplyLeaveService
         if($users > 0) {
             foreach ($users as $u) {
                 if(
-                    $u->upper_user_no != 0 &&               //找不到第一簽核人
-                    $u->title_id != $approved_title_id &&   //找到休假的簽核職等
-                    count($array) < 10 && 
-                    !in_array($u->upper_user_no, $array) && 
-                    $u->upper_user_no != $apply_user_no
+                    $u->upper_user_no != 0 &&               //找到第一簽核人
+                    ($u->title_id != $approved_title_id || $u->NO == $apply_user_no) &&   //簽核職等不對
+                    count($array) < 10 &&                   //簽核人數量<10
+                    !in_array($u->upper_user_no, $array) && //簽核人不重覆
+                    $u->upper_user_no != $apply_user_no     //簽核人不等於申請人
                 ) {
                     array_push($array, $u->upper_user_no);
                     return self::find_upper($apply_user_no, $u->upper_user_no, $array, $approved_title_id);
