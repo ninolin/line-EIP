@@ -443,13 +443,13 @@
           <div class="form-group row">
             <label class="col-5 col-form-label">休假的新開始日期</label>
             <div class="col-7">
-              <input type="datetime-local" class="form-control date-input new_leave_start_date" value="">
+              <input type="datetime-local" min="2019-{{date('m')}}-01T00:00" class="form-control date-input new_leave_start_date" value="">
             </div>
           </div>
           <div class="form-group row">
             <label class="col-5 col-form-label">休假的新結束日期</label>
             <div class="col-7">
-              <input type="datetime-local" class="form-control date-input new_leave_end_date" value="">
+              <input type="datetime-local" min="2019-{{date('m')}}-01T00:00" class="form-control date-input new_leave_end_date" value="">
             </div>
           </div>
           <div class="form-group row">
