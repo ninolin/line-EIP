@@ -104,6 +104,11 @@
                       <div class="dropdown-menu dropdown-menu-right">
                         <a class="dropdown-item" href="#" onclick="showDetailModal({{$leave->id}}, {{$login_user_no}})">簽核紀錄</a>
                         <a class="dropdown-item" href="#" onclick="showChangeLogModal({{$leave->id}})">更新紀錄</a>
+                        @if (
+                          ($leave->apply_status == 'Y' && strtotime($leave->start_date) > strtotime(date('Y-m-d'))) || ($leave->apply_status == 'P')
+                          )
+                          <a class="dropdown-item text-danger" href="#" onclick="showCancelModal({{$leave->id}})">取消</a>
+                        @endif
                       </div>
                     </div>
                   </td>
@@ -398,6 +403,27 @@
     </div>
   </div>
 </div>
+<div class="modal fade" id="cancelModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-leave">取消</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form>
+            <div class="container-fluid form-group msg"></div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
+          <button type="button" class="btn btn-primary todo">同意</button>
+        </div>
+      </div>
+    </div>
+</div>
 <script>
 
   const showDetailModal = async (apply_id, login_user_no) => {
@@ -471,6 +497,50 @@
     }
   }
 
+  const showCancelModal = async (apply_id) => {
+    const res = await promise_call({
+          url: "../api/applyleave/"+apply_id, 
+          method: "get"
+    });
+    if(res.status == "successful") {
+        if(res.data.length > 0) $("#cancelModal").find(".msg").html("");
+        const apply = res.data[0];
+        let html = '<table class="table table-bordered table-striped">';
+            html += '   <tr><td>申請人</td><td>'+apply.cname+'</td></tr>';
+            if(apply.apply_type == 'L') {
+              html += '   <tr><td>代理人</td><td>'+apply.agent_cname+'</td></tr>';
+              html += '   <tr><td>假別</td><td>'+apply.leave_name+'('+apply.leave_hours+'小時)</td></tr>';
+              html += '   <tr><td>起</td><td>'+apply.start_date+'</td></tr>';
+              html += '   <tr><td>迄</td><td>'+apply.end_date+'</td></tr>';
+            } else {
+              html += '   <tr><td>假別</td><td>加班('+apply.over_work_hours+'小時)</td></tr>';
+              html += '   <tr><td>日期</td><td>'+apply.over_work_date+')</td></tr>';
+            }
+            html += '   <tr><td>備註</td><td>'+apply.comment+'</td></tr>';
+            html += '   <tr><td>申請日</td><td>'+apply.apply_time+'</td></tr>';
+            html += "</table>";
+            $("#cancelModal").find(".msg").html(html);
+            $("#cancelModal").find(".todo").attr("onclick", "cancel_leave('"+apply_id+"')");
+            $("#cancelModal").find(".todo").addClass("btn-primary");
+            $("#cancelModal").find(".todo").html("取消");
+            $('#cancelModal').modal('toggle');
+    } else {
+      alert("找不到申請紀錄");
+    }
+  }
+
+  const cancel_leave = async (apply_id) => {
+    const res = await promise_call({
+          url: "../api/individuallog/"+apply_id, 
+          method: "put"
+    });
+    if(res.status == "successful") {
+      window.location.reload();
+    } else {
+      alert("取消失敗");
+    }
+  }
+
   const get_applyleave = (apply_id) => {
     return promise_call({
         url: "../api/applyleave/"+apply_id, 
@@ -481,6 +551,7 @@
   const change_year = () => {
     document.forms['search_form'].submit();
   }
+
   window.onload = function() {
     $('.blade_select2').select2();
   };
