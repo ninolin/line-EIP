@@ -14,8 +14,16 @@
         <div class="weui-flex"><div class="weui-flex__item mobile_topbar">工時紀錄</div></div>
         <div class="text-center">
             <div id="useridfield" style="display:none"></div>
-            <div class="weui-cells" id="leave_type_data">
-               
+            <div class="weui-cells" id="leave_type_data"></div>
+        </div>
+        <div style="display: none;" id="no_bind_alert">
+            <div class="weui-mask"></div>
+            <div class="weui-dialog">
+                <div class="weui-dialog__hd"><strong class="weui-dialog__title">錯誤</strong></div>
+                <div class="weui-dialog__bd">目前未完成綁定，無法使用Everplast員工服務</div>
+                <div class="weui-dialog__ft">
+                    <a href="javascript:;" class="weui-dialog__btn weui-dialog__btn_primary" onclick="close_no_bind_alert()">確定</a>
+                </div>
             </div>
         </div>
     </body>
@@ -34,18 +42,22 @@
 
         function initializeApp(data) {
             document.getElementById('useridfield').textContent = data.context.userId;
-            promise_call({
-                url: "./api/individuallog/leavetype", 
-                method: "get"
-            })
+            Promise.all([
+                promise_call({url: "./api/userlist/checklineid/"+data.context.userId, method: "get"}),
+                promise_call({url: "./api/individuallog/leavetype", method: "get"}),
+            ])
             .then(v => {
-                if(v.status != 'successful') {
+                if(v[0].status == "successful" && v[0].data.length == 0) {
+                    $("#no_bind_alert").show();
+                    return;
+                } 
+                if(v[1].status != 'successful') {
                     alert("get data error");
                 } else {
-                    if(v.data.length > 0) $("#leave_type_data").html("");
+                    if(v[1].data.length > 0) $("#leave_type_data").html("");
                     $html = "";
-                    v.data.unshift({name: '簽核中'});
-                    v.data.map(item => {     
+                    v[1].data.unshift({name: '簽核中'});
+                    v[1].data.map(item => {     
                         $html +=  '<a class="weui-cell weui-cell_access" href="./individuallog/leavetype/'+item.name+'/'+data.context.userId+'">';
                         $html +=  ' <div class="weui-cell__bd"><p>'+item.name+'</p></div>';
                         $html +=  ' <div class="weui-cell__ft"></div>';

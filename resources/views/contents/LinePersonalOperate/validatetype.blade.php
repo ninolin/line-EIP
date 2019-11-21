@@ -17,9 +17,20 @@
             <div class="weui-cells" id="validate_type_data">
             </div>
         </div>
+        <div style="display: none;" id="no_bind_alert">
+            <div class="weui-mask"></div>
+            <div class="weui-dialog">
+                <div class="weui-dialog__hd"><strong class="weui-dialog__title">錯誤</strong></div>
+                <div class="weui-dialog__bd">目前未完成綁定，無法使用Everplast員工服務</div>
+                <div class="weui-dialog__ft">
+                    <a href="javascript:;" class="weui-dialog__btn weui-dialog__btn_primary" onclick="close_no_bind_alert()">確定</a>
+                </div>
+            </div>
+        </div>
     </body>
     <script src="{{ asset('js/jquery/jquery.min.js') }}"></script>
     <script src="https://d.line-scdn.net/liff/1.0/sdk.js"></script>
+    <script src="{{ asset('js/restcall.js') }}"></script>
     <script>
         window.onload = function (e) {
             liff.init(function (data) {
@@ -31,15 +42,25 @@
         };
 
         function initializeApp(data) {
-            $html =  '<a class="weui-cell weui-cell_access" href="../validateleave/unvalidate/'+data.context.userId+'">';
-            $html +=  ' <div class="weui-cell__bd"><p>未簽核</p></div>';
-            $html +=  ' <div class="weui-cell__ft"></div>';
-            $html +=  '</a>';
-            $html +=  '<a class="weui-cell weui-cell_access" href="../validateleave/validate/'+data.context.userId+'">';
-            $html +=  ' <div class="weui-cell__bd"><p>已簽核</p></div>';
-            $html +=  ' <div class="weui-cell__ft"></div>';
-            $html +=  '</a>';
-            $("#validate_type_data").append($html);
+            promise_call({
+                url: "./api/userlist/checklineid/"+data.context.userId, 
+                method: "get"
+            })
+            .then(v => {
+                if(v.status == "successful" && v.data.length == 0) {
+                    $("#no_bind_alert").show();
+                    return;
+                } 
+                $html =  '<a class="weui-cell weui-cell_access" href="../validateleave/unvalidate/'+data.context.userId+'">';
+                $html +=  ' <div class="weui-cell__bd"><p>未簽核</p></div>';
+                $html +=  ' <div class="weui-cell__ft"></div>';
+                $html +=  '</a>';
+                $html +=  '<a class="weui-cell weui-cell_access" href="../validateleave/validate/'+data.context.userId+'">';
+                $html +=  ' <div class="weui-cell__bd"><p>已簽核</p></div>';
+                $html +=  ' <div class="weui-cell__ft"></div>';
+                $html +=  '</a>';
+                $("#validate_type_data").append($html);
+            })
         }
 
     </script>
