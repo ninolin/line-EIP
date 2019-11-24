@@ -149,8 +149,8 @@ class individuallog extends Controller
                 'is_annual'             =>  $is_annual,
                 'is_compensatory'       =>  $is_compensatory,
                 'annual_hours'          =>  $annual_hours,
-                'next_y_annual_hours'   => $next_y_annual_hours,
-                'pre_y_annual_use_hours'=> $pre_y_annual_use_hours
+                'next_y_annual_hours'   =>  $next_y_annual_hours,
+                'pre_y_annual_use_hours'=>  $pre_y_annual_use_hours
             ]);
         } catch (Exception $e) {
             return response()->json([

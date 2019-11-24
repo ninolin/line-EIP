@@ -31,6 +31,20 @@
             </div>
             <div class="weui-flex__item mobile_topbar">工時紀錄</div>
         </div>
+        <div class="weui-flex search_flex">
+            <div class="weui-cell weui-cell_select weui-cell_select-after" style="width: 100%;">
+                <div class="weui-cell__hd"><span class="weui-label">狀態</span></div>
+                <div class="weui-cell__bd">
+                    <select id="leave_type_select" class="weui-select" onchange="search()">
+                        <option value="0">全部</option>
+                        <option value="P">簽核中</option>
+                        <option value="Y">已簽核</option>
+                        <option value="N">已拒絕</option>
+                        <option value="C">已取消</option>
+                    </select>
+                </div>
+            </div>
+        </div> 
         <div>
             <div class="weui-cells__title"></div>
             <div class="weui-cells">
@@ -79,7 +93,7 @@
             <div class="main-section" id="leave_data">
                 @if (count($leaves) > 0)
                     @foreach($leaves as $leave)
-                        <div class="weui-form-preview mb-3"> 
+                        <div class="weui-form-preview mb-3 leave_type_{{$leave->apply_status}}"> 
                             <div class="weui-form-preview__hd" style="padding: 5px 16px;">
                                 @if ($leave->apply_type == 'L')
                                     <label class="weui-form-preview__label" style="color: black;">{{$leave->leave_name}}</label>
@@ -229,6 +243,15 @@
             }).then(v => {
                 window.location.reload();
             })
+        }
+
+        const search = () => {
+            $(".weui-form-preview").hide();
+            if($("#leave_type_select").val() == 0) {
+                $(".weui-form-preview").show();
+            } else {
+                $(".leave_type_"+$("#leave_type_select").val()).show();
+            }
         }
     </script>
 </html>

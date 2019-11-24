@@ -109,7 +109,7 @@ class LeaveApplyRepository {
                 $count_data = array_merge($count_data, $leave_type);
             }
 
-            $sql .=' order by start_date';
+            $sql .=' order by start_date DESC ';
 
             if (!is_null($page)) {
                 $sql .= ' limit '.(($page-1)*10).',10 ';
@@ -185,7 +185,7 @@ class LeaveApplyRepository {
                 array_push($count_data, $end_date);
             }
 
-            $sql .=' order by over_work_date';
+            $sql .=' order by over_work_date DESC ';
 
             if (!is_null($page)) {
                 $sql .= ' limit '.(($page-1)*10).',10 ';
