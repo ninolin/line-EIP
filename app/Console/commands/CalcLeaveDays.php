@@ -13,6 +13,7 @@ class CalcLeaveDays extends Command
     protected $description = '用受顧日期來更新user可休假天數';
     protected $month_days = [0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
     protected $leave_days = [7, 10, 14, 14, 15, 15, 15, 15, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30];
+    protected $MAX_DIFF_YEAR = 24;
 
     public function __construct()
     {
@@ -87,6 +88,8 @@ class CalcLeaveDays extends Command
         } else if($today_m == "01" && $today_d == "01" && $today_y > $onboard_y) {
             // 每年1/1要計算當年的假
             $diff_y = $today_y - $onboard_y;
+            if($diff_y > $this->MAX_DIFF_YEAR) return round(30, 1);
+
             $last_y_leave = 0;
             if($diff_y == 1) {
                 $last_y_leave = (($onboard_m-1) + ($onboard_d-1)/$this->month_days[(int)$onboard_m] )/6 * 3;
