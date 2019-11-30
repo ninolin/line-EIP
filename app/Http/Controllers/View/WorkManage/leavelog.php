@@ -328,45 +328,55 @@ class leavelog extends Controller
      */
     public function change_leave_date(Request $request)
     {
-        $apply_id               = $request->get('apply_id');
-        $new_leave_start_date   = $request->get('new_leave_start_date');
-        $new_leave_end_date     = $request->get('new_leave_end_date');
-        $reason                 = $request->get('reason');
-        $login_user_no          = $request->get('login_user_no');
+        try {    
+            $apply_id               = $request->get('apply_id');
+            $new_leave_start_date   = $request->get('new_leave_start_date');
+            $new_leave_end_date     = $request->get('new_leave_end_date');
+            $reason                 = $request->get('reason');
+            $login_user_no          = $request->get('login_user_no');
 
-        $apply_leave        = $this->leaveApplyRepo->findApplyLeave($apply_id);
-        $work_class_id      = $apply_leave[0]->work_class_id;
-        $event_id           = $apply_leave[0]->event_id;
-        $apply_status       = $apply_leave[0]->apply_status;
-        $leave_name         = $apply_leave[0]->leave_name;
-        $apply_user_cname   = $apply_leave[0]->cname;
-        $leave_hours        = 0;
-        $insert_event       = null;
+            $apply_leave        = $this->leaveApplyRepo->findApplyLeave($apply_id);
+            $work_class_id      = $apply_leave[0]->work_class_id;
+            $event_id           = $apply_leave[0]->event_id;
+            $apply_status       = $apply_leave[0]->apply_status;
+            $leave_name         = $apply_leave[0]->leave_name;
+            $apply_user_cname   = $apply_leave[0]->cname;
+            $leave_hours        = 0;
+            $insert_event       = null;
 
-        //重算休假小時
-        $r = json_decode(json_encode(LeaveProvider::getLeaveHours($new_leave_start_date, $new_leave_end_date, $work_class_id)));
-        if($r->status == "successful") {
-            $leave_hours = $r->leave_hours;
-        } else {
-            throw new Exception($r->message);
-        }
-        
-        if($apply_status == 'Y') {
-            LeaveProvider::delete_event_from_gcalendar($event_id);
-            $insert_event = LeaveProvider::insert_event2gcalendar($new_leave_start_date, $new_leave_end_date, $apply_user_cname."的".$leave_name);
+            $new_leave_start_date_m = date('m', strtotime($new_leave_start_date));
+            if($new_leave_start_date_m < date('m')) throw new Exception("無法修改為".date('Y')."年".date('m')."月前的日期");
+
+            //重算休假小時
+            $r = json_decode(json_encode(LeaveProvider::getLeaveHours($new_leave_start_date, $new_leave_end_date, $work_class_id)));
+            if($r->status == "successful") {
+                $leave_hours = $r->leave_hours;
+            } else {
+                throw new Exception($r->message);
+            }
             
-        }
+            if($apply_status == 'Y') {
+                LeaveProvider::delete_event_from_gcalendar($event_id);
+                $insert_event = LeaveProvider::insert_event2gcalendar($new_leave_start_date, $new_leave_end_date, $apply_user_cname."的".$leave_name);
+                
+            }
 
-        $update = $this->leaveApplyRepo->update_leave_date($apply_id, $new_leave_start_date, $new_leave_end_date, $reason, $login_user_no, $leave_hours, $insert_event);
-        if($update["status"] == "successful") {
-            $this->sendLineMessageService->sendUpdateNotify($apply_id, 'change_leave_date');
-        } else {
-            throw new Exception($update["message"]);
+            $update = $this->leaveApplyRepo->update_leave_date($apply_id, $new_leave_start_date, $new_leave_end_date, $reason, $login_user_no, $leave_hours, $insert_event);
+            if($update["status"] == "successful") {
+                $this->sendLineMessageService->sendUpdateNotify($apply_id, 'change_leave_date');
+            } else {
+                throw new Exception($update["message"]);
+            }
+            
+            return response()->json([
+                'status' => 'successful'
+            ]);
+        } catch (Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => $e->getMessage()
+            ], 500);
         }
-        
-        return response()->json([
-            'status' => 'successful'
-        ]);
     }
 
     /**
@@ -376,20 +386,31 @@ class leavelog extends Controller
      */
     public function change_overwork_date(Request $request)
     {
-        $apply_id           = $request->get('apply_id');
-        $new_overwork_date  = $request->get('new_overwork_date');
-        $new_overwork_hours = $request->get('new_overwork_hours');
-        $reason             = $request->get('reason');
-        $login_user_no      = $request->get('login_user_no');
-        $update = $this->leaveApplyRepo->update_overwork_date($apply_id, $new_overwork_date, $new_overwork_hours, $reason, $login_user_no);
-        if($update["status"] == "successful") {
-            $this->sendLineMessageService->sendUpdateNotify($apply_id, 'change_overwork_date');
-        } else {
-            throw new Exception($update["message"]);
+        try {    
+            $apply_id           = $request->get('apply_id');
+            $new_overwork_date  = $request->get('new_overwork_date');
+            $new_overwork_hours = $request->get('new_overwork_hours');
+            $reason             = $request->get('reason');
+            $login_user_no      = $request->get('login_user_no');
+            
+            $new_overwork_date_m = date('m', strtotime($new_overwork_date));
+            if($new_overwork_date_m < date('m')) throw new Exception("無法修改為".date('Y')."年".date('m')."月前的日期");
+
+            $update = $this->leaveApplyRepo->update_overwork_date($apply_id, $new_overwork_date, $new_overwork_hours, $reason, $login_user_no);
+            if($update["status"] == "successful") {
+                $this->sendLineMessageService->sendUpdateNotify($apply_id, 'change_overwork_date');
+            } else {
+                throw new Exception($update["message"]);
+            }
+            return response()->json([
+                'status' => 'successful'
+            ]);
+        } catch (Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => $e->getMessage()
+            ], 500);
         }
-        return response()->json([
-            'status' => 'successful'
-        ]);
     }
     
     /**
