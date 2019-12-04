@@ -15,6 +15,7 @@ class LeaveProcessRepository {
 
     public function findApplyProcess(
         $upper_user_no = null, 
+        $apply_user_no = null, 
         $is_validate = null, 
         $page = null
     ) 
@@ -27,6 +28,13 @@ class LeaveProcessRepository {
             $where_sql = 'select a.id as process_id, b.* 
                     from eip_leave_apply_process a, eip_leave_apply b 
                     where a.apply_id = b.id';
+
+            if (!is_null($apply_user_no)) {
+                $where_sql .= ' and a.apply_user_no = ? ';
+                $count_sql .= ' and apply_user_no = ? ';
+                array_push($query_data, $apply_user_no);
+                array_push($count_data, $apply_user_no);
+            }
 
             if (!is_null($upper_user_no)) {
                 $where_sql .= ' and a.upper_user_no = ? ';
@@ -55,7 +63,6 @@ class LeaveProcessRepository {
                         left join eip_leave_type on a.leave_type = eip_leave_type.id
                         left join user as u2 on a.apply_user_no = u2.NO
                     order by id desc';
-
             if (!is_null($page)) {
                 $sql .= ' limit '.(($page-1)*10).',10 ';
             }
@@ -81,11 +88,30 @@ class LeaveProcessRepository {
      * 
      */
     public function findUnValidateApplyProcess(
-        $upper_user_no = null, 
+        $upper_user_no = null,
+        $apply_user_no = null, 
         $page = null
     ) 
     {
         try {
+
+            $query_data = [];
+            $where_sql = '  select a.id as process_id, b.* 
+                            from eip_leave_apply_process a, eip_leave_apply b 
+                            where 
+                                a.apply_id = b.id and 
+                                a.is_validate IS NULL and 
+                                b.apply_status = "P" '; 
+
+            if (!is_null($apply_user_no)) {
+                $where_sql .= ' and a.apply_user_no = ? ';
+                array_push($query_data, $apply_user_no);
+            }
+
+            if (!is_null($upper_user_no)) {
+                $where_sql .= ' and a.upper_user_no = ? ';
+                array_push($query_data, $upper_user_no);
+            }
 
             $sql  = 'select 
                         a.*, 
@@ -93,19 +119,12 @@ class LeaveProcessRepository {
                         u1.cname as agent_cname, 
                         eip_leave_type.name as leave_name
                     from 
-                        (   select a.id as process_id, b.* 
-                            from eip_leave_apply_process a, eip_leave_apply b 
-                            where 
-                                a.apply_id = b.id and 
-                                a.is_validate IS NULL and 
-                                b.apply_status = "P" and 
-                                a.upper_user_no =? 
-                        ) as a
+                        ( '.$where_sql.' ) as a
                         left join user as u1 on a.agent_user_no = u1.NO
                         left join eip_leave_type on a.leave_type = eip_leave_type.id
                         left join user as u2 on a.apply_user_no = u2.NO
                     order by id desc';
-            $data = DB::select($sql, [$upper_user_no]);
+            $data = DB::select($sql, $query_data);
             $new_data = [];
             foreach ($data as $d) {
                 //去檢查這個no是不是這張假單的下一個簽核人

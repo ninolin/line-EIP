@@ -17,6 +17,20 @@
   }
 </style>
 <div class="container-fluid pt-lg-4">
+  <form id="search_form" method="POST" action="{{ route('webpo_validate') }}">
+    {{ csrf_field() }}
+    <div class="row">
+      <div class="col-sm-4 form-row">
+        <div class="col-auto">
+          <input type="text" name="search" class="form-control" placeholder="申請人" value="{{ $search }}">
+        </div>
+        <div class="col-auto">
+          <button type="submit" class="btn-c">搜尋</button>
+        </div>
+      </div>
+    </div>
+  </form>
+  </br>
   <nav>
     <div class="nav nav-tabs" id="nav-tab" role="tablist">
       <a class="nav-item nav-link @if ($show_tab === 'unvalidate_apply') active @endif" id="nav-unvalidate-tab" data-toggle="tab" href="#nav-unvalidate" role="tab" aria-controls="nav-unvalidate" aria-selected="false">待簽核</a>
@@ -444,6 +458,11 @@
           //$('#validateModal').modal('toggle');
         } 
     })
+  }
+
+  const reload_page = () => {
+    $("#search_form").attr("action", "./validate?apply_cname="+page);
+    $("#search_form").submit();
   }
 </script>
 @endsection

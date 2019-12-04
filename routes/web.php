@@ -44,6 +44,7 @@ Route::middleware('auth')->get('/work/manage/applyoverwork', 'View\WorkManage\ap
 Route::middleware('auth')->get('/webpo/applyleave', 'View\WebPersonalOperate\applyleave@show_view')->name('webpo_applyleave');
 Route::middleware('auth')->get('/webpo/applyoverwork', 'View\WebPersonalOperate\applyoverwork@show_view')->name('webpo_applyoverwork');
 Route::middleware('auth')->get('/webpo/validate', 'View\WebPersonalOperate\validate@show_view')->name('webpo_validate');
+Route::middleware('auth')->post('/webpo/validate', 'View\WebPersonalOperate\validate@show_view')->name('webpo_validate');
 Route::middleware('auth')->get('/webpo/individual', 'View\WebPersonalOperate\individuallog@show_view')->name('webpo_individual');
 
 Route::get('/calendar', function () {return view('contents.calendar');})->name('calendar');
